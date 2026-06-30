@@ -51,17 +51,21 @@ export function getMockZoneSeries(zoneId) {
       .split('')
       .reduce((acc, c) => acc + c.charCodeAt(0), 7),
   )
-  // Day-ahead clears once per hour: a flat reference for the mock hour.
-  const dayAhead = round1(clampPrice(base + 4))
 
+  // 24h of 5-min points (288) with a diurnal shape; day-ahead steps per hour.
   const points = []
-  for (let i = 0; i < 12; i++) {
-    const drift = 6 * Math.sin(i / 2)
-    points.push({
-      label: `:${String(i * 5).padStart(2, '0')}`,
-      zonePrice: round1(clampPrice(base + drift + (rand() - 0.5) * 8)),
-      dayAhead,
-    })
+  for (let hour = 0; hour < 24; hour++) {
+    const diurnal =
+      14 * Math.sin(((hour - 6) / 24) * Math.PI * 2) +
+      18 * Math.exp(-Math.pow(hour - 18, 2) / 6)
+    const dayAhead = round1(clampPrice(base + diurnal * 0.9 + 4))
+    for (let i = 0; i < 12; i++) {
+      points.push({
+        label: `${String(hour).padStart(2, '0')}:${String(i * 5).padStart(2, '0')}`,
+        zonePrice: round1(clampPrice(base + diurnal + (rand() - 0.5) * 10)),
+        dayAhead,
+      })
+    }
   }
   return points
 }

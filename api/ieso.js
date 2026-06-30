@@ -16,9 +16,13 @@ import { XMLParser } from 'fast-xml-parser'
 
 // --- Report sources (public, no login) -------------------------------------
 const REPORTS = {
-  // Per-virtual-zone 5-min energy prices (map + per-zone chart series).
+  // Per-virtual-zone 5-min energy prices. The base file is the current hour
+  // (used for the map); the directory holds dated hourly archives we stitch
+  // into a rolling 24h chart series.
   zonalPrices:
     'https://reports-public.ieso.ca/public/RealtimeZonalEnergyPrices/PUB_RealtimeZonalEnergyPrices.xml',
+  zonalPricesDir:
+    'https://reports-public.ieso.ca/public/RealtimeZonalEnergyPrices/',
   // Province-wide real-time Ontario Zonal Price (headline price tile).
   ontarioPrice:
     'https://reports-public.ieso.ca/public/RealtimeOntarioZonalPrice/PUB_RealtimeOntarioZonalPrice.xml',
@@ -221,30 +225,66 @@ async function handleSnapshot(debug) {
   return payload
 }
 
+// Fetch the most recent `hours` hourly zonal-price files from the report's
+// directory autoindex (highest revision per hour) and parse them. Stateless —
+// no storage. Returns parsed trees oldest→newest, or [] if the index can't be
+// read (caller falls back to the current-hour file).
+async function fetchZonalArchive(hours = 24) {
+  const html = await fetchText(REPORTS.zonalPricesDir)
+  const re = /PUB_RealtimeZonalEnergyPrices_(\d{10})_v(\d+)\.xml/g
+  const latest = new Map() // stamp -> { v, file }
+  let m
+  while ((m = re.exec(html))) {
+    const [file, stamp, v] = [m[0], m[1], Number(m[2])]
+    const cur = latest.get(stamp)
+    if (!cur || v > cur.v) latest.set(stamp, { v, file })
+  }
+  const stamps = [...latest.keys()].sort().slice(-hours)
+  const trees = await Promise.all(
+    stamps.map((s) =>
+      fetchXml(REPORTS.zonalPricesDir + latest.get(s).file).catch(() => null),
+    ),
+  )
+  return trees.filter(Boolean).map(parseZonalPrices)
+}
+
 async function handleSeries(zoneIdParam, debug) {
-  const [zonalTree, daTree] = await Promise.all([
-    fetchXml(REPORTS.zonalPrices).catch(() => null),
+  const [archive, daTree, currentTree] = await Promise.all([
+    fetchZonalArchive(24).catch(() => []),
     fetchXml(REPORTS.daPrice).catch(() => null),
+    fetchXml(REPORTS.zonalPrices).catch(() => null), // current-hour fallback
   ])
 
-  const zonal = zonalTree ? parseZonalPrices(zonalTree) : { byZone: {} }
   const da = daTree ? parseDAHourly(daTree) : { byHour: new Map() }
 
-  const zoneIntervals = zonal.byZone[zoneIdParam]?.intervals ?? []
-  // Day-ahead is a single cleared price for the whole hour; draw it as a flat
-  // reference across the current hour's 5-min intervals.
-  const dayAhead = da.byHour.get(zonal.deliveryHour) ?? null
+  // Prefer the rolling 24h archive; fall back to just the current hour.
+  let hourly = archive
+  let usedArchive = archive.length > 0
+  if (!usedArchive && currentTree) hourly = [parseZonalPrices(currentTree)]
 
-  const series = zoneIntervals
-    .filter((p) => p.price != null)
-    .map((p) => ({
-      label: intervalLabel(zonal.deliveryHour, p.interval),
-      zonePrice: p.price,
-      dayAhead,
-    }))
+  const series = []
+  for (const h of hourly) {
+    const intervals = h.byZone?.[zoneIdParam]?.intervals ?? []
+    // Day-ahead clears once per hour; repeat it across that hour's 5-min steps.
+    const dayAhead = da.byHour.get(h.deliveryHour) ?? null
+    for (const p of intervals) {
+      if (p.price == null) continue
+      series.push({
+        label: intervalLabel(h.deliveryHour, p.interval),
+        zonePrice: p.price,
+        dayAhead,
+      })
+    }
+  }
 
   const payload = { series, asOf: new Date().toISOString() }
-  if (debug) payload.raw = { zonalPrices: zonalTree, daPrice: daTree }
+  if (debug) {
+    payload.debug = {
+      usedArchive,
+      hoursFetched: hourly.length,
+      points: series.length,
+    }
+  }
   return payload
 }
 

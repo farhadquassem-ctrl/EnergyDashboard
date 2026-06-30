@@ -34,12 +34,13 @@ function ChartTooltip({ active, payload, label }) {
 }
 
 /**
- * Right column: current-hour 5-min price for the selected zone vs the
- * province-wide Ontario price. (The public real-time report covers the current
- * dispatch hour; a longer history needs an additional report — see README.)
+ * Right column: rolling ~24h of 5-min real-time price for the selected zone,
+ * with the province day-ahead cleared price overlaid as a per-hour reference.
  */
 export default function PriceChart({ zoneName, data = [], loading, isLive }) {
   const empty = !loading && data.length === 0
+  // Thin the x-axis to ~8 labels regardless of how many 5-min points there are.
+  const tickInterval = Math.max(0, Math.floor(data.length / 8))
   return (
     <div className="flex h-full flex-col rounded-xl border border-zinc-800 bg-panel p-4">
       <div className="mb-3 flex items-baseline justify-between">
@@ -47,7 +48,7 @@ export default function PriceChart({ zoneName, data = [], loading, isLive }) {
           Real-Time Price — {zoneName}
         </h2>
         <span className="text-xs text-zinc-500">
-          $/MWh · 5-min{!loading && !isLive ? ' · mock' : ''}
+          $/MWh · 24h{!loading && !isLive ? ' · mock' : ''}
         </span>
       </div>
 
@@ -74,7 +75,8 @@ export default function PriceChart({ zoneName, data = [], loading, isLive }) {
               dataKey="label"
               stroke={AXIS_COLOR}
               tick={{ fontSize: 10, fill: AXIS_COLOR }}
-              interval="preserveStartEnd"
+              interval={tickInterval}
+              minTickGap={24}
             />
             <YAxis
               stroke={AXIS_COLOR}

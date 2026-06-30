@@ -135,8 +135,10 @@ header is parsed (not assumed) to locate the `Ontario Demand` column.
 
 - `?report=snapshot` → `{ zones:[{id,lmp}], snapshot:{demandMW,price,systemCondition}, asOf }`
 - `?report=series&zone=<id>` → `{ series:[{label,zonePrice,dayAhead}], asOf }`
-  — `zonePrice` is the zone's 5-min real-time price for the current hour;
-  `dayAhead` is the province day-ahead cleared price for that hour (flat).
+  — a rolling ~24h of 5-min `zonePrice` for the zone, stitched from the hourly
+  archive files; `dayAhead` is the province day-ahead cleared price for each
+  hour (a per-hour step across the window). `&debug=1` adds
+  `{ usedArchive, hoursFetched, points }`.
 - add `&debug=1` to either → also returns the **raw parsed report tree(s)**.
 
 The frontend (`src/data/iesoClient.js` + `useIesoData.js`) calls these, merges
@@ -170,11 +172,15 @@ behaviours still depend on the live server over time — open
 
 ### Known limitations / next enhancements
 
-- **Chart window is the current hour only.** The real-time zonal price report
-  covers the current dispatch hour (≤12 five-minute points), so early in an hour
-  the real-time line is short; the day-ahead line is the flat cleared price for
-  that hour. A full 24h real-time history would need to accumulate hourly
-  snapshots or a daily report.
+- **Chart spans a rolling ~24h**, stitched from the hourly archive files in the
+  `RealtimeZonalEnergyPrices/` directory (there is no single 24h report). This is
+  **stateless** — no storage/cron. If the directory autoindex can't be read, the
+  chart falls back to just the current hour. Verify on the deployed app:
+  `…/api/ieso?report=series&zone=toronto&debug=1` should show
+  `usedArchive: true`, `hoursFetched` near 24, and `points` in the low hundreds
+  (≈288 when every hour is complete). If `usedArchive` is `false`, the autoindex
+  format/retention differs — check the `fetchZonalArchive` regex against the
+  live directory listing.
 - **Day-ahead is province-wide**, while the real-time line is per-zone — the
   chart compares a zone's real-time price against the Ontario day-ahead price.
   Per-zone day-ahead would need a zonal day-ahead report.
