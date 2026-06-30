@@ -90,7 +90,7 @@ export default function PriceChart({ zoneName, data = [], loading, isLive }) {
             <Line
               type="monotone"
               dataKey="zonePrice"
-              name="This zone"
+              name="This zone (RT)"
               stroke="#38bdf8"
               strokeWidth={2}
               dot={false}
@@ -99,8 +99,8 @@ export default function PriceChart({ zoneName, data = [], loading, isLive }) {
             />
             <Line
               type="monotone"
-              dataKey="ontarioPrice"
-              name="Ontario"
+              dataKey="dayAhead"
+              name="Day-Ahead (Ontario)"
               stroke="#f59e0b"
               strokeWidth={2}
               strokeDasharray="5 4"

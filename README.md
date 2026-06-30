@@ -121,18 +121,22 @@ Reports used (field mappings confirmed against `docs/Sample-Reports/`):
 | Purpose | Report |
 | --- | --- |
 | Per-zone 5-min price (map colour + chart "This zone" line) | `RealtimeZonalEnergyPrices/PUB_RealtimeZonalEnergyPrices.xml` |
-| Province-wide price (price tile + chart "Ontario" line) | `RealtimeOntarioZonalPrice/PUB_RealtimeOntarioZonalPrice.xml` |
-| Ontario demand (demand tile + GA risk) | `RealtimeZonalDemand/PUB_RealtimeZonalDemand.csv` |
+| Province-wide real-time price (headline price tile) | `RealtimeOntarioZonalPrice/PUB_RealtimeOntarioZonalPrice.xml` |
+| Day-ahead hourly price (chart "Day-Ahead" line) | `DAHourlyOntarioZonalPrice/PUB_DAHourlyOntarioZonalPrice.xml` |
+| Ontario demand (demand tile + GA risk) | `Demand/PUB_Demand.csv` |
 
 Zone names in the price report are virtual-zone hubs (`TORONTO:HUB`,
 `NORTHWEST:HUB`, …); we strip `:HUB` and match the 7 plotted zones. Each zone
 lists 12 five-minute `IntervalPrice` rows for the current `DELIVERYHOUR`; the
-"current price" is the latest interval that has a value.
+"current price" is the latest interval that has a value. The demand report's
+header is parsed (not assumed) to locate the `Ontario Demand` column.
 
 ### API endpoints (`/api/ieso`)
 
 - `?report=snapshot` → `{ zones:[{id,lmp}], snapshot:{demandMW,price,systemCondition}, asOf }`
-- `?report=series&zone=<id>` → `{ series:[{label,zonePrice,ontarioPrice}], asOf }`
+- `?report=series&zone=<id>` → `{ series:[{label,zonePrice,dayAhead}], asOf }`
+  — `zonePrice` is the zone's 5-min real-time price for the current hour;
+  `dayAhead` is the province day-ahead cleared price for that hour (flat).
 - add `&debug=1` to either → also returns the **raw parsed report tree(s)**.
 
 The frontend (`src/data/iesoClient.js` + `useIesoData.js`) calls these, merges
@@ -147,33 +151,33 @@ snapshot every 5 minutes.
 
 ### ⚠️ Verify once deployed (couldn't be tested without live network)
 
-The parsers are validated against the committed sample files, but a few things
-can only be confirmed against the live server (the dev sandbox can't reach the
-IESO host). Open `https://<your-app>.vercel.app/api/ieso?report=snapshot&debug=1`
-and check:
+All four report mappings are validated against the committed sample files and
+confirmed live (per-zone prices, province price, demand, and day-ahead). A few
+behaviours still depend on the live server over time — open
+`https://<your-app>.vercel.app/api/ieso?report=snapshot&debug=1` and confirm:
 
-1. **Live report URLs / filenames** — especially the demand CSV path
-   (`RealtimeZonalDemand/PUB_RealtimeZonalDemand.csv` is best-effort; the sample
-   was named `PUB_RealtimeDemandZonal.csv`). If `demandMW` is `null`, fix the
-   `REPORTS.demand` URL in `api/ieso.js`.
-2. **Demand magnitude / units** — the sample CSV's "Ontario Demand" values are
-   implausibly low (~1,300), suggesting test/sandbox data. The
-   `deriveSystemCondition` thresholds (19,000 / 22,000 MW) assume real
-   production magnitudes — sanity-check against the live feed.
-3. **Range requests** — demand uses an HTTP `Range: bytes=-65536` tail fetch to
-   avoid downloading the full (multi-MB) CSV. If the server ignores `Range`, the
-   whole file is downloaded (still works, just heavier).
-4. **Actual 5-min refresh timing** — confirm new intervals appear roughly every
+1. **Demand magnitude** — should read realistic provincial values
+   (~12,000–22,000 MW). The `deriveSystemCondition` thresholds (19,000 / 22,000
+   MW) assume those magnitudes. (The earlier `RealtimeDemandZonal` report
+   carried scaled ~1,300 MW test values; we switched to `Demand/PUB_Demand.csv`,
+   which reads ~15,000+.)
+2. **Day-ahead day alignment** — `DAHourlyOntarioZonalPrice` is published per
+   delivery day; we match the real-time `DELIVERYHOUR` to the same hour in the
+   latest DA file. Around midnight / new DA publication the two can briefly
+   reference different days.
+3. **Actual 5-min refresh timing** — confirm new intervals appear roughly every
    5 minutes.
 
 ### Known limitations / next enhancements
 
-- **Chart history is the current hour only.** The real-time price report covers
-  the current dispatch hour (≤12 five-minute points), so early in an hour the
-  chart is sparse. A true 24h history needs an hourly/daily price report (e.g. a
-  predispatch or day-ahead zonal report) — not included in the samples.
-- **No Day-Ahead series yet** (the original RT-vs-DA design). The chart shows
-  *zone vs province* real-time instead. Add `DAHourlyOntarioZonalPrice` to
-  restore a day-ahead line.
-- **Nodal LMP** (`PUB_RealtimeEnergyLMP.csv`, 900+ nodes) is available for a
-  future node-level drill-down but needs a node→zone reference to aggregate.
+- **Chart window is the current hour only.** The real-time zonal price report
+  covers the current dispatch hour (≤12 five-minute points), so early in an hour
+  the real-time line is short; the day-ahead line is the flat cleared price for
+  that hour. A full 24h real-time history would need to accumulate hourly
+  snapshots or a daily report.
+- **Day-ahead is province-wide**, while the real-time line is per-zone — the
+  chart compares a zone's real-time price against the Ontario day-ahead price.
+  Per-zone day-ahead would need a zonal day-ahead report.
+- **Nodal LMP** (`PUB_RealtimeEnergyLMP.csv` / `PUB_DAHourlyEnergyLMP.csv`,
+  900+ nodes) is available for a future node-level drill-down but needs a
+  node→zone reference to aggregate.

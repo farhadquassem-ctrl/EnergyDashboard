@@ -83,7 +83,7 @@ export async function fetchZoneSeries(zoneId) {
       `/api/ieso?report=series&zone=${encodeURIComponent(zoneId)}`,
     )
     const series = (data.series ?? []).filter(
-      (p) => p.zonePrice != null || p.ontarioPrice != null,
+      (p) => p.zonePrice != null || p.dayAhead != null,
     )
     if (series.length === 0) throw new Error('empty series')
     return { series, isLive: true }

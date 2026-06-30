@@ -46,12 +46,13 @@ export const MOCK_ZONES = ZONES.map((z) => ({
 // ---------------------------------------------------------------------------
 export function getMockZoneSeries(zoneId) {
   const base = FALLBACK_LMP[zoneId] ?? 50
-  const ontarioBase = 60
   const rand = seeded(
     String(zoneId)
       .split('')
       .reduce((acc, c) => acc + c.charCodeAt(0), 7),
   )
+  // Day-ahead clears once per hour: a flat reference for the mock hour.
+  const dayAhead = round1(clampPrice(base + 4))
 
   const points = []
   for (let i = 0; i < 12; i++) {
@@ -59,7 +60,7 @@ export function getMockZoneSeries(zoneId) {
     points.push({
       label: `:${String(i * 5).padStart(2, '0')}`,
       zonePrice: round1(clampPrice(base + drift + (rand() - 0.5) * 8)),
-      ontarioPrice: round1(clampPrice(ontarioBase + drift + (rand() - 0.5) * 6)),
+      dayAhead,
     })
   }
   return points

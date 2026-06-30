@@ -19,14 +19,16 @@ const REPORTS = {
   // Per-virtual-zone 5-min energy prices (map + per-zone chart series).
   zonalPrices:
     'https://reports-public.ieso.ca/public/RealtimeZonalEnergyPrices/PUB_RealtimeZonalEnergyPrices.xml',
-  // Province-wide Ontario Zonal Price (headline price tile + chart reference).
+  // Province-wide real-time Ontario Zonal Price (headline price tile).
   ontarioPrice:
     'https://reports-public.ieso.ca/public/RealtimeOntarioZonalPrice/PUB_RealtimeOntarioZonalPrice.xml',
-  // Per-zone 5-min demand (Ontario total used for the demand tile + GA risk).
-  // This CSV is large; we range-fetch the tail. Path confirmed against the IESO
-  // report index: RealtimeDemandZonal/PUB_RealtimeDemandZonal.csv.
-  demand:
-    'https://reports-public.ieso.ca/public/RealtimeDemandZonal/PUB_RealtimeDemandZonal.csv',
+  // Day-ahead hourly Ontario Zonal Price (chart "Day-Ahead" reference line).
+  daPrice:
+    'https://reports-public.ieso.ca/public/DAHourlyOntarioZonalPrice/PUB_DAHourlyOntarioZonalPrice.xml',
+  // Hourly Ontario demand (demand tile + GA risk). The zonal-demand report
+  // carries scaled/test magnitudes, so we use the standard Demand report which
+  // has real provincial values. Header: Date,Hour,Market Demand,Ontario Demand.
+  demand: 'https://reports-public.ieso.ca/public/Demand/PUB_Demand.csv',
 }
 
 // Dashboard zone ids (subset of IESO's virtual zones we plot).
@@ -39,10 +41,6 @@ const KNOWN_ZONES = new Set([
   'southwest',
   'toronto',
 ])
-
-// Column index of "Ontario Demand" in the zonal-demand CSV
-// (Date,Hour,Interval,Ontario Demand,NORTHWEST,...).
-const DEMAND_ONTARIO_COL = 3
 
 const parser = new XMLParser({
   ignoreAttributes: true,
@@ -137,26 +135,42 @@ function parseOntarioPrice(tree) {
   }
 }
 
-// Range-fetch the tail of the (large) zonal-demand CSV and read the most
-// recent row's Ontario Demand value. Returns a number or null.
+// Day-ahead hourly Ontario Zonal Price: Document>DocBody>HourlyPriceComponents[]
+//   { PricingHour, ZonalPrice, LossPriceCapped, CongestionPriceCapped }.
+// Returns { deliveryDate, byHour: Map<hour, price> }.
+function parseDAHourly(tree) {
+  const body = tree?.Document?.DocBody ?? {}
+  const byHour = new Map()
+  for (const c of toArray(body.HourlyPriceComponents)) {
+    const hour = toNum(c?.PricingHour)
+    const price = toNum(c?.ZonalPrice)
+    if (hour != null && price != null) byHour.set(hour, price)
+  }
+  return { deliveryDate: body.DeliveryDate, byHour }
+}
+
+// Parse the standard hourly Demand report (Date,Hour,Market Demand,Ontario
+// Demand) and return the most recent row's Ontario Demand. The header is read
+// rather than assumed, so a column reorder won't silently break it.
 async function fetchOntarioDemand() {
   try {
-    const text = await fetchText(REPORTS.demand, { Range: 'bytes=-65536' })
-    const lines = text
-      .split('\n')
-      .map((l) => l.trim())
-      .filter(Boolean)
-    // Walk backwards to the last line that looks like a data row.
-    for (let i = lines.length - 1; i >= 0; i--) {
-      const cols = lines[i].split(',')
-      const demand = toNum(cols[DEMAND_ONTARIO_COL])
-      // Data rows start with a date (col 0) and have many columns.
-      if (cols.length > DEMAND_ONTARIO_COL && /\d{4}-\d{2}-\d{2}/.test(cols[0]) && demand != null) {
-        return demand
-      }
+    const text = await fetchText(REPORTS.demand)
+    const lines = text.split('\n').map((l) => l.trim())
+    const headerIdx = lines.findIndex(
+      (l) => /(^|,)\s*Date\s*,/i.test(l) && /Ontario Demand/i.test(l),
+    )
+    if (headerIdx === -1) return null
+    const cols = lines[headerIdx].split(',').map((c) => c.trim().toLowerCase())
+    const ontarioCol = cols.indexOf('ontario demand')
+    if (ontarioCol === -1) return null
+
+    for (let i = lines.length - 1; i > headerIdx; i--) {
+      const row = lines[i].split(',')
+      const demand = toNum(row[ontarioCol])
+      if (/\d{4}-\d{2}-\d{2}/.test(row[0] ?? '') && demand != null) return demand
     }
   } catch {
-    // fall through
+    // fall through to null -> mock fallback
   }
   return null
 }
@@ -208,29 +222,29 @@ async function handleSnapshot(debug) {
 }
 
 async function handleSeries(zoneIdParam, debug) {
-  const [zonalTree, ontarioTree] = await Promise.all([
+  const [zonalTree, daTree] = await Promise.all([
     fetchXml(REPORTS.zonalPrices).catch(() => null),
-    fetchXml(REPORTS.ontarioPrice).catch(() => null),
+    fetchXml(REPORTS.daPrice).catch(() => null),
   ])
 
   const zonal = zonalTree ? parseZonalPrices(zonalTree) : { byZone: {} }
-  const ontario = ontarioTree ? parseOntarioPrice(ontarioTree) : null
+  const da = daTree ? parseDAHourly(daTree) : { byHour: new Map() }
 
   const zoneIntervals = zonal.byZone[zoneIdParam]?.intervals ?? []
-  const ontarioByInterval = new Map(
-    (ontario?.intervals ?? []).map((p) => [p.interval, p.price]),
-  )
+  // Day-ahead is a single cleared price for the whole hour; draw it as a flat
+  // reference across the current hour's 5-min intervals.
+  const dayAhead = da.byHour.get(zonal.deliveryHour) ?? null
 
   const series = zoneIntervals
     .filter((p) => p.price != null)
     .map((p) => ({
       label: intervalLabel(zonal.deliveryHour, p.interval),
       zonePrice: p.price,
-      ontarioPrice: ontarioByInterval.get(p.interval) ?? null,
+      dayAhead,
     }))
 
   const payload = { series, asOf: new Date().toISOString() }
-  if (debug) payload.raw = { zonalPrices: zonalTree, ontarioPrice: ontarioTree }
+  if (debug) payload.raw = { zonalPrices: zonalTree, daPrice: daTree }
   return payload
 }
 
