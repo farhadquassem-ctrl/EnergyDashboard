@@ -210,7 +210,7 @@ export default function NodalTab() {
           <p className="text-xs text-zinc-500">
             Nodal LMP = energy + congestion + loss · basis = node − Ontario Zonal
             Price (ONZP{state.onzp != null ? ` $${state.onzp.toFixed(2)}` : ''}) ·
-            zone is best-effort (most nodes “Unmapped” pending IESO’s reference)
+            zone = IESO virtual trading zone (transmission buses show “Unmapped”)
           </p>
         </div>
         <div className="flex items-center gap-3">

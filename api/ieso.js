@@ -13,6 +13,7 @@
 // docs/Sample-Reports/. See README "Live data" for the report catalogue.
 
 import { XMLParser } from 'fast-xml-parser'
+import { NODE_ZONES } from './nodeZones.js'
 
 // --- Report sources (public, no login) -------------------------------------
 const REPORTS = {
@@ -309,20 +310,22 @@ function inferLocationType(name) {
   return 'Other'
 }
 
-// Best-effort virtual-trading-zone assignment. The authoritative node→zone
-// mapping is in IESO's internal network model (not published as a clean
-// report), so we only assign the few unambiguous facility names and leave the
-// rest "Unmapped". Supply IESO's pricing-location reference to complete this;
-// drop the lookup in NODE_ZONE_EXACT and extend inferZone.
-const NODE_ZONE_EXACT = {} // name -> zone, populated from a reference if supplied
+// Virtual-trading-zone assignment from IESO's pricing-location reference
+// (nodeZones.js, generated from docs/Sample-Reports/PUB_NodeZoneMap.csv).
+// Station index (text before "-LT") covers resources not listed individually —
+// co-located resources share a zone. First assignment wins.
+const STATION_ZONE = {}
+for (const [n, z] of Object.entries(NODE_ZONES)) {
+  const st = n.split('-LT')[0]
+  if (st && !(st in STATION_ZONE)) STATION_ZONE[st] = z
+}
+// The reference lists 10 electrical zones; the zonal price report uses 9
+// virtual trading zones (Bruce folds into Southwest), so merge here.
+const toVirtual = (z) => (z === 'Bruce' ? 'Southwest' : z)
+
 function inferZone(name) {
-  const exact = NODE_ZONE_EXACT[name]
-  if (exact) return exact
-  const n = String(name).toUpperCase()
-  if (n.startsWith('BRUCE')) return 'Southwest' // Bruce merges into Southwest
-  if (n.startsWith('ESSA')) return 'Essa'
-  if (n.startsWith('NIAGARA')) return 'Niagara'
-  return 'Unmapped'
+  const z = NODE_ZONES[name] ?? STATION_ZONE[String(name).split('-LT')[0]]
+  return z ? toVirtual(z) : 'Unmapped'
 }
 
 // Parse the nodal LMP CSV. Two preamble lines, then a header, then rows of
