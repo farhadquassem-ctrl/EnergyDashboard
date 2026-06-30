@@ -1,0 +1,63 @@
+import { useState } from 'react'
+import MapPanel from './components/MapPanel'
+import PriceChart from './components/PriceChart'
+import GAPeakRisk from './components/GAPeakRisk'
+import BottomBar from './components/BottomBar'
+import { ZONES, SYSTEM_SNAPSHOT } from './data/mockData'
+
+export default function App() {
+  const [selectedZoneId, setSelectedZoneId] = useState(ZONES[0].id)
+  const selectedZone =
+    ZONES.find((z) => z.id === selectedZoneId) ?? ZONES[0]
+
+  return (
+    <div className="flex min-h-screen flex-col bg-canvas text-zinc-200">
+      {/* Header */}
+      <header className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800 px-6 py-4">
+        <div>
+          <h1 className="text-lg font-bold tracking-tight text-zinc-100">
+            IESO LMP Dashboard
+          </h1>
+          <p className="text-xs text-zinc-500">
+            Ontario electricity market — locational marginal prices, demand &amp; HOEP
+          </p>
+        </div>
+        <div className="flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs text-amber-400">
+          <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+          Mock data — IESO API not yet connected
+        </div>
+      </header>
+
+      {/* Main grid: map (60%) + chart/risk (40%) */}
+      <main className="flex flex-1 flex-col gap-4 p-4 lg:p-6">
+        <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-5">
+          {/* Left column — 60% */}
+          <section className="min-h-[420px] lg:col-span-3">
+            <MapPanel
+              selectedZoneId={selectedZoneId}
+              onSelectZone={setSelectedZoneId}
+            />
+          </section>
+
+          {/* Right column — 40% */}
+          <section className="flex min-h-[420px] flex-col gap-4 lg:col-span-2">
+            <div className="min-h-0 flex-1">
+              <PriceChart
+                zoneId={selectedZone.id}
+                zoneName={selectedZone.name}
+              />
+            </div>
+            <GAPeakRisk demandMW={SYSTEM_SNAPSHOT.demandMW} />
+          </section>
+        </div>
+
+        {/* Bottom bar */}
+        <BottomBar snapshot={SYSTEM_SNAPSHOT} />
+      </main>
+
+      <footer className="border-t border-zinc-800 px-6 py-3 text-center text-xs text-zinc-600">
+        Portfolio project · Data shown is synthetic · Not affiliated with the IESO
+      </footer>
+    </div>
+  )
+}
