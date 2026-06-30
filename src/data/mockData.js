@@ -1,12 +1,14 @@
-// Mock data for the IESO LMP dashboard.
+// Mock / fallback data for the IESO LMP dashboard.
 //
-// Everything here is synthetic but kept within realistic Ontario bounds:
-//   - HOEP / LMP: ~$20–$120 /MWh
+// This is now the *fallback* source: the app prefers live IESO data (see
+// iesoClient.js) and drops back to these values when the API is unreachable or
+// a parse fails, so the UI always renders something sensible.
+//
+// Everything here stays within realistic Ontario bounds:
+//   - prices: ~$20–$120 /MWh
 //   - Ontario demand: ~12,000–18,000 MW
-//
-// This module is the single seam to replace when wiring in the real IESO
-// public reports API (see README "Next step"). Keep the exported shapes
-// stable so the components don't need to change.
+
+import { ZONES } from './zones'
 
 // ---------------------------------------------------------------------------
 // Deterministic pseudo-random helper so the mock data is stable across
@@ -21,35 +23,35 @@ function seeded(seed) {
   }
 }
 
-// ---------------------------------------------------------------------------
-// IESO pricing zones with approximate map coordinates and a current mock LMP.
-// ---------------------------------------------------------------------------
-export const ZONES = [
-  { id: 'northwest', name: 'Northwest', lat: 48.38, lng: -89.25, lmp: 28.4 },
-  { id: 'northeast', name: 'Northeast', lat: 46.49, lng: -80.99, lmp: 41.7 },
-  { id: 'ottawa', name: 'Ottawa', lat: 45.42, lng: -75.69, lmp: 72.9 },
-  { id: 'east', name: 'East', lat: 44.23, lng: -76.49, lmp: 58.3 },
-  { id: 'west', name: 'West', lat: 42.98, lng: -81.24, lmp: 64.1 },
-  { id: 'southwest', name: 'Southwest', lat: 42.31, lng: -83.04, lmp: 88.6 },
-  { id: 'toronto', name: 'Toronto', lat: 43.65, lng: -79.38, lmp: 104.2 },
-]
+// Representative fallback price ($/MWh) per zone.
+const FALLBACK_LMP = {
+  northwest: 28.4,
+  northeast: 41.7,
+  ottawa: 72.9,
+  east: 58.3,
+  west: 64.1,
+  southwest: 88.6,
+  toronto: 104.2,
+}
 
-// Geographic centre used to frame the Leaflet map over Ontario.
-export const ONTARIO_CENTER = [46.5, -82.0]
-export const ONTARIO_ZOOM = 5
+// Zones decorated with a fallback price, matching the live `zones` shape.
+export const MOCK_ZONES = ZONES.map((z) => ({
+  ...z,
+  lmp: FALLBACK_LMP[z.id] ?? 50,
+}))
 
 // ---------------------------------------------------------------------------
 // 24h price series (Real-Time vs Day-Ahead) for a given zone.
 // Returns 24 hourly points; values stay within the realistic $/MWh band.
 // ---------------------------------------------------------------------------
-export function getZonePriceSeries(zoneId) {
-  const zone = ZONES.find((z) => z.id === zoneId) ?? ZONES[0]
-  // Seed from the zone so each zone has a distinct but stable shape.
+export function getMockZoneSeries(zoneId) {
+  const base = FALLBACK_LMP[zoneId] ?? 50
   const rand = seeded(
-    zone.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 7),
+    String(zoneId)
+      .split('')
+      .reduce((acc, c) => acc + c.charCodeAt(0), 7),
   )
 
-  const base = zone.lmp
   const points = []
   for (let hour = 0; hour < 24; hour++) {
     // Diurnal shape: morning ramp + evening peak around 18:00.
@@ -60,25 +62,31 @@ export function getZonePriceSeries(zoneId) {
     const rtNoise = (rand() - 0.5) * 16
     const daNoise = (rand() - 0.5) * 8
 
-    const realTime = clampPrice(base + diurnal + rtNoise)
-    // Day-ahead is smoother and tracks the real-time signal loosely.
-    const dayAhead = clampPrice(base + diurnal * 0.85 + daNoise)
-
     points.push({
       hour: `${String(hour).padStart(2, '0')}:00`,
-      realTime: round1(realTime),
-      dayAhead: round1(dayAhead),
+      realTime: round1(clampPrice(base + diurnal + rtNoise)),
+      dayAhead: round1(clampPrice(base + diurnal * 0.85 + daNoise)),
     })
   }
   return points
 }
 
 // ---------------------------------------------------------------------------
-// GA (Global Adjustment) peak-risk indicator.
-// In reality this is driven by forecast top-5 demand peaks; here we derive a
-// simple Green / Yellow / Red status from the mock provincial demand.
+// Fallback system snapshot: Ontario demand, reference price, system condition.
+// `price` is the Ontario Zonal Price / OEMP (HOEP was retired May 2025).
 // ---------------------------------------------------------------------------
-export function getGAPeakRisk(demandMW = SYSTEM_SNAPSHOT.demandMW) {
+export const MOCK_SNAPSHOT = {
+  demandMW: 15820,
+  price: 96.4,
+  // One of: 'Normal' | 'Tight' | 'Emergency'
+  systemCondition: 'Tight',
+}
+
+// ---------------------------------------------------------------------------
+// GA (Global Adjustment) peak-risk indicator.
+// Derived from provincial demand: a simple Green / Yellow / Red status.
+// ---------------------------------------------------------------------------
+export function getGAPeakRisk(demandMW = MOCK_SNAPSHOT.demandMW) {
   if (demandMW >= 16500) {
     return {
       level: 'Red',
@@ -100,14 +108,12 @@ export function getGAPeakRisk(demandMW = SYSTEM_SNAPSHOT.demandMW) {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Bottom-bar system snapshot: Ontario demand, HOEP, and system condition.
-// ---------------------------------------------------------------------------
-export const SYSTEM_SNAPSHOT = {
-  demandMW: 15820,
-  hoep: 96.4,
-  // One of: 'Normal' | 'Tight' | 'Emergency'
-  systemCondition: 'Tight',
+// Derive a coarse system condition from demand (used for live data, which
+// doesn't ship a single "condition" field).
+export function deriveSystemCondition(demandMW) {
+  if (demandMW >= 16500) return 'Emergency'
+  if (demandMW >= 15000) return 'Tight'
+  return 'Normal'
 }
 
 // ---------------------------------------------------------------------------

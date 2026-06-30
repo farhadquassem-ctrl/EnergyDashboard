@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import {
   ResponsiveContainer,
   LineChart,
@@ -9,7 +8,6 @@ import {
   Tooltip,
   Legend,
 } from 'recharts'
-import { getZonePriceSeries } from '../data/mockData'
 
 const AXIS_COLOR = '#52525b' // zinc-600
 const GRID_COLOR = '#27272a' // zinc-800
@@ -38,19 +36,25 @@ function ChartTooltip({ active, payload, label }) {
 /**
  * Right column: 24h Real-Time vs Day-Ahead price series for the selected zone.
  */
-export default function PriceChart({ zoneId, zoneName }) {
-  const data = useMemo(() => getZonePriceSeries(zoneId), [zoneId])
-
+export default function PriceChart({ zoneName, data = [], loading, isLive }) {
   return (
     <div className="flex h-full flex-col rounded-xl border border-zinc-800 bg-panel p-4">
       <div className="mb-3 flex items-baseline justify-between">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-400">
           24h Price — {zoneName}
         </h2>
-        <span className="text-xs text-zinc-500">$/MWh</span>
+        <span className="text-xs text-zinc-500">
+          $/MWh{!loading && !isLive ? ' · mock' : ''}
+        </span>
       </div>
 
-      <div className="min-h-0 flex-1">
+      {loading && (
+        <div className="flex flex-1 items-center justify-center text-xs text-zinc-500">
+          Loading price series…
+        </div>
+      )}
+
+      <div className={`min-h-0 flex-1 ${loading ? 'hidden' : ''}`}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={data}
@@ -82,6 +86,7 @@ export default function PriceChart({ zoneId, zoneName }) {
               strokeWidth={2}
               dot={false}
               activeDot={{ r: 4 }}
+              connectNulls
             />
             <Line
               type="monotone"
@@ -92,6 +97,7 @@ export default function PriceChart({ zoneId, zoneName }) {
               strokeDasharray="5 4"
               dot={false}
               activeDot={{ r: 4 }}
+              connectNulls
             />
           </LineChart>
         </ResponsiveContainer>

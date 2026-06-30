@@ -3,12 +3,21 @@ import MapPanel from './components/MapPanel'
 import PriceChart from './components/PriceChart'
 import GAPeakRisk from './components/GAPeakRisk'
 import BottomBar from './components/BottomBar'
-import { ZONES, SYSTEM_SNAPSHOT } from './data/mockData'
+import StatusBadge from './components/StatusBadge'
+import { ZONES } from './data/zones'
+import { MOCK_SNAPSHOT } from './data/mockData'
+import { useSnapshot, useZoneSeries } from './data/useIesoData'
 
 export default function App() {
   const [selectedZoneId, setSelectedZoneId] = useState(ZONES[0].id)
-  const selectedZone =
-    ZONES.find((z) => z.id === selectedZoneId) ?? ZONES[0]
+  const selectedZone = ZONES.find((z) => z.id === selectedZoneId) ?? ZONES[0]
+
+  const { zones, snapshot, asOf, isLive, loading } = useSnapshot()
+  const series = useZoneSeries(selectedZoneId)
+
+  // Until the first snapshot resolves, render the zone geography with no price.
+  const mapZones = zones.length ? zones : ZONES.map((z) => ({ ...z, lmp: null }))
+  const activeSnapshot = snapshot ?? MOCK_SNAPSHOT
 
   return (
     <div className="flex min-h-screen flex-col bg-canvas text-zinc-200">
@@ -19,13 +28,10 @@ export default function App() {
             IESO LMP Dashboard
           </h1>
           <p className="text-xs text-zinc-500">
-            Ontario electricity market — locational marginal prices, demand &amp; HOEP
+            Ontario electricity market — zonal prices, demand &amp; system status
           </p>
         </div>
-        <div className="flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs text-amber-400">
-          <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-          Mock data — IESO API not yet connected
-        </div>
+        <StatusBadge isLive={isLive} loading={loading} asOf={asOf} />
       </header>
 
       {/* Main grid: map (60%) + chart/risk (40%) */}
@@ -34,6 +40,7 @@ export default function App() {
           {/* Left column — 60% */}
           <section className="min-h-[420px] lg:col-span-3">
             <MapPanel
+              zones={mapZones}
               selectedZoneId={selectedZoneId}
               onSelectZone={setSelectedZoneId}
             />
@@ -43,20 +50,22 @@ export default function App() {
           <section className="flex min-h-[420px] flex-col gap-4 lg:col-span-2">
             <div className="min-h-0 flex-1">
               <PriceChart
-                zoneId={selectedZone.id}
                 zoneName={selectedZone.name}
+                data={series.series}
+                loading={series.loading}
+                isLive={series.isLive}
               />
             </div>
-            <GAPeakRisk demandMW={SYSTEM_SNAPSHOT.demandMW} />
+            <GAPeakRisk demandMW={activeSnapshot.demandMW} />
           </section>
         </div>
 
         {/* Bottom bar */}
-        <BottomBar snapshot={SYSTEM_SNAPSHOT} />
+        <BottomBar snapshot={activeSnapshot} />
       </main>
 
       <footer className="border-t border-zinc-800 px-6 py-3 text-center text-xs text-zinc-600">
-        Portfolio project · Data shown is synthetic · Not affiliated with the IESO
+        Portfolio project · Live data from the IESO public reports · Not affiliated with the IESO
       </footer>
     </div>
   )
