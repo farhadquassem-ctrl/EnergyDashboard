@@ -309,6 +309,22 @@ function inferLocationType(name) {
   return 'Other'
 }
 
+// Best-effort virtual-trading-zone assignment. The authoritative node→zone
+// mapping is in IESO's internal network model (not published as a clean
+// report), so we only assign the few unambiguous facility names and leave the
+// rest "Unmapped". Supply IESO's pricing-location reference to complete this;
+// drop the lookup in NODE_ZONE_EXACT and extend inferZone.
+const NODE_ZONE_EXACT = {} // name -> zone, populated from a reference if supplied
+function inferZone(name) {
+  const exact = NODE_ZONE_EXACT[name]
+  if (exact) return exact
+  const n = String(name).toUpperCase()
+  if (n.startsWith('BRUCE')) return 'Southwest' // Bruce merges into Southwest
+  if (n.startsWith('ESSA')) return 'Essa'
+  if (n.startsWith('NIAGARA')) return 'Niagara'
+  return 'Unmapped'
+}
+
 // Parse the nodal LMP CSV. Two preamble lines, then a header, then rows of
 // Delivery Hour,Interval,Pricing Location,LMP,Loss,Congestion. Keeps the latest
 // interval per location. Returns { byNode: Map, asOf }.
@@ -356,7 +372,7 @@ async function handleNodal(debug) {
       nodeId: name,
       nodeName: name,
       locationType: inferLocationType(name),
-      zone: null, // not published per-node; see README
+      zone: inferZone(name), // best-effort; "Unmapped" without IESO's reference
       lmp: v.lmp,
       energy,
       congestion: v.cong,
