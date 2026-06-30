@@ -29,6 +29,11 @@ const REPORTS = {
   // Day-ahead hourly Ontario Zonal Price (chart "Day-Ahead" reference line).
   daPrice:
     'https://reports-public.ieso.ca/public/DAHourlyOntarioZonalPrice/PUB_DAHourlyOntarioZonalPrice.xml',
+  // Real-time 5-min nodal LMP for all ~1000 pricing locations (Nodal tab).
+  // Header: Delivery Hour,Interval,Pricing Location,LMP,Energy Loss Price,
+  // Energy Congestion Price. Directory name best-effort — verify on deploy.
+  nodal:
+    'https://reports-public.ieso.ca/public/RealtimeEnergyLMP/PUB_RealtimeEnergyLMP.csv',
   // Hourly Ontario demand (demand tile + GA risk). The zonal-demand report
   // carries scaled/test magnitudes, so we use the standard Demand report which
   // has real provincial values. Header: Date,Hour,Market Demand,Ontario Demand.
@@ -61,6 +66,8 @@ const toNum = (v) => {
   const n = typeof v === 'number' ? v : parseFloat(String(v).trim())
   return Number.isFinite(n) ? n : null
 }
+
+const round2 = (v) => (v == null ? null : Math.round(v * 100) / 100)
 
 // "NORTHWEST:HUB" / "Toronto" -> "northwest" / "toronto" (or null if unknown).
 function zoneId(zoneName) {
@@ -288,6 +295,83 @@ async function handleSeries(zoneIdParam, debug) {
   return payload
 }
 
+// Infer a location class from the pricing-location name. The report has no
+// type field, so this is heuristic (confirmed against the sample's naming).
+function inferLocationType(name) {
+  const n = String(name).toUpperCase()
+  if (n.endsWith('_DRA')) return 'DRA'
+  if (n.includes('BATT')) return 'Storage'
+  if (/:LMP$/.test(n)) return 'Node'
+  if (n.includes('LF')) return 'Load'
+  if (/(\.AG|\.G\d*$|\.SG|\.T\d|_TG|\.TT)/.test(n)) return 'Generator'
+  return 'Other'
+}
+
+// Parse the nodal LMP CSV. Two preamble lines, then a header, then rows of
+// Delivery Hour,Interval,Pricing Location,LMP,Loss,Congestion. Keeps the latest
+// interval per location. Returns { byNode: Map, asOf }.
+function parseNodal(text) {
+  const lines = text.split('\n')
+  const headerIdx = lines.findIndex((l) => /Pricing Location/i.test(l))
+  const createdLine = lines.find((l) => /CREATED AT/i.test(l)) ?? ''
+  const asOf = (createdLine.match(/\d{4}\/\d{2}\/\d{2}\s+\d{2}:\d{2}:\d{2}/) ?? [])[0] ?? null
+
+  const byNode = new Map()
+  for (let i = headerIdx + 1; i < lines.length; i++) {
+    const row = lines[i].split(',')
+    if (row.length < 6) continue
+    const interval = toNum(row[1])
+    const name = (row[2] ?? '').trim()
+    const lmp = toNum(row[3])
+    const loss = toNum(row[4])
+    const cong = toNum(row[5])
+    if (!name || interval == null || lmp == null) continue
+    const prev = byNode.get(name)
+    if (!prev || interval > prev.interval) {
+      byNode.set(name, { interval, lmp, loss, cong })
+    }
+  }
+  return { byNode, asOf }
+}
+
+async function handleNodal(debug) {
+  const [nodalText, ontarioTree] = await Promise.all([
+    fetchText(REPORTS.nodal),
+    fetchXml(REPORTS.ontarioPrice).catch(() => null),
+  ])
+
+  const { byNode, asOf } = parseNodal(nodalText)
+  const ontario = ontarioTree ? parseOntarioPrice(ontarioTree) : null
+  const onzp = ontario?.price ?? ontario?.average ?? null
+
+  const rows = []
+  for (const [name, v] of byNode) {
+    const energy =
+      v.lmp != null && v.loss != null && v.cong != null
+        ? round2(v.lmp - v.loss - v.cong)
+        : null
+    rows.push({
+      nodeId: name,
+      nodeName: name,
+      locationType: inferLocationType(name),
+      zone: null, // not published per-node; see README
+      lmp: v.lmp,
+      energy,
+      congestion: v.cong,
+      loss: v.loss,
+      basis: onzp != null && v.lmp != null ? round2(v.lmp - onzp) : null,
+      congestionPct:
+        v.lmp != null && Math.abs(v.lmp) > 1 && v.cong != null
+          ? round2((v.cong / v.lmp) * 100)
+          : null,
+    })
+  }
+
+  const payload = { rows, onzp, asOf, count: rows.length }
+  if (debug) payload.debug = { onzp, asOf, count: rows.length }
+  return payload
+}
+
 // --- entry point -----------------------------------------------------------
 
 export default async function handler(req, res) {
@@ -309,6 +393,8 @@ export default async function handler(req, res) {
       payload = await handleSeries(id, wantDebug)
     } else if (report === 'snapshot') {
       payload = await handleSnapshot(wantDebug)
+    } else if (report === 'nodal') {
+      payload = await handleNodal(wantDebug)
     } else {
       res.status(400).json({ error: `unknown report: ${report}` })
       return
