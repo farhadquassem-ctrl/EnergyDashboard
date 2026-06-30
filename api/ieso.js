@@ -300,10 +300,12 @@ async function handleSeries(zoneIdParam, debug) {
 function inferLocationType(name) {
   const n = String(name).toUpperCase()
   if (n.endsWith('_DRA')) return 'DRA'
-  if (n.includes('BATT')) return 'Storage'
+  // Match the storage resource token, not any "BATT" substring (e.g. the
+  // place-name BATTERSEA is a load, not storage).
+  if (/BATT_(LF|TG)/.test(n)) return 'Storage'
   if (/:LMP$/.test(n)) return 'Node'
   if (n.includes('LF')) return 'Load'
-  if (/(\.AG|\.G\d*$|\.SG|\.T\d|_TG|\.TT)/.test(n)) return 'Generator'
+  if (/(\.AG|\.G\d|\.SG|\.T\d|_TG|\.TT)/.test(n)) return 'Generator'
   return 'Other'
 }
 
