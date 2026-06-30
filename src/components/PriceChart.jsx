@@ -34,17 +34,20 @@ function ChartTooltip({ active, payload, label }) {
 }
 
 /**
- * Right column: 24h Real-Time vs Day-Ahead price series for the selected zone.
+ * Right column: current-hour 5-min price for the selected zone vs the
+ * province-wide Ontario price. (The public real-time report covers the current
+ * dispatch hour; a longer history needs an additional report — see README.)
  */
 export default function PriceChart({ zoneName, data = [], loading, isLive }) {
+  const empty = !loading && data.length === 0
   return (
     <div className="flex h-full flex-col rounded-xl border border-zinc-800 bg-panel p-4">
       <div className="mb-3 flex items-baseline justify-between">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-400">
-          24h Price — {zoneName}
+          Real-Time Price — {zoneName}
         </h2>
         <span className="text-xs text-zinc-500">
-          $/MWh{!loading && !isLive ? ' · mock' : ''}
+          $/MWh · 5-min{!loading && !isLive ? ' · mock' : ''}
         </span>
       </div>
 
@@ -54,7 +57,13 @@ export default function PriceChart({ zoneName, data = [], loading, isLive }) {
         </div>
       )}
 
-      <div className={`min-h-0 flex-1 ${loading ? 'hidden' : ''}`}>
+      {empty && (
+        <div className="flex flex-1 items-center justify-center px-6 text-center text-xs text-zinc-500">
+          No published intervals yet for the current hour.
+        </div>
+      )}
+
+      <div className={`min-h-0 flex-1 ${loading || empty ? 'hidden' : ''}`}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={data}
@@ -62,15 +71,15 @@ export default function PriceChart({ zoneName, data = [], loading, isLive }) {
           >
             <CartesianGrid stroke={GRID_COLOR} strokeDasharray="3 3" />
             <XAxis
-              dataKey="hour"
+              dataKey="label"
               stroke={AXIS_COLOR}
               tick={{ fontSize: 10, fill: AXIS_COLOR }}
-              interval={3}
+              interval="preserveStartEnd"
             />
             <YAxis
               stroke={AXIS_COLOR}
               tick={{ fontSize: 10, fill: AXIS_COLOR }}
-              domain={[0, 'auto']}
+              domain={['auto', 'auto']}
               width={36}
             />
             <Tooltip content={<ChartTooltip />} />
@@ -80,8 +89,8 @@ export default function PriceChart({ zoneName, data = [], loading, isLive }) {
             />
             <Line
               type="monotone"
-              dataKey="realTime"
-              name="Real-Time"
+              dataKey="zonePrice"
+              name="This zone"
               stroke="#38bdf8"
               strokeWidth={2}
               dot={false}
@@ -90,8 +99,8 @@ export default function PriceChart({ zoneName, data = [], loading, isLive }) {
             />
             <Line
               type="monotone"
-              dataKey="dayAhead"
-              name="Day-Ahead"
+              dataKey="ontarioPrice"
+              name="Ontario"
               stroke="#f59e0b"
               strokeWidth={2}
               strokeDasharray="5 4"

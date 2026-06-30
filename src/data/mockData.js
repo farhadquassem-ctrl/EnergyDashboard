@@ -41,11 +41,12 @@ export const MOCK_ZONES = ZONES.map((z) => ({
 }))
 
 // ---------------------------------------------------------------------------
-// 24h price series (Real-Time vs Day-Ahead) for a given zone.
-// Returns 24 hourly points; values stay within the realistic $/MWh band.
+// Current-hour 5-minute price series for a zone (matches the live shape:
+// zone price vs the province-wide Ontario price). 12 intervals.
 // ---------------------------------------------------------------------------
 export function getMockZoneSeries(zoneId) {
   const base = FALLBACK_LMP[zoneId] ?? 50
+  const ontarioBase = 60
   const rand = seeded(
     String(zoneId)
       .split('')
@@ -53,19 +54,12 @@ export function getMockZoneSeries(zoneId) {
   )
 
   const points = []
-  for (let hour = 0; hour < 24; hour++) {
-    // Diurnal shape: morning ramp + evening peak around 18:00.
-    const diurnal =
-      18 * Math.sin(((hour - 6) / 24) * Math.PI * 2) +
-      22 * Math.exp(-Math.pow(hour - 18, 2) / 6)
-
-    const rtNoise = (rand() - 0.5) * 16
-    const daNoise = (rand() - 0.5) * 8
-
+  for (let i = 0; i < 12; i++) {
+    const drift = 6 * Math.sin(i / 2)
     points.push({
-      hour: `${String(hour).padStart(2, '0')}:00`,
-      realTime: round1(clampPrice(base + diurnal + rtNoise)),
-      dayAhead: round1(clampPrice(base + diurnal * 0.85 + daNoise)),
+      label: `:${String(i * 5).padStart(2, '0')}`,
+      zonePrice: round1(clampPrice(base + drift + (rand() - 0.5) * 8)),
+      ontarioPrice: round1(clampPrice(ontarioBase + drift + (rand() - 0.5) * 6)),
     })
   }
   return points

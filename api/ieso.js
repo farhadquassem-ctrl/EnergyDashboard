@@ -1,175 +1,197 @@
 // Vercel serverless function: IESO public-reports proxy + normalizer.
 //
-// The browser can't fetch reports.ieso.ca directly (no CORS headers, and the
-// legacy host is http). This function runs on Vercel's servers, fetches the
-// public XML reports over HTTPS, parses them, and returns clean JSON in the
-// shapes the dashboard's components expect.
+// The browser can't fetch the IESO reports directly (no CORS headers), so this
+// function runs on Vercel's servers, fetches the public XML/CSV reports over
+// HTTPS, parses them, and returns clean JSON in the shapes the dashboard wants.
 //
 // Endpoints (all under /api/ieso):
-//   ?report=snapshot          -> { zones:[{id,name,lmp}], snapshot:{demandMW,price,systemCondition}, asOf }
-//   ?report=series&zone=<id>  -> { series:[{hour,realTime,dayAhead}], asOf }
-//   &debug=1                  -> also include the raw parsed XML tree(s) for
-//                                inspecting the real element names
+//   ?report=snapshot          -> per-zone prices + province price + demand
+//   ?report=series&zone=<id>  -> current-hour 5-min series for one zone
+//   &debug=1                  -> also include the raw parsed report(s)
 //
-// NOTE: the exact XML element names below are best-effort and were written
-// without a live sample (the dev sandbox can't reach the IESO host). The
-// extraction is deliberately tolerant, and `?debug=1` lets us confirm the real
-// structure on the deployed function and tighten the mapping. See README.
+// Field mappings below were confirmed against real sample reports in
+// docs/Sample-Reports/. See README "Live data" for the report catalogue.
 
 import { XMLParser } from 'fast-xml-parser'
 
-// --- Report sources --------------------------------------------------------
-// Public (no-login) IESO reports live on the reports-public.ieso.ca host.
+// --- Report sources (public, no login) -------------------------------------
 const REPORTS = {
-  rtZonal:
+  // Per-virtual-zone 5-min energy prices (map + per-zone chart series).
+  zonalPrices:
+    'https://reports-public.ieso.ca/public/RealtimeZonalEnergyPrices/PUB_RealtimeZonalEnergyPrices.xml',
+  // Province-wide Ontario Zonal Price (headline price tile + chart reference).
+  ontarioPrice:
     'https://reports-public.ieso.ca/public/RealtimeOntarioZonalPrice/PUB_RealtimeOntarioZonalPrice.xml',
-  daZonal:
-    'https://reports-public.ieso.ca/public/DAHourlyOntarioZonalPrice/PUB_DAHourlyOntarioZonalPrice.xml',
+  // Per-zone 5-min demand (Ontario total used for the demand tile + GA risk).
+  // NOTE: this CSV is large; we range-fetch the tail. URL is best-effort —
+  // verify via ?report=snapshot&debug=1 if demand shows as null.
   demand:
-    'https://reports-public.ieso.ca/public/RealtimeTotals/PUB_RealtimeTotals.xml',
+    'https://reports-public.ieso.ca/public/RealtimeZonalDemand/PUB_RealtimeZonalDemand.csv',
 }
 
-// IESO zone display name (lower-cased) -> dashboard zone id.
-const ZONE_NAME_TO_ID = {
-  northwest: 'northwest',
-  northeast: 'northeast',
-  ottawa: 'ottawa',
-  east: 'east',
-  west: 'west',
-  southwest: 'southwest',
-  toronto: 'toronto',
-}
+// Dashboard zone ids (subset of IESO's virtual zones we plot).
+const KNOWN_ZONES = new Set([
+  'northwest',
+  'northeast',
+  'ottawa',
+  'east',
+  'west',
+  'southwest',
+  'toronto',
+])
+
+// Column index of "Ontario Demand" in the zonal-demand CSV
+// (Date,Hour,Interval,Ontario Demand,NORTHWEST,...).
+const DEMAND_ONTARIO_COL = 3
 
 const parser = new XMLParser({
-  ignoreAttributes: false,
-  attributeNamePrefix: '',
+  ignoreAttributes: true,
   parseTagValue: true,
   trimValues: true,
 })
 
-// --- Generic XML helpers ---------------------------------------------------
+// --- helpers ---------------------------------------------------------------
 
-async function fetchXml(url) {
-  const res = await fetch(url, {
-    headers: { 'User-Agent': 'ieso-lmp-dashboard/1.0 (+portfolio)' },
-  })
-  if (!res.ok) throw new Error(`IESO responded ${res.status} for ${url}`)
-  const text = await res.text()
-  return parser.parse(text)
-}
-
-// Depth-first visit of every plain object in a parsed tree.
-function walk(node, visit) {
-  if (Array.isArray(node)) {
-    node.forEach((n) => walk(n, visit))
-  } else if (node && typeof node === 'object') {
-    visit(node)
-    for (const key of Object.keys(node)) walk(node[key], visit)
-  }
-}
+const toArray = (v) => (Array.isArray(v) ? v : v == null ? [] : [v])
 
 const toNum = (v) => {
-  const n = typeof v === 'number' ? v : parseFloat(String(v))
+  if (v === '' || v == null) return null
+  const n = typeof v === 'number' ? v : parseFloat(String(v).trim())
   return Number.isFinite(n) ? n : null
 }
 
-// Find, anywhere in `obj`, the first value whose key matches `re`.
-function findValueByKey(obj, re) {
-  let found
-  walk(obj, (node) => {
-    if (found !== undefined) return
-    for (const key of Object.keys(node)) {
-      if (re.test(key) && typeof node[key] !== 'object') {
-        found = node[key]
-        return
+// "NORTHWEST:HUB" / "Toronto" -> "northwest" / "toronto" (or null if unknown).
+function zoneId(zoneName) {
+  const base = String(zoneName ?? '')
+    .split(':')[0]
+    .trim()
+    .toLowerCase()
+  return KNOWN_ZONES.has(base) ? base : null
+}
+
+async function fetchText(url, headers = {}) {
+  const res = await fetch(url, {
+    headers: { 'User-Agent': 'ieso-lmp-dashboard/1.0 (+portfolio)', ...headers },
+  })
+  if (!res.ok && res.status !== 206) {
+    throw new Error(`IESO responded ${res.status} for ${url}`)
+  }
+  return res.text()
+}
+
+async function fetchXml(url) {
+  return parser.parse(await fetchText(url))
+}
+
+// --- parsers (confirmed against docs/Sample-Reports) -----------------------
+
+// RealtimeZonalEnergyPrices: Document>DocBody>ZonalPrices>TransactionZone[]
+//   each: ZoneName, IntervalPrice[] { Interval, ZonalPrice, EnergyLossPrice,
+//   EnergyCongPrice, FlagNo }. Returns { deliveryHour, byZone:{id:{price,intervals[]}} }.
+function parseZonalPrices(tree) {
+  const body = tree?.Document?.DocBody ?? {}
+  const deliveryHour = toNum(body.DELIVERYHOUR)
+  const zones = toArray(body?.ZonalPrices?.TransactionZone)
+
+  const byZone = {}
+  for (const z of zones) {
+    const id = zoneId(z?.ZoneName)
+    if (!id) continue
+    const intervals = toArray(z?.IntervalPrice)
+      .map((ip) => ({
+        interval: toNum(ip?.Interval),
+        price: toNum(ip?.ZonalPrice),
+        loss: toNum(ip?.EnergyLossPrice),
+        cong: toNum(ip?.EnergyCongPrice),
+      }))
+      .filter((p) => p.interval != null)
+
+    // Current price = last interval that has a numeric price.
+    const priced = intervals.filter((p) => p.price != null)
+    const latest = priced[priced.length - 1]
+    byZone[id] = { price: latest?.price ?? null, intervals }
+  }
+  return { deliveryHour, byZone }
+}
+
+// RealtimeOntarioZonalPrice: Document>DocBody> DeliveryHour, ZonalPrice[]
+//   { Interval, LmpCap, LossPriceCap, CongPriceCap }, AveragePrice{ LmpCap }.
+function parseOntarioPrice(tree) {
+  const body = tree?.Document?.DocBody ?? {}
+  const deliveryHour = toNum(body.DeliveryHour)
+  const intervals = toArray(body.ZonalPrice)
+    .map((zp) => ({
+      interval: toNum(zp?.Interval),
+      price: toNum(zp?.LmpCap),
+    }))
+    .filter((p) => p.interval != null)
+
+  const priced = intervals.filter((p) => p.price != null)
+  const latest = priced[priced.length - 1]
+  const average = toNum(body?.AveragePrice?.LmpCap)
+  return {
+    deliveryHour,
+    price: latest?.price ?? average,
+    average,
+    intervals,
+  }
+}
+
+// Range-fetch the tail of the (large) zonal-demand CSV and read the most
+// recent row's Ontario Demand value. Returns a number or null.
+async function fetchOntarioDemand() {
+  try {
+    const text = await fetchText(REPORTS.demand, { Range: 'bytes=-65536' })
+    const lines = text
+      .split('\n')
+      .map((l) => l.trim())
+      .filter(Boolean)
+    // Walk backwards to the last line that looks like a data row.
+    for (let i = lines.length - 1; i >= 0; i--) {
+      const cols = lines[i].split(',')
+      const demand = toNum(cols[DEMAND_ONTARIO_COL])
+      // Data rows start with a date (col 0) and have many columns.
+      if (cols.length > DEMAND_ONTARIO_COL && /\d{4}-\d{2}-\d{2}/.test(cols[0]) && demand != null) {
+        return demand
       }
     }
-  })
-  return found
-}
-
-// --- Normalizers (best-effort; confirm via ?debug=1) -----------------------
-
-// Pull a price-per-zone map { id: number } from the RT zonal-price tree.
-function extractZonePrices(tree) {
-  const prices = {}
-  walk(tree, (node) => {
-    // Look for an object that names a zone and carries a numeric price.
-    const zoneRaw =
-      node.ZoneName ?? node.Zone ?? node.PricingZone ?? node.Name
-    if (zoneRaw == null) return
-    const id = ZONE_NAME_TO_ID[String(zoneRaw).trim().toLowerCase()]
-    if (!id) return
-
-    // Prefer an explicit energy/price field; fall back to any *Price key.
-    const price =
-      toNum(node.ZonalPrice) ??
-      toNum(node.EnergyPrice) ??
-      toNum(node.LMP) ??
-      toNum(node.Price) ??
-      toNum(findValueByKey(node, /price|lmp|energy/i))
-    if (price == null) return
-
-    // Reports list many intervals per zone; keep the latest we encounter.
-    prices[id] = price
-  })
-  return prices
-}
-
-// Pull a 24-point { hour, value } series for one zone from a tree.
-function extractZoneSeries(tree, zoneId) {
-  const series = []
-  walk(tree, (node) => {
-    const zoneRaw =
-      node.ZoneName ?? node.Zone ?? node.PricingZone ?? node.Name
-    if (zoneRaw == null) return
-    const id = ZONE_NAME_TO_ID[String(zoneRaw).trim().toLowerCase()]
-    if (id !== zoneId) return
-
-    const hour = toNum(
-      node.DeliveryHour ?? node.Hour ?? node.Interval ?? node.IntervalNumber,
-    )
-    const value =
-      toNum(node.ZonalPrice) ??
-      toNum(node.EnergyPrice) ??
-      toNum(node.LMP) ??
-      toNum(node.Price) ??
-      toNum(findValueByKey(node, /price|lmp|energy/i))
-    if (hour == null || value == null) return
-    series.push({ hour, value })
-  })
-  return series
-}
-
-function extractDemand(tree) {
-  // RealtimeTotals carries a provincial total demand/load figure.
-  const v =
-    toNum(findValueByKey(tree, /ontario.*demand|total.*demand|total.*load/i)) ??
-    toNum(findValueByKey(tree, /demand|total/i))
-  return v
+  } catch {
+    // fall through
+  }
+  return null
 }
 
 function deriveSystemCondition(demandMW) {
   if (demandMW == null) return 'Normal'
-  if (demandMW >= 16500) return 'Emergency'
-  if (demandMW >= 15000) return 'Tight'
+  if (demandMW >= 22000) return 'Emergency'
+  if (demandMW >= 19000) return 'Tight'
   return 'Normal'
 }
 
-// --- Handlers --------------------------------------------------------------
+function intervalLabel(deliveryHour, interval) {
+  // IESO delivery hour H covers (H-1):00–H:00; interval n is a 5-min step.
+  const baseHour = ((deliveryHour ?? 1) - 1 + 24) % 24
+  const minute = ((interval ?? 1) - 1) * 5
+  return `${String(baseHour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
+}
+
+// --- handlers --------------------------------------------------------------
 
 async function handleSnapshot(debug) {
-  const [rt, dem] = await Promise.all([
-    fetchXml(REPORTS.rtZonal),
-    fetchXml(REPORTS.demand).catch(() => null),
+  const [zonalTree, ontarioTree, demandMW] = await Promise.all([
+    fetchXml(REPORTS.zonalPrices),
+    fetchXml(REPORTS.ontarioPrice).catch(() => null),
+    fetchOntarioDemand(),
   ])
 
-  const prices = extractZonePrices(rt)
-  const zones = Object.entries(prices).map(([id, lmp]) => ({ id, lmp }))
+  const zonal = parseZonalPrices(zonalTree)
+  const ontario = ontarioTree ? parseOntarioPrice(ontarioTree) : null
 
-  const demandMW = dem ? extractDemand(dem) : null
-  // Reference price for the headline tile: Toronto if present, else first zone.
-  const price = prices.toronto ?? Object.values(prices)[0] ?? null
+  const zones = Object.entries(zonal.byZone)
+    .filter(([, v]) => v.price != null)
+    .map(([id, v]) => ({ id, lmp: v.price }))
+
+  const price = ontario?.price ?? null
 
   const payload = {
     zones,
@@ -181,62 +203,56 @@ async function handleSnapshot(debug) {
     asOf: new Date().toISOString(),
     source: 'reports-public.ieso.ca',
   }
-  if (debug) payload.raw = { rtZonal: rt, demand: dem }
+  if (debug) payload.raw = { zonalPrices: zonalTree, ontarioPrice: ontarioTree }
   return payload
 }
 
-async function handleSeries(zoneId, debug) {
-  const [rt, da] = await Promise.all([
-    fetchXml(REPORTS.rtZonal).catch(() => null),
-    fetchXml(REPORTS.daZonal).catch(() => null),
+async function handleSeries(zoneIdParam, debug) {
+  const [zonalTree, ontarioTree] = await Promise.all([
+    fetchXml(REPORTS.zonalPrices).catch(() => null),
+    fetchXml(REPORTS.ontarioPrice).catch(() => null),
   ])
 
-  const rtSeries = rt ? extractZoneSeries(rt, zoneId) : []
-  const daSeries = da ? extractZoneSeries(da, zoneId) : []
+  const zonal = zonalTree ? parseZonalPrices(zonalTree) : { byZone: {} }
+  const ontario = ontarioTree ? parseOntarioPrice(ontarioTree) : null
 
-  // Align both onto an hourly axis keyed by hour-of-day.
-  const byHour = new Map()
-  for (const { hour, value } of daSeries) {
-    byHour.set(hour, { hour, dayAhead: value })
-  }
-  for (const { hour, value } of rtSeries) {
-    byHour.set(hour, { ...(byHour.get(hour) ?? { hour }), realTime: value })
-  }
+  const zoneIntervals = zonal.byZone[zoneIdParam]?.intervals ?? []
+  const ontarioByInterval = new Map(
+    (ontario?.intervals ?? []).map((p) => [p.interval, p.price]),
+  )
 
-  const series = [...byHour.values()]
-    .sort((a, b) => a.hour - b.hour)
+  const series = zoneIntervals
+    .filter((p) => p.price != null)
     .map((p) => ({
-      hour: `${String(p.hour).padStart(2, '0')}:00`,
-      realTime: p.realTime ?? null,
-      dayAhead: p.dayAhead ?? null,
+      label: intervalLabel(zonal.deliveryHour, p.interval),
+      zonePrice: p.price,
+      ontarioPrice: ontarioByInterval.get(p.interval) ?? null,
     }))
 
   const payload = { series, asOf: new Date().toISOString() }
-  if (debug) payload.raw = { rtZonal: rt, daZonal: da }
+  if (debug) payload.raw = { zonalPrices: zonalTree, ontarioPrice: ontarioTree }
   return payload
 }
 
-// --- Entry point -----------------------------------------------------------
+// --- entry point -----------------------------------------------------------
 
 export default async function handler(req, res) {
   const { report = 'snapshot', zone, debug } = req.query ?? {}
   const wantDebug = debug === '1' || debug === 'true'
 
-  // Cache at the edge: IESO real-time reports refresh every 5 minutes.
-  res.setHeader(
-    'Cache-Control',
-    's-maxage=120, stale-while-revalidate=300',
-  )
+  // Edge cache: IESO real-time reports refresh every ~5 minutes, so cache for
+  // 5 minutes and serve stale-while-revalidate for a smooth refresh.
+  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600')
 
   try {
     let payload
     if (report === 'series') {
-      const zoneId = String(zone ?? '').toLowerCase()
-      if (!ZONE_NAME_TO_ID[zoneId]) {
+      const id = String(zone ?? '').toLowerCase()
+      if (!KNOWN_ZONES.has(id)) {
         res.status(400).json({ error: `unknown or missing zone: ${zone}` })
         return
       }
-      payload = await handleSeries(zoneId, wantDebug)
+      payload = await handleSeries(id, wantDebug)
     } else if (report === 'snapshot') {
       payload = await handleSnapshot(wantDebug)
     } else {
@@ -245,7 +261,6 @@ export default async function handler(req, res) {
     }
     res.status(200).json(payload)
   } catch (err) {
-    // Surface a clean error; the client falls back to mock data on non-200.
     res.status(502).json({ error: String(err?.message ?? err) })
   }
 }
