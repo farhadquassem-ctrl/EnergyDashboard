@@ -23,10 +23,10 @@ const REPORTS = {
   ontarioPrice:
     'https://reports-public.ieso.ca/public/RealtimeOntarioZonalPrice/PUB_RealtimeOntarioZonalPrice.xml',
   // Per-zone 5-min demand (Ontario total used for the demand tile + GA risk).
-  // NOTE: this CSV is large; we range-fetch the tail. URL is best-effort —
-  // verify via ?report=snapshot&debug=1 if demand shows as null.
+  // This CSV is large; we range-fetch the tail. Path confirmed against the IESO
+  // report index: RealtimeDemandZonal/PUB_RealtimeDemandZonal.csv.
   demand:
-    'https://reports-public.ieso.ca/public/RealtimeZonalDemand/PUB_RealtimeZonalDemand.csv',
+    'https://reports-public.ieso.ca/public/RealtimeDemandZonal/PUB_RealtimeDemandZonal.csv',
 }
 
 // Dashboard zone ids (subset of IESO's virtual zones we plot).

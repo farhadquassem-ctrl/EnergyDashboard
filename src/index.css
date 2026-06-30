@@ -26,6 +26,11 @@ body {
   background: #09090b;
 }
 
+/* Pointer cursor over the interactive zone markers. */
+.leaflet-interactive {
+  cursor: pointer;
+}
+
 .leaflet-tile {
   filter: brightness(0.6) invert(1) contrast(0.9) hue-rotate(180deg)
     saturate(0.4) brightness(0.9);
