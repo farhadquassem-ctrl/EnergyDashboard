@@ -257,9 +257,11 @@ export default function NodalTab() {
         )}
       </div>
 
-      {/* Grid */}
+      {/* Grid — AG Grid needs a *definite* height. flex-1/min-height is
+          indefinite on mobile Safari and collapses the grid to zero rows, so
+          use a viewport height (vh is definite) with a px floor. */}
       <div
-        className="ag-theme-quartz-dark min-h-[460px] flex-1 overflow-hidden rounded-xl border border-zinc-800"
+        className="ag-theme-quartz-dark h-[70vh] min-h-[420px] overflow-hidden rounded-xl border border-zinc-800"
         style={GRID_THEME_VARS}
       >
         <AgGridReact
