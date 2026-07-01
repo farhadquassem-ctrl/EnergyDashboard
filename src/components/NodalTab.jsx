@@ -25,15 +25,19 @@ const pct = (p) => (p.value == null || p.value === '' ? '—' : `${Math.round(p.
 // --- grouping (hand-rolled; AG Grid Community has no row grouping) ----------
 const avg = (xs) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null)
 
+// All aggregates are over ONLY the group's own descendant leaf rows (buildTree
+// passes each group's rows here), so values are per-group, never global.
 function aggregate(rows) {
   const lmps = rows.map((r) => r.lmp).filter((n) => n != null)
   const congs = rows.map((r) => r.congestion).filter((n) => n != null)
+  const losses = rows.map((r) => r.loss).filter((n) => n != null)
   const bases = rows.map((r) => r.basis).filter((n) => n != null)
   return {
     count: rows.length,
     avgLmp: avg(lmps),
     avgCong: avg(congs),
     maxCong: congs.length ? Math.max(...congs.map(Math.abs)) : null,
+    avgLoss: avg(losses),
     maxBasis: bases.length ? Math.max(...bases.map(Math.abs)) : null,
   }
 }
@@ -89,8 +93,8 @@ function flatten(tree, expanded, depth = 0, out = []) {
       congestion: g.aggr.avgCong,
       maxCong: g.aggr.maxCong,
       basis: g.aggr.maxBasis,
+      loss: g.aggr.avgLoss,
       type: '',
-      loss: '',
       congestionPct: '',
     })
     if (isExpanded) {
