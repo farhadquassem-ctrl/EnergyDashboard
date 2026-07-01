@@ -1,0 +1,5 @@
+node_modules
+# Fetched intermediates and the full generated dataset are not committed
+# (they require live network + are large). See data/schema_sample.csv.
+data/*.json
+data/peak_dataset.csv

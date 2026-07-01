@@ -1,0 +1,4 @@
+timestamp,ontario_demand_mw,market_demand_mw,temp_c,dewpoint_c,humidex,wind_kmh,hour_of_day,day_of_week,month,is_weekend,is_holiday,is_top5_peak,is_top10_peak
+2025-07-15T17:00:00-04:00,21900,24720,32.1,21.4,41,14,17,2,7,0,0,0,1
+2025-07-15T18:00:00-04:00,22850,24760,31.7,21.0,40,12,18,2,7,0,0,1,1
+2025-07-16T03:00:00-04:00,14200,16100,19.8,17.2,,8,3,3,7,0,0,0,0

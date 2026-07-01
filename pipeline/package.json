@@ -1,0 +1,18 @@
+{
+  "name": "ieso-peak-pipeline",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Assembles a 12-month hourly dataset (demand + weather + official peak labels) for an Ontario 5CP peak-prediction model. Separate from the dashboard app.",
+  "scripts": {
+    "fetch:demand": "node src/fetch_demand.js",
+    "fetch:weather": "node src/fetch_weather.js",
+    "fetch:peaks": "node src/fetch_peaks.js",
+    "build": "node src/build_dataset.js",
+    "stations": "node src/fetch_weather.js --list-stations"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^4.4.1",
+    "luxon": "^3.5.0"
+  }
+}
