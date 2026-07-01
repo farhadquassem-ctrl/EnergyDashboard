@@ -84,13 +84,15 @@ function printSummary(rows, peaks) {
     if (miss > 0) console.log(`  ${c.padEnd(20)} ${miss} (${((miss / n) * 100).toFixed(1)}%)`)
   }
 
-  console.log('\ntop-5 peak hours (from ICI Peak Tracker, status=Final):')
+  console.log('\ntop-5 peak hours per base period (ICI Peak Tracker, status=Final):')
   if (!peaks.peaks?.length) {
     console.log('  (none — re-check fetch_peaks / base period)')
   } else {
-    peaks.peaks.slice(0, 5).forEach((p, i) =>
-      console.log(`  ${i + 1}. ${p.date} HE${p.hour}  ${p.value} MW  [${p.status}]`),
-    )
+    for (const p of peaks.peaks) {
+      console.log(
+        `  ${p.baseYear ?? '?'} #${p.rank}: ${p.date} HE${p.hour}  ${Math.round(p.value)} MW  [${p.status}]`,
+      )
+    }
   }
   console.log('\nSanity-check these against known 2025/26 Ontario peak days (hot summer weekday afternoons, HE13–HE19).')
 }

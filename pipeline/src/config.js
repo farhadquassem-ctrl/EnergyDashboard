@@ -68,10 +68,12 @@ function shiftMonths(iso, months) {
   d.setUTCMonth(d.getUTCMonth() + months)
   return d.toISOString().slice(0, 10)
 }
-// Base-period label for a date: May 1 2025 – Apr 30 2026 is the "2026" file.
+// ICI files are labelled by the base period's START year: May 2025 – Apr 2026
+// is "PUB_ICIPeakTracker_2025.xml" (confirmed against the real files). So a date
+// in May–Dec belongs to that year's period; Jan–Apr to the prior year's.
 function baseYearOf(iso) {
   const [y, m] = iso.split('-').map(Number)
-  return m >= 5 ? y + 1 : y
+  return m >= 5 ? y : y - 1
 }
 function baseYearsForWindow(startIso, endIso) {
   const a = baseYearOf(startIso)
