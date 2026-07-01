@@ -101,6 +101,10 @@ function flatten(tree, expanded, depth = 0, out = []) {
   return out
 }
 
+// Group/Node column value: group label for group rows, node name for leaves.
+const nameValueGetter = (p) =>
+  p.data?.__kind === 'group' ? p.data.name : p.data?.nodeName
+
 // First column: indented caret + group label (with count) or node name.
 function NameCell(p) {
   const d = p.data || {}
@@ -109,39 +113,40 @@ function NameCell(p) {
     return (
       <span style={{ paddingLeft: pad }} className="font-semibold text-zinc-100">
         <span className="inline-block w-4 text-zinc-400">{d.__expanded ? '▾' : '▸'}</span>
-        {d.name} <span className="font-normal text-zinc-500">({d.count})</span>
+        {p.value} <span className="font-normal text-zinc-500">({d.count})</span>
       </span>
     )
   }
   return (
     <span style={{ paddingLeft: pad + 18 }} className="text-zinc-300">
-      {d.name}
+      {p.value}
     </span>
   )
 }
 
 // --- column sets -----------------------------------------------------------
+// flex on every column so the grid fills the desktop width (no horizontal
+// scroll); minWidth acts as a floor so mobile scrolls instead of crushing.
 const GROUPED_COLS = [
-  { headerName: 'Group / Node', field: 'name', flex: 2, minWidth: 240, cellRenderer: NameCell, sortable: false },
-  { headerName: 'Type', field: 'type', minWidth: 90, sortable: false },
-  { headerName: 'Avg/LMP', field: 'lmp', type: 'rightAligned', valueFormatter: num, sortable: false, minWidth: 90 },
-  { headerName: 'Congestion', field: 'congestion', type: 'rightAligned', valueFormatter: num, cellStyle: divergingCellStyle, sortable: false, minWidth: 105 },
-  { headerName: 'Max |Cong|', field: 'maxCong', type: 'rightAligned', valueFormatter: num, sortable: false, minWidth: 95 },
-  { headerName: 'Loss', field: 'loss', type: 'rightAligned', valueFormatter: num, sortable: false, minWidth: 70 },
-  { headerName: 'Basis', field: 'basis', type: 'rightAligned', valueFormatter: num, cellStyle: divergingCellStyle, sortable: false, minWidth: 80 },
-  { headerName: 'Cong %', field: 'congestionPct', type: 'rightAligned', valueFormatter: pct, sortable: false, minWidth: 80 },
+  { headerName: 'Group / Node', valueGetter: nameValueGetter, cellRenderer: NameCell, flex: 2.4, minWidth: 190, sortable: false },
+  { headerName: 'Type', field: 'type', flex: 0.9, minWidth: 78, sortable: false },
+  { headerName: 'LMP', field: 'lmp', type: 'rightAligned', valueFormatter: num, flex: 1, minWidth: 76, sortable: false },
+  { headerName: 'Congestion', field: 'congestion', type: 'rightAligned', valueFormatter: num, cellStyle: divergingCellStyle, flex: 1.1, minWidth: 92, sortable: false },
+  { headerName: 'Max |Cong|', field: 'maxCong', type: 'rightAligned', valueFormatter: num, flex: 1, minWidth: 84, sortable: false },
+  { headerName: 'Loss', field: 'loss', type: 'rightAligned', valueFormatter: num, flex: 0.8, minWidth: 66, sortable: false },
+  { headerName: 'Basis', field: 'basis', type: 'rightAligned', valueFormatter: num, cellStyle: divergingCellStyle, flex: 1.1, minWidth: 84, sortable: false },
 ]
 
 const FLAT_COLS = [
-  { headerName: 'Node', field: 'nodeName', flex: 2, minWidth: 200, filter: 'agTextColumnFilter' },
-  { headerName: 'Zone', field: 'zone', minWidth: 110, filter: 'agTextColumnFilter' },
-  { headerName: 'Type', field: 'locationType', minWidth: 100, filter: 'agTextColumnFilter' },
-  { headerName: 'LMP', field: 'lmp', type: 'rightAligned', valueFormatter: num, minWidth: 90 },
-  { headerName: 'Energy', field: 'energy', type: 'rightAligned', valueFormatter: num, minWidth: 90 },
-  { headerName: 'Congestion', field: 'congestion', type: 'rightAligned', valueFormatter: num, cellStyle: divergingCellStyle, sort: 'desc', minWidth: 110 },
-  { headerName: 'Loss', field: 'loss', type: 'rightAligned', valueFormatter: num, minWidth: 80 },
-  { headerName: 'Basis (vs ONZP)', field: 'basis', type: 'rightAligned', valueFormatter: num, cellStyle: divergingCellStyle, minWidth: 120 },
-  { headerName: 'Cong %', field: 'congestionPct', type: 'rightAligned', valueFormatter: pct, minWidth: 90 },
+  { headerName: 'Node', field: 'nodeName', flex: 2.2, minWidth: 190, filter: 'agTextColumnFilter' },
+  { headerName: 'Zone', field: 'zone', flex: 1, minWidth: 96, filter: 'agTextColumnFilter' },
+  { headerName: 'Type', field: 'locationType', flex: 1, minWidth: 90, filter: 'agTextColumnFilter' },
+  { headerName: 'LMP', field: 'lmp', type: 'rightAligned', valueFormatter: num, flex: 0.9, minWidth: 76 },
+  { headerName: 'Energy', field: 'energy', type: 'rightAligned', valueFormatter: num, flex: 0.9, minWidth: 76 },
+  { headerName: 'Congestion', field: 'congestion', type: 'rightAligned', valueFormatter: num, cellStyle: divergingCellStyle, sort: 'desc', flex: 1.1, minWidth: 92 },
+  { headerName: 'Loss', field: 'loss', type: 'rightAligned', valueFormatter: num, flex: 0.8, minWidth: 66 },
+  { headerName: 'Basis', field: 'basis', type: 'rightAligned', valueFormatter: num, cellStyle: divergingCellStyle, flex: 1.1, minWidth: 84 },
+  { headerName: 'Cong %', field: 'congestionPct', type: 'rightAligned', valueFormatter: pct, flex: 0.9, minWidth: 76 },
 ]
 
 const GRID_THEME_VARS = {
