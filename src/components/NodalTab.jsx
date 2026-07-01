@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AgGridReact } from 'ag-grid-react'
+// Side-effect import of the packages bundle registers all community modules.
+// Without it the production build ships an unregistered grid that renders blank
+// (no headers/rows). Must precede the CSS imports.
+import 'ag-grid-community'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 import { lmpToColor } from '../utils/colorScale'
