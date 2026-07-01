@@ -11,6 +11,7 @@ import { FILES, DATA_DIR, START_DATE, END_DATE } from './config.js'
 import { toCsv } from './lib/csv.js'
 import { easternHourlyIndex, calendarFeatures, easternIso } from './lib/time.js'
 import { isOntarioHoliday } from './lib/holidays.js'
+import { isMain } from './lib/is-main.js'
 
 const COLUMNS = [
   'timestamp',
@@ -94,7 +95,7 @@ function printSummary(rows, peaks) {
   console.log('\nSanity-check these against known 2025/26 Ontario peak days (hot summer weekday afternoons, HE13–HE19).')
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMain(import.meta.url)) {
   try {
     buildDataset()
   } catch (e) {

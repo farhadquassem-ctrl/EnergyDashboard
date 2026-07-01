@@ -11,6 +11,7 @@ import { URLS, FILES, DATA_DIR, START_DATE, END_DATE } from './config.js'
 import { fetchText } from './lib/http.js'
 import { parseCsv, columnIndex } from './lib/csv.js'
 import { iesoHourEndingToDateTime, utcHourKey } from './lib/time.js'
+import { isMain } from './lib/is-main.js'
 
 function yearsInWindow(startIso, endIso) {
   const a = Number(startIso.slice(0, 4))
@@ -52,9 +53,16 @@ export async function fetchDemand() {
   for (const year of yearsInWindow(START_DATE, END_DATE)) {
     const url = year === thisYear ? URLS.demandCurrent : URLS.demandYear(year)
     console.log(`fetch_demand: ${url}`)
-    const text = await fetchText(url)
-    for (const row of parseDemandCsv(text)) merged.set(row.key, row)
+    try {
+      const text = await fetchText(url)
+      for (const row of parseDemandCsv(text)) merged.set(row.key, row)
+    } catch (e) {
+      // A missing/renamed archive year shouldn't abort the whole pull — the
+      // window just loses those months (reported by build_dataset's QA summary).
+      console.warn(`  skipped ${year} (${e.message}) — check archive filename if you need this range`)
+    }
   }
+  if (merged.size === 0) throw new Error('no demand rows fetched (all sources failed)')
 
   const rows = [...merged.values()].sort((a, b) => a.key.localeCompare(b.key))
   mkdirSync(DATA_DIR, { recursive: true })
@@ -64,7 +72,7 @@ export async function fetchDemand() {
 }
 
 // Run directly: `npm run fetch:demand`
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMain(import.meta.url)) {
   fetchDemand().catch((e) => {
     console.error('fetch_demand failed:', e.message)
     console.error('NOTE: reports-public.ieso.ca is blocked from the Claude sandbox; run this locally.')

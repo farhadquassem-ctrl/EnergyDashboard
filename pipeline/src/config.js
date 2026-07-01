@@ -13,9 +13,12 @@ export const DATA_DIR = join(here, '..', 'data')
 export const END_DATE = process.env.PIPELINE_END ?? isoToday()
 export const START_DATE = shiftMonths(END_DATE, -12)
 
-// The ICI base period(s) the window overlaps. Base period = May 1 – Apr 30.
-// A trailing-12-month window usually spans two base-period year files.
+// The ICI base period(s) the window overlaps. Base period = May 1 – Apr 30,
+// labelled by the year it ends in (May 2025–Apr 2026 => "2026"). A trailing
+// 12-month window usually spans two. The still-in-progress period has no year
+// file yet — it's the no-year current tracker (see URLS.peaksCurrent).
 export const PEAK_YEARS = baseYearsForWindow(START_DATE, END_DATE)
+export const CURRENT_BASE_YEAR = baseYearOf(END_DATE)
 
 // --- Weather station -------------------------------------------------------
 // Toronto Pearson Int'l A: most complete continuous HOURLY record (24/7 airport
@@ -39,6 +42,9 @@ export const URLS = {
   // ICI Peak Tracker — finalized per-base-period ranking (ground-truth labels).
   peaksYear: (year) =>
     `https://reports-public.ieso.ca/public/ICIPeakTracker/PUB_ICIPeakTracker_${year}.xml`,
+  // The current, in-progress base period (no year suffix).
+  peaksCurrent:
+    'https://reports-public.ieso.ca/public/ICIPeakTracker/PUB_ICIPeakTracker.xml',
 
   // MSC GeoMet OGC API (Environment Canada).
   weatherItems: 'https://api.weather.gc.ca/collections/climate-hourly/items',

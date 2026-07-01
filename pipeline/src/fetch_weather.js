@@ -13,6 +13,7 @@ import { writeFileSync, mkdirSync } from 'node:fs'
 import { URLS, FILES, DATA_DIR, START_DATE, END_DATE, WEATHER_STATION } from './config.js'
 import { fetchJson } from './lib/http.js'
 import { estLocalToDateTime, utcHourKey } from './lib/time.js'
+import { isMain } from './lib/is-main.js'
 
 const PAGE = 10000
 
@@ -85,7 +86,7 @@ export async function fetchWeather() {
   return rows
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMain(import.meta.url)) {
   const run = process.argv.includes('--list-stations') ? listStations : fetchWeather
   run().catch((e) => {
     console.error('fetch_weather failed:', e.message)

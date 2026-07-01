@@ -9,9 +9,10 @@
 
 import { writeFileSync, mkdirSync } from 'node:fs'
 import { XMLParser } from 'fast-xml-parser'
-import { URLS, FILES, DATA_DIR, PEAK_YEARS } from './config.js'
+import { URLS, FILES, DATA_DIR, PEAK_YEARS, CURRENT_BASE_YEAR } from './config.js'
 import { fetchText } from './lib/http.js'
 import { iciPeakToDateTime, utcHourKey } from './lib/time.js'
+import { isMain } from './lib/is-main.js'
 
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '', parseTagValue: true, trimValues: true })
 
@@ -38,12 +39,20 @@ function collectPeakRows(node, out = []) {
 }
 
 export async function fetchPeaks() {
+  // Completed base periods -> year files; the in-progress one -> no-year file.
+  const urls = PEAK_YEARS.map((year) =>
+    year >= CURRENT_BASE_YEAR ? URLS.peaksCurrent : URLS.peaksYear(year),
+  )
+
   const all = []
-  for (const year of PEAK_YEARS) {
-    const url = URLS.peaksYear(year)
+  for (const url of [...new Set(urls)]) {
     console.log(`fetch_peaks: ${url}`)
-    const tree = parser.parse(await fetchText(url))
-    all.push(...collectPeakRows(tree))
+    try {
+      const tree = parser.parse(await fetchText(url))
+      all.push(...collectPeakRows(tree))
+    } catch (e) {
+      console.warn(`  skipped ${url}: ${e.message}`)
+    }
   }
 
   // Final rows only; if a (date,hour) appears more than once keep the max value.
@@ -68,7 +77,7 @@ export async function fetchPeaks() {
   return payload
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMain(import.meta.url)) {
   fetchPeaks().catch((e) => {
     console.error('fetch_peaks failed:', e.message)
     console.error('NOTE: reports-public.ieso.ca is blocked from the Claude sandbox; run this locally.')
