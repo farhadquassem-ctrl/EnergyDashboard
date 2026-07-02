@@ -14,26 +14,33 @@ export const END_DATE = process.env.PIPELINE_END ?? isoToday()
 export const START_DATE = shiftMonths(END_DATE, -12)
 
 // The ICI base period(s) the window overlaps. Base period = May 1 – Apr 30,
-// labelled by the year it ends in (May 2025–Apr 2026 => "2026"). A trailing
-// 12-month window usually spans two. The still-in-progress period has no year
-// file yet — it's the no-year current tracker (see URLS.peaksCurrent).
+// labelled by its START year (May 2025–Apr 2026 => "2025"; see baseYearOf).
+// A trailing 12-month window usually spans two.
 export const PEAK_YEARS = baseYearsForWindow(START_DATE, END_DATE)
 export const CURRENT_BASE_YEAR = baseYearOf(END_DATE)
 
 // --- Weather station -------------------------------------------------------
 // Active Toronto hourly stations (all reporting as of 2026-06-30):
-//   6158355 TORONTO CITY        - downtown load-centroid; the demand-weather
-//                                 literature uses "City of Toronto" (default).
 //   6158731 TORONTO INTL A       - Pearson (current); most complete airport
-//                                 record — the completeness backup.
+//                                 record, reports wind — the default, and the
+//                                 station weather-normalization models weight.
+//   6158355 TORONTO CITY         - downtown load-centroid; ~complete temp but
+//                                 no wind (no downtown anemometer).
 //   6158359 TORONTO CITY CENTRE  - island airport.
 // (The old 6158733 Pearson "INT'L A" was decommissioned; data ends 2013.)
-// If build_dataset reports a high weather-missing %, switch to 6158731.
-// Verify coverage anytime with `npm run stations`.
-export const WEATHER_STATION = {
-  climateId: '6158731',
-  name: 'TORONTO INTL A',
-}
+// Override without editing this file:  WEATHER_STATION_ID=6158355 npm run build
+// Compare all candidates:              npm run weather:compare
+const DEFAULT_STATION_ID = '6158731'
+export const CANDIDATE_STATIONS = [
+  { climateId: '6158731', name: 'TORONTO INTL A (Pearson)' },
+  { climateId: '6158355', name: 'TORONTO CITY' },
+  { climateId: '6158359', name: 'TORONTO CITY CENTRE' },
+]
+export const WEATHER_STATION = (() => {
+  const id = process.env.WEATHER_STATION_ID ?? DEFAULT_STATION_ID
+  const match = CANDIDATE_STATIONS.find((s) => s.climateId === id)
+  return match ?? { climateId: id, name: `station ${id}` }
+})()
 
 // --- Source URLs (verified in DATA_PIPELINE.md — do not guess others) -------
 export const URLS = {
