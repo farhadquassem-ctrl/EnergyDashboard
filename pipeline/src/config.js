@@ -8,14 +8,22 @@ const here = dirname(fileURLToPath(import.meta.url))
 export const DATA_DIR = join(here, '..', 'data')
 
 // --- Date window -----------------------------------------------------------
-// Trailing 12 months. Override END with e.g. PIPELINE_END=2026-04-30.
-// Everything downstream is anchored to these two dates (Eastern calendar days).
+// Trailing window (default 12 months). Everything downstream — demand/weather
+// year fans, PEAK_YEARS, the hourly index — is anchored to these two Eastern
+// calendar days, so widening the window is all it takes to cover more history.
+//   PIPELINE_END=2026-04-30      align the end to a complete base period
+//   PIPELINE_MONTHS=24           window length in months (2 years)
+//   PIPELINE_START=2024-05-01    pin the start explicitly (overrides MONTHS)
+// For a 5CP backtest, prefer whole base periods (May 1 – Apr 30). Two periods:
+//   PIPELINE_START=2024-05-01 PIPELINE_END=2026-04-30  (base years 2024 + 2025)
+const WINDOW_MONTHS = Number(process.env.PIPELINE_MONTHS ?? 12)
 export const END_DATE = process.env.PIPELINE_END ?? isoToday()
-export const START_DATE = shiftMonths(END_DATE, -12)
+export const START_DATE = process.env.PIPELINE_START ?? shiftMonths(END_DATE, -WINDOW_MONTHS)
 
 // The ICI base period(s) the window overlaps. Base period = May 1 – Apr 30,
 // labelled by its START year (May 2025–Apr 2026 => "2025"; see baseYearOf).
-// A trailing 12-month window usually spans two.
+// A trailing 12-month window usually spans two; a 24-month window spans two full
+// periods, and fetch_peaks pulls one year file per base period listed here.
 export const PEAK_YEARS = baseYearsForWindow(START_DATE, END_DATE)
 export const CURRENT_BASE_YEAR = baseYearOf(END_DATE)
 
