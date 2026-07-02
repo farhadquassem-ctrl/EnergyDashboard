@@ -62,32 +62,37 @@ export async function fetchWeather() {
   const { climateId, name } = WEATHER_STATION
   console.log(`fetch_weather: station ${name} (${climateId}), ${START_DATE} .. ${END_DATE}`)
 
+  // Neither the OGC `datetime` param nor a LOCAL_YEAR filter is honoured by this
+  // collection, but `sortby` is. So walk newest-first and stop once we pass the
+  // window start — one page (~10k hours ≈ 14 months) usually covers 12 months.
   const out = new Map()
-  for (const year of yearsInWindow(START_DATE, END_DATE)) {
-    for (let offset = 0; ; offset += PAGE) {
-      const url =
-        `${URLS.weatherItems}?CLIMATE_IDENTIFIER=${climateId}&LOCAL_YEAR=${year}` +
-        `&limit=${PAGE}&offset=${offset}&f=json`
-      const data = await fetchJson(url)
-      const feats = data.features ?? []
-      for (const f of feats) {
-        const p = f.properties
-        if (p.LOCAL_YEAR == null || p.LOCAL_HOUR == null) continue
-        const dt = estLocalToDateTime(+p.LOCAL_YEAR, +p.LOCAL_MONTH, +p.LOCAL_DAY, +p.LOCAL_HOUR)
-        const key = utcHourKey(dt)
-        // keep only the requested window (year queries include out-of-window months)
-        if (dt < WINDOW_START || dt > WINDOW_END) continue
-        out.set(key, {
-          key,
-          temp_c: num(p.TEMP),
-          dewpoint_c: num(p.DEW_POINT_TEMP),
-          humidex: num(p.HUMIDEX),
-          wind_kmh: num(p.WIND_SPEED),
-        })
+  for (let offset = 0; ; offset += PAGE) {
+    const url =
+      `${URLS.weatherItems}?CLIMATE_IDENTIFIER=${climateId}` +
+      `&sortby=-LOCAL_DATE&limit=${PAGE}&offset=${offset}&f=json`
+    const data = await fetchJson(url)
+    const feats = data.features ?? []
+    let passedWindowStart = false
+    for (const f of feats) {
+      const p = f.properties
+      if (p.LOCAL_YEAR == null || p.LOCAL_HOUR == null) continue
+      const dt = estLocalToDateTime(+p.LOCAL_YEAR, +p.LOCAL_MONTH, +p.LOCAL_DAY, +p.LOCAL_HOUR)
+      if (dt < WINDOW_START) {
+        passedWindowStart = true // sorted desc, so the rest are older too
+        break
       }
-      console.log(`  ${year} offset=${offset}: ${feats.length} obs (kept ${out.size})`)
-      if (feats.length < PAGE) break
+      if (dt > WINDOW_END) continue
+      const key = utcHourKey(dt)
+      out.set(key, {
+        key,
+        temp_c: num(p.TEMP),
+        dewpoint_c: num(p.DEW_POINT_TEMP),
+        humidex: num(p.HUMIDEX),
+        wind_kmh: num(p.WIND_SPEED),
+      })
     }
+    console.log(`  offset=${offset}: ${feats.length} obs (kept ${out.size})`)
+    if (passedWindowStart || feats.length < PAGE) break
   }
 
   const rows = [...out.values()].sort((a, b) => a.key.localeCompare(b.key))
