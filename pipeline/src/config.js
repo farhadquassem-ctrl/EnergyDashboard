@@ -21,13 +21,18 @@ export const PEAK_YEARS = baseYearsForWindow(START_DATE, END_DATE)
 export const CURRENT_BASE_YEAR = baseYearOf(END_DATE)
 
 // --- Weather station -------------------------------------------------------
-// Toronto Pearson Int'l A: most complete continuous HOURLY record (24/7 airport
-// obs), best for a gap-free backtest. Toronto City (6158355) is the downtown
-// load-centroid alternative but has more gaps. Run `npm run stations` to verify
-// coverage before changing this.
+// Active Toronto hourly stations (all reporting as of 2026-06-30):
+//   6158355 TORONTO CITY        - downtown load-centroid; the demand-weather
+//                                 literature uses "City of Toronto" (default).
+//   6158731 TORONTO INTL A       - Pearson (current); most complete airport
+//                                 record — the completeness backup.
+//   6158359 TORONTO CITY CENTRE  - island airport.
+// (The old 6158733 Pearson "INT'L A" was decommissioned; data ends 2013.)
+// If build_dataset reports a high weather-missing %, switch to 6158731.
+// Verify coverage anytime with `npm run stations`.
 export const WEATHER_STATION = {
-  climateId: '6158733',
-  name: 'TORONTO INTL A (Pearson)',
+  climateId: '6158355',
+  name: 'TORONTO CITY',
 }
 
 // --- Source URLs (verified in DATA_PIPELINE.md — do not guess others) -------
