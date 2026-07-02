@@ -80,26 +80,11 @@ peaks labeled correctly (Jun 24 HE19 24,862 MW, etc.).
 
 ## Open tasks (pick up here)
 
-1. **✅ 2024 (and earlier) ICI peak labels — fixed via a historical fallback,
-   verified end-to-end on the user's machine.**
-   Root cause wasn't a pre-Market-Renewal schema difference: reports-public.ieso.ca
-   doesn't reliably archive every base year — 2020/2021 404, and `PUB_ICIPeakTracker_2024.xml`
-   returns 5 datapoints with zero `Final` status (an incomplete/in-progress file,
-   not a real 2024 archive).
-   Fix: `pipeline/fixtures/historical_peaks_top5.csv`, one consolidated reference
-   covering 2010-2011 → 2025-2026 base years, with two row kinds (`Metric` column):
-   `AQEW_MWh` (ranks 1-5, all years, from the user's Historical Peaks export —
-   AQEW is ON demand − storage injection − embedded generation; different
-   published value, same identified peak hour vs. `TOP_ONTARIO_DEMAND`, an
-   accepted apples-to-apples v1 choice) and `Demand_MW` (ranks 6-10, 2022/2023/2025
-   only — appended after a real run got live `Final` data for those years,
-   values read straight from that run's `demand.json`). `fetch_peaks.js` falls
-   back to this file whenever a base year's live fetch fails or returns zero
-   Final entries; for years with only ranks 1-5, `is_top10_peak == is_top5_peak`.
-   **Verified on the user's machine** (`PIPELINE_START=2020-05-01
-   PIPELINE_END=2026-04-30`): `fetch:peaks` → 2020/2021/2024 via fallback (top5),
-   2022/2023/2025 live (top10); `build` → 52,584-row `peak_dataset.csv`,
-   2020-05-01 → 2026-04-30, all 6 base years' peak hours present and correct.
+1. **✅ Done — 2024 (and earlier) ICI peak labels, fixed via a historical
+   fallback** (`pipeline/fixtures/historical_peaks_top5.csv`, consolidated
+   AQEW_MWh ranks 1-5 + Demand_MW ranks 6-10 for 2022/2023/2025). Verified
+   end-to-end on the user's machine over 2020-05-01 → 2026-04-30. PR:
+   https://github.com/farhadquassem-ctrl/EnergyDashboard/pull/4
 
 2. **Tab 3 — Peak Prediction backtest/validation module** (not started, paused
    at user's request). Consume `peak_dataset.csv` **directly** (already aligned +
