@@ -4,7 +4,19 @@
 //   * IESO Hourly Demand  -> EPT: America/Toronto wall time, DST-aware.
 //                            "Hour" is hour-ENDING 1..24 (HE1 covers 00:00-01:00).
 //   * ECCC hourly weather -> LST: Local Standard Time = EST year-round (NO DST).
-//   * ICI Peak Tracker    -> EST year-round, base period May 1 – Apr 30.
+//   * ICI Peak Tracker    -> deliveryHour empirically matches IESO demand's own
+//                            EPT (DST-aware) hour-ending, NOT fixed EST, despite
+//                            the report XML's own metadata timestamps using a
+//                            constant -0500 offset. Confirmed by cross-referencing
+//                            three independent real peak entries (2022-07-19 HE18,
+//                            2023-09-05 HE17, 2025-06-24 HE19) against demand.json:
+//                            each source's reported peak *value* only matches the
+//                            demand row when deliveryHour is converted via the
+//                            same DST-aware Eastern zone as demand, not EST_FIXED
+//                            -- the earlier "EST year-round" assumption here was
+//                            wrong and silently shifted every peak label 1 hour
+//                            late for the entire DST season (i.e. every real
+//                            peak in this dataset, since they're all summer).
 //
 // Strategy: convert every source to a UTC epoch-hour key, join on that, and
 // emit the human-facing `timestamp` in Eastern wall time (America/Toronto).
@@ -46,13 +58,12 @@ export function estLocalToDateTime(year, month, day, hour) {
 }
 
 /**
- * ICI Peak Tracker deliveryDate + deliveryHour (EST, hour-ending) -> DateTime.
- * Same hour-ending convention as IESO demand, but fixed EST year-round.
+ * ICI Peak Tracker deliveryDate + deliveryHour -> DateTime. Same hour-ending
+ * convention as IESO demand (EPT, DST-aware) -- see the file-level comment
+ * for how this was confirmed against real demand values.
  */
 export function iciPeakToDateTime(deliveryDate, deliveryHour) {
-  return DateTime.fromISO(`${deliveryDate}T00:00`, { zone: EST_FIXED }).plus({
-    hours: Number(deliveryHour) - 1,
-  })
+  return iesoHourEndingToDateTime(deliveryDate, deliveryHour)
 }
 
 // Build the full hourly index (inclusive start, exclusive end) as UTC-hour keys

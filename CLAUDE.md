@@ -10,9 +10,12 @@ Two independent deliverables live in this repo:
    official ICI peak labels) for backtesting an Ontario **5CP** model. It does
    **not** import or touch the app.
 
-> Branch convention for this workstream: develop on
-> `claude/peak-prediction-pipeline`, commit with clear messages, push with
-> `git push -u origin <branch>`. Don't open PRs unless asked.
+> Branch convention for this workstream: `claude/peak-prediction-pipeline` (data
+> pipeline, done — merged) has given way to `claude/peak-prediction-engine`
+> (the model + backtest, current work). `main` and
+> `claude/ieso-lmp-dashboard-scaffold-2j6b2j` are both fully up to date and
+> content-identical as of this branch's creation. Commit with clear messages,
+> push with `git push -u origin <branch>`. Don't open PRs unless asked.
 
 ---
 
@@ -86,11 +89,63 @@ peaks labeled correctly (Jun 24 HE19 24,862 MW, etc.).
    end-to-end on the user's machine over 2020-05-01 → 2026-04-30. PR:
    https://github.com/farhadquassem-ctrl/EnergyDashboard/pull/4
 
-2. **Tab 3 — Peak Prediction backtest/validation module** (not started, paused
-   at user's request). Consume `peak_dataset.csv` **directly** (already aligned +
-   labeled) — do **not** re-rank raw demand. Honest backtest note: v1 uses
-   *actual* demand as the signal; a real forecast-based eval (IESO Adequacy
-   Report) is a documented future refinement.
+2. **✅ Peak-prediction engine + backtest v1 — working, on `claude/peak-prediction-engine`.**
+   Pipeline-side CLI only so far (`npm run backtest`; `pipeline/src/peak_model.js`
+   + `pipeline/src/backtest.js`) — no dashboard UI yet, that's a later, separate
+   step now that the model's validated. Consumes `peak_dataset.csv` **directly**
+   — does **not** re-rank raw demand.
+
+   **⚠️ Bug found and fixed while building this: every peak label in
+   `peak_dataset.csv` was shifted 1 hour late, for every year.** `iciPeakToDateTime`
+   (`pipeline/src/lib/time.js`) converted the ICI Peak Tracker's `deliveryHour`
+   using a fixed EST (UTC-5) offset, per this file's own prior documentation
+   ("ICI Peak Tracker -> EST year-round"). That assumption was wrong: cross-
+   referencing 3 independent real peak entries (2022-07-19 HE18, 2023-09-05
+   HE17, 2025-06-24 HE19) against `demand.json` showed each source's reported
+   peak *value* only matches the demand row when `deliveryHour` is converted
+   via the same DST-aware Eastern zone as demand, not fixed EST — despite the
+   report XML's own metadata timestamps using a constant -0500 offset. Fixed
+   by having `iciPeakToDateTime` reuse `iesoHourEndingToDateTime` directly.
+   This silently affected every previous build of `peak_dataset.csv` (task 1
+   included) since every real peak in this dataset falls in DST season.
+
+   **Model:** multivariate OLS regression (normal equations, hand-rolled —
+   `simple-statistics` has no multivariate/logistic fitting, only 2-variable
+   `linearRegression`; used instead for `mean`/`sampleCorrelation` diagnostics)
+   predicting `ontario_demand_mw` from complete-record features: `temp_c`,
+   `dewpoint_c`, `wind_kmh`, `hour_of_day`, `month`, `is_weekend`, `is_holiday`
+   (excludes `humidex` — ~82% missing, summer-only). Candidates are hard-filtered
+   to **HE11-HE22 and June-September** (`peak_model.js`). The month filter isn't
+   just convenience: Ontario demand-vs-month is bimodal (winter heating +
+   summer cooling both raise demand), so left unfiltered, winter data cancels
+   out `temp_c`'s real summer signal — measured R²~0.13 unfiltered vs. **~0.82**
+   once restricted to the real summer season, which covers 44/45 actual top10
+   peak hours in 2020-2025 (the one exception, a Feb-2023 cold-snap entry, is
+   an accepted v1 gap).
+
+   **Backtest:** walk-forward / expanding window across the 6 base periods —
+   train on base years strictly before the test year (2020 is training-only,
+   2021-2025 evaluated). Per test year: predict every candidate hour, rank
+   days by their highest-predicted hour, flag the top 15, and for each emit a
+   window centered on that day's top hour at 3 widths = **risk profiles**
+   (Conservative=3h, Balanced=4h, Aggressive=5h — narrower = less unnecessary
+   ICI curtailment cost, wider = safer catch). **Results (2021-2025):** R²
+   0.81-0.82 every year; top5/top10 recall inside the flagged window ranges
+   40-100% (Conservative) up to 78-100% (Aggressive), at 45-75 curtailment-hours
+   per ~1,500-hour candidate season (~3-5%). The stricter *unwindowed*
+   top-10-predicted-vs-actual-top10 overlap is lower (1-2/10) — expected, exact
+   hour-for-hour ranking across a whole season is a much harder bar than
+   "within my flagged window."
+
+   **Known v1 limitations (accepted, not bugs):** uses actual demand/weather as
+   the signal, not a forecast (real forecast-based eval is a documented future
+   refinement); assumes peaks fall in the HE11-22 / June-Sept band, which holds
+   for 44/45 hours in 2020-2025 but not universally (base year 2014-2015 peaked
+   in a Jan/Feb cold snap, outside this dataset's window — flagged so it's not
+   a silent blind spot if winter years are ever added).
+
+   **Next:** dashboard Tab 3 UI (needs a design decision on how the app reads
+   pipeline output — no `public/` folder or serving convention exists yet).
 
 3. (Optional) Adapt Gemini's Vitest serverless-fallback integration test onto a
    dashboard branch — offered, not confirmed. Note: Gemini's draft had wrong

@@ -79,6 +79,7 @@ export const FILES = {
   weather: join(DATA_DIR, 'weather.json'),
   peaks: join(DATA_DIR, 'peaks.json'),
   dataset: join(DATA_DIR, 'peak_dataset.csv'),
+  backtest: join(DATA_DIR, 'backtest_results.json'),
 }
 
 // Checked-in fallback labels — a single consolidated reference (top-5 AQEW,
@@ -101,7 +102,8 @@ function shiftMonths(iso, months) {
 // ICI files are labelled by the base period's START year: May 2025 – Apr 2026
 // is "PUB_ICIPeakTracker_2025.xml" (confirmed against the real files). So a date
 // in May–Dec belongs to that year's period; Jan–Apr to the prior year's.
-function baseYearOf(iso) {
+// Exported: also used by backtest.js to group peak_dataset.csv rows by base year.
+export function baseYearOf(iso) {
   const [y, m] = iso.split('-').map(Number)
   return m >= 5 ? y : y - 1
 }
