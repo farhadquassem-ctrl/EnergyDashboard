@@ -11,19 +11,26 @@
 //     > datapoint > datetimeInfo > { deliveryDate, deliveryHour }
 //                 > value, status
 //
-// Fallback: reports-public.ieso.ca has no per-year archive before 2025 (the
-// "_2024" URL serves the in-progress 2025 tracker instead of a real 2024
-// archive — confirmed by inspecting a real pull of that URL). For base years
-// where the live file 404s or has zero Final entries, we fall back to
-// fixtures/historical_peaks_top5.csv, a checked-in top-5 AQEW reference
-// covering 2010-2011 onward. Its (date, hour) pairs were spot-checked against
-// the live 2025 TOP_ONTARIO_DEMAND/Final ranking and match rank-for-rank.
-// AQEW (Allocated Quantity of Energy Withdrawn) != raw Ontario demand — it's
-// ON demand minus storage injection (batteries) minus embedded/behind-the-meter
-// generation — but it identifies the same peak hours, so using its (date, hour)
-// as the label is an apples-to-apples v1 choice; the two published values just
-// aren't numerically comparable. It has no ranks 6-10, so for any base year
-// sourced from it, is_top10_peak == is_top5_peak (not independently known).
+// Fallback: reports-public.ieso.ca doesn't reliably archive every base year —
+// confirmed 404 for 2020/2021, and the "_2024" URL returns 5 datapoints with
+// zero Final status (an incomplete/in-progress file, not a real 2024 archive).
+// For base years where the live file 404s or has zero Final entries, we fall
+// back to fixtures/historical_peaks_top5.csv, a single checked-in reference
+// covering 2010-2011 onward. Two kinds of rows live in that one file:
+//   - AQEW_MWh (ranks 1-5, all years): from the user's historical Top-5 export.
+//     AQEW (Allocated Quantity of Energy Withdrawn) != raw Ontario demand —
+//     it's ON demand minus storage injection (batteries) minus embedded/
+//     behind-the-meter generation — but it identifies the same peak hours, so
+//     using its (date, hour) as the label is an apples-to-apples v1 choice;
+//     the two published values just aren't numerically comparable. Spot-checked
+//     against the live 2025 TOP_ONTARIO_DEMAND/Final ranking and matches
+//     rank-for-rank.
+//   - Demand_MW (ranks 6-10, 2022/2023/2025 only): appended after a real
+//     fetch_peaks run got live Final data for those years, pulled straight out
+//     of that run's demand.json. Keeps top10 coverage for those years even if
+//     IESO's archive later disappears; not (yet) known for any other year.
+// Every other year only has ranks 1-5, so is_top10_peak == is_top5_peak for
+// those base years (ranks 6-10 aren't independently known).
 //
 // Output: pipeline/data/peaks.json = { top5:[key], top10:[key], peaks:[...] }
 
@@ -37,17 +44,22 @@ import { isMain } from './lib/is-main.js'
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '', parseTagValue: true, trimValues: true })
 const toArray = (v) => (Array.isArray(v) ? v : v == null ? [] : [v])
 
-// fixtures/historical_peaks_top5.csv -> Map<baseYear, [{rank,date,hour,value}]>,
+// fixtures/historical_peaks_top5.csv -> Map<baseYear, [{rank,date,hour,value,metric}]>,
 // keyed by the base period's START year (its "Base Year" column is "2024-2025"
-// etc.; we key on the leading year to match PEAK_YEARS).
+// etc.; we key on the leading year to match PEAK_YEARS). Most base years only
+// have ranks 1-5 (metric=AQEW_MWh, from the user's historical export). A few
+// years where a real fetch_peaks run got a live "Final" result (2022, 2023,
+// 2025) have been enriched with ranks 6-10 (metric=Demand_MW, read straight
+// out of that run's demand.json) so the fixture keeps full top10 coverage
+// even if IESO's live archive for that year later disappears.
 function loadHistoricalTop5() {
   const lines = readFileSync(HISTORICAL_TOP5_FILE, 'utf8').trim().split('\n').slice(1)
   const byYear = new Map()
   for (const line of lines) {
-    const [baseYear, rank, date, hour, value] = line.split(',')
+    const [baseYear, rank, date, hour, value, metric] = line.split(',')
     const year = Number(baseYear.split('-')[0])
     const rows = byYear.get(year) ?? []
-    rows.push({ rank: Number(rank), date, hour: Number(hour), value: Number(value) })
+    rows.push({ rank: Number(rank), date, hour: Number(hour), value: Number(value), metric })
     byYear.set(year, rows)
   }
   return byYear
@@ -107,22 +119,26 @@ export async function fetchPeaks() {
     }
 
     // No live Final entries (missing archive, or a pre-2025 year IESO doesn't
-    // serve at this URL) — fall back to the checked-in top-5 reference. Only
-    // ranks 1-5 are known, so top10 gets the same keys as top5 here.
+    // serve at this URL) — fall back to the checked-in reference. Most years
+    // only have ranks 1-5; a few enriched years also carry ranks 6-10.
     const fallbackRows = historical.get(year) ?? []
     if (fallbackRows.length === 0) {
       console.warn(`  ${year}: no live Final entries and no historical fallback — skipped.`)
       continue
     }
+    const fallbackTop5 = fallbackRows.filter((p) => p.rank <= 5).length
     fallbackRows.forEach((p) => {
       const key = utcHourKey(iciPeakToDateTime(p.date, p.hour))
-      top5.add(key)
       top10.add(key)
-      summary.push({ baseYear: year, source: 'fallback-top5', ...p, status: 'Final(AQEW)' })
+      if (p.rank <= 5) {
+        top5.add(key)
+        summary.push({ baseYear: year, source: 'fallback', ...p, status: `Final(${p.metric})` })
+      }
     })
     console.log(
       `  ${year}: 0 live Final entries -> using historical fallback: ` +
-        `top5=${fallbackRows.length} top10=${fallbackRows.length} (top10 unknown beyond rank 5)`,
+        `top5=${fallbackTop5} top10=${fallbackRows.length}` +
+        (fallbackRows.length <= 5 ? ' (top10 unknown beyond rank 5)' : ''),
     )
   }
 

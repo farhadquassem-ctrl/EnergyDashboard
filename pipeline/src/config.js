@@ -81,12 +81,12 @@ export const FILES = {
   dataset: join(DATA_DIR, 'peak_dataset.csv'),
 }
 
-// Checked-in fallback labels (top-5 AQEW hours per base period, 2010-2011
-// onward) for base years where reports-public.ieso.ca has no per-year
-// PUB_ICIPeakTracker_<year>.xml archive (confirmed missing for 2024 and
-// earlier — the "_2024" URL returns the in-progress 2025 tracker instead).
-// Only ranks 1-5 are known from this source, so is_top10_peak == is_top5_peak
-// for any base year that falls back to it (see fetch_peaks.js).
+// Checked-in fallback labels — a single consolidated reference (top-5 AQEW,
+// 2010-2011 onward, plus top 6-10 Demand_MW for a few years a live fetch has
+// already confirmed) for base years where reports-public.ieso.ca has no
+// per-year PUB_ICIPeakTracker_<year>.xml archive. Most years only have ranks
+// 1-5, so is_top10_peak == is_top5_peak when falling back to those (see
+// fetch_peaks.js for the exact per-year behavior and column meanings).
 export const HISTORICAL_TOP5_FILE = join(here, '..', 'fixtures', 'historical_peaks_top5.csv')
 
 // --- small date helpers (no deps; luxon is used where DST matters) ----------
