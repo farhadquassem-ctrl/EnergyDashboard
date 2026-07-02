@@ -53,19 +53,21 @@ isolation. `npm run build` reads the three intermediates and emits the final CSV
 
 - **Date window:** trailing 12 months; override the end with
   `PIPELINE_END=2026-04-30 npm run build` to align to a complete base period.
-- **Weather station:** default **Toronto City (`6158355`)** — the downtown
-  load-centroid the demand-weather literature uses. Override without editing
-  code: `WEATHER_STATION_ID=6158731 npm run fetch:weather`. Compare candidates
-  head-to-head with `npm run weather:compare` (prints per-station missing % for
-  each feature). Candidates: `6158355` Toronto City, `6158731` Toronto Int'l A
-  (Pearson — reports wind), `6158359` Toronto City Centre. (The old `6158733`
-  Pearson was decommissioned; its record ends 2013.)
+- **Weather station:** default **Toronto Int'l A / Pearson (`6158731`)** — the
+  most complete airport record and, unlike downtown, it reports wind; it's also
+  the station weather-normalization models weight most heavily. Override without
+  editing code: `WEATHER_STATION_ID=6158355 npm run fetch:weather`. Compare
+  candidates head-to-head with `npm run weather:compare` (prints per-station
+  missing % for each feature). Candidates: `6158731` Toronto Int'l A (Pearson),
+  `6158355` Toronto City (downtown load-centroid, no wind), `6158359` Toronto
+  City Centre. (The old `6158733` Pearson was decommissioned; its record ends
+  2013.)
 
   **Coverage notes:** Toronto City gives near-complete temperature/dewpoint
-  (~0.2% missing) but **no wind** (no downtown anemometer). Pearson reports wind.
-  `humidex` is ~80% "missing" at any station — that's expected, ECCC only
-  computes it in warm conditions, so it's present during summer peaks (what
-  matters) and null otherwise.
+  (~0.2% missing) but **no wind** (no downtown anemometer) — the reason Pearson
+  is the default. `humidex` is ~80% "missing" at any station — that's expected,
+  ECCC only computes it in warm conditions, so it's present during summer peaks
+  (what matters) and null otherwise.
 
 ## Time alignment (the important part) — `src/lib/time.js`
 
