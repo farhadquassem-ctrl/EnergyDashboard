@@ -9,7 +9,8 @@
     "fetch:weather": "node src/fetch_weather.js",
     "fetch:peaks": "node src/fetch_peaks.js",
     "build": "node src/build_dataset.js",
-    "stations": "node src/fetch_weather.js --list-stations"
+    "stations": "node src/fetch_weather.js --list-stations",
+    "weather:compare": "node src/fetch_weather.js --compare"
   },
   "dependencies": {
     "fast-xml-parser": "^4.4.1",

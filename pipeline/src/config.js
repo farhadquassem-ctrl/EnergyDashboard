@@ -8,32 +8,49 @@ const here = dirname(fileURLToPath(import.meta.url))
 export const DATA_DIR = join(here, '..', 'data')
 
 // --- Date window -----------------------------------------------------------
-// Trailing 12 months. Override END with e.g. PIPELINE_END=2026-04-30.
-// Everything downstream is anchored to these two dates (Eastern calendar days).
+// Trailing window (default 12 months). Everything downstream — demand/weather
+// year fans, PEAK_YEARS, the hourly index — is anchored to these two Eastern
+// calendar days, so widening the window is all it takes to cover more history.
+//   PIPELINE_END=2026-04-30      align the end to a complete base period
+//   PIPELINE_MONTHS=24           window length in months (2 years)
+//   PIPELINE_START=2024-05-01    pin the start explicitly (overrides MONTHS)
+// For a 5CP backtest, prefer whole base periods (May 1 – Apr 30). Two periods:
+//   PIPELINE_START=2024-05-01 PIPELINE_END=2026-04-30  (base years 2024 + 2025)
+// Seven periods, using the historical fallback labels for 2020-2024:
+//   PIPELINE_START=2020-05-01 PIPELINE_END=2026-04-30  (base years 2020-2026)
+const WINDOW_MONTHS = Number(process.env.PIPELINE_MONTHS ?? 12)
 export const END_DATE = process.env.PIPELINE_END ?? isoToday()
-export const START_DATE = shiftMonths(END_DATE, -12)
+export const START_DATE = process.env.PIPELINE_START ?? shiftMonths(END_DATE, -WINDOW_MONTHS)
 
 // The ICI base period(s) the window overlaps. Base period = May 1 – Apr 30,
-// labelled by the year it ends in (May 2025–Apr 2026 => "2026"). A trailing
-// 12-month window usually spans two. The still-in-progress period has no year
-// file yet — it's the no-year current tracker (see URLS.peaksCurrent).
+// labelled by its START year (May 2025–Apr 2026 => "2025"; see baseYearOf).
+// A trailing 12-month window usually spans two; a 24-month window spans two full
+// periods, and fetch_peaks pulls one year file per base period listed here.
 export const PEAK_YEARS = baseYearsForWindow(START_DATE, END_DATE)
 export const CURRENT_BASE_YEAR = baseYearOf(END_DATE)
 
 // --- Weather station -------------------------------------------------------
 // Active Toronto hourly stations (all reporting as of 2026-06-30):
-//   6158355 TORONTO CITY        - downtown load-centroid; the demand-weather
-//                                 literature uses "City of Toronto" (default).
 //   6158731 TORONTO INTL A       - Pearson (current); most complete airport
-//                                 record — the completeness backup.
+//                                 record, reports wind — the default, and the
+//                                 station weather-normalization models weight.
+//   6158355 TORONTO CITY         - downtown load-centroid; ~complete temp but
+//                                 no wind (no downtown anemometer).
 //   6158359 TORONTO CITY CENTRE  - island airport.
 // (The old 6158733 Pearson "INT'L A" was decommissioned; data ends 2013.)
-// If build_dataset reports a high weather-missing %, switch to 6158731.
-// Verify coverage anytime with `npm run stations`.
-export const WEATHER_STATION = {
-  climateId: '6158355',
-  name: 'TORONTO CITY',
-}
+// Override without editing this file:  WEATHER_STATION_ID=6158355 npm run build
+// Compare all candidates:              npm run weather:compare
+const DEFAULT_STATION_ID = '6158731'
+export const CANDIDATE_STATIONS = [
+  { climateId: '6158731', name: 'TORONTO INTL A (Pearson)' },
+  { climateId: '6158355', name: 'TORONTO CITY' },
+  { climateId: '6158359', name: 'TORONTO CITY CENTRE' },
+]
+export const WEATHER_STATION = (() => {
+  const id = process.env.WEATHER_STATION_ID ?? DEFAULT_STATION_ID
+  const match = CANDIDATE_STATIONS.find((s) => s.climateId === id)
+  return match ?? { climateId: id, name: `station ${id}` }
+})()
 
 // --- Source URLs (verified in DATA_PIPELINE.md — do not guess others) -------
 export const URLS = {
@@ -63,6 +80,14 @@ export const FILES = {
   peaks: join(DATA_DIR, 'peaks.json'),
   dataset: join(DATA_DIR, 'peak_dataset.csv'),
 }
+
+// Checked-in fallback labels — a single consolidated reference (top-5 AQEW,
+// 2010-2011 onward, plus top 6-10 Demand_MW for a few years a live fetch has
+// already confirmed) for base years where reports-public.ieso.ca has no
+// per-year PUB_ICIPeakTracker_<year>.xml archive. Most years only have ranks
+// 1-5, so is_top10_peak == is_top5_peak when falling back to those (see
+// fetch_peaks.js for the exact per-year behavior and column meanings).
+export const HISTORICAL_TOP5_FILE = join(here, '..', 'fixtures', 'historical_peaks_top5.csv')
 
 // --- small date helpers (no deps; luxon is used where DST matters) ----------
 function isoToday() {

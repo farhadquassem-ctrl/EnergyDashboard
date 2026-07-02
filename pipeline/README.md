@@ -49,14 +49,42 @@ npm run build
 Each step writes an intermediate to `data/` so you can re-run any one in
 isolation. `npm run build` reads the three intermediates and emits the final CSV.
 
+**Two base periods (2024 + 2025) for backtesting.** The default window is a
+trailing 12 months (one base period). To cover two full periods — the better
+backtest — pin the window to base-period boundaries and re-run every step so the
+demand/weather/peak fans all widen together (export the vars once so all four
+steps share them):
+
+```bash
+export PIPELINE_START=2024-05-01 PIPELINE_END=2026-04-30
+npm run fetch:demand && npm run fetch:weather && npm run fetch:peaks && npm run build
+```
+
+`fetch:peaks` will then pull both `PUB_ICIPeakTracker_2024.xml` and `_2025.xml`
+and label each period's own top-5/top-10 (Git Bash / macOS / Linux `export`; on
+Windows PowerShell use `$env:PIPELINE_START='2024-05-01'`).
+
 ## Configuration (`src/config.js`)
 
-- **Date window:** trailing 12 months; override the end with
-  `PIPELINE_END=2026-04-30 npm run build` to align to a complete base period.
-- **Weather station:** default **Toronto Pearson Int'l A (`6158733`)** — the most
-  complete continuous *hourly* record (24/7 airport obs), best for a gap-free
-  backtest. Toronto City downtown (`6158355`) is the load-centroid alternative
-  but has more gaps. Run `npm run stations` and swap `WEATHER_STATION` if desired.
+- **Date window:** trailing 12 months by default. `PIPELINE_END=2026-04-30`
+  aligns the end to a complete base period; `PIPELINE_MONTHS=24` widens the
+  window to two years; `PIPELINE_START=2024-05-01` pins the start explicitly (see
+  the two-base-period recipe above). All downstream year fans follow these dates.
+- **Weather station:** default **Toronto Int'l A / Pearson (`6158731`)** — the
+  most complete airport record and, unlike downtown, it reports wind; it's also
+  the station weather-normalization models weight most heavily. Override without
+  editing code: `WEATHER_STATION_ID=6158355 npm run fetch:weather`. Compare
+  candidates head-to-head with `npm run weather:compare` (prints per-station
+  missing % for each feature). Candidates: `6158731` Toronto Int'l A (Pearson),
+  `6158355` Toronto City (downtown load-centroid, no wind), `6158359` Toronto
+  City Centre. (The old `6158733` Pearson was decommissioned; its record ends
+  2013.)
+
+  **Coverage notes:** Toronto City gives near-complete temperature/dewpoint
+  (~0.2% missing) but **no wind** (no downtown anemometer) — the reason Pearson
+  is the default. `humidex` is ~80% "missing" at any station — that's expected,
+  ECCC only computes it in warm conditions, so it's present during summer peaks
+  (what matters) and null otherwise.
 
 ## Time alignment (the important part) — `src/lib/time.js`
 

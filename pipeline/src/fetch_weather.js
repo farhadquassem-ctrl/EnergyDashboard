@@ -16,7 +16,7 @@
 
 import { writeFileSync, mkdirSync } from 'node:fs'
 import { DateTime } from 'luxon'
-import { URLS, FILES, DATA_DIR, START_DATE, END_DATE, WEATHER_STATION } from './config.js'
+import { URLS, FILES, DATA_DIR, START_DATE, END_DATE, WEATHER_STATION, CANDIDATE_STATIONS } from './config.js'
 import { fetchJson } from './lib/http.js'
 import { estLocalToDateTime, utcHourKey } from './lib/time.js'
 import { isMain } from './lib/is-main.js'
@@ -57,14 +57,11 @@ async function listStations() {
   console.log('Pick one with continuous recent hourly coverage; set it in config.js WEATHER_STATION.')
 }
 
-// --- main fetch ------------------------------------------------------------
-export async function fetchWeather() {
-  const { climateId, name } = WEATHER_STATION
-  console.log(`fetch_weather: station ${name} (${climateId}), ${START_DATE} .. ${END_DATE}`)
-
-  // Neither the OGC `datetime` param nor a LOCAL_YEAR filter is honoured by this
-  // collection, but `sortby` is. So walk newest-first and stop once we pass the
-  // window start — one page (~10k hours ≈ 14 months) usually covers 12 months.
+// --- per-station fetch -----------------------------------------------------
+// Fetch one station's hourly obs within the window. The OGC `datetime` param and
+// a LOCAL_YEAR filter both return nothing on this collection, but `sortby` works
+// — so walk newest-first and stop once we pass the window start (~one 10k page).
+async function fetchStationRows(climateId, { quiet = false } = {}) {
   const out = new Map()
   for (let offset = 0; ; offset += PAGE) {
     const url =
@@ -91,20 +88,68 @@ export async function fetchWeather() {
         wind_kmh: num(p.WIND_SPEED),
       })
     }
-    console.log(`  offset=${offset}: ${feats.length} obs (kept ${out.size})`)
+    if (!quiet) console.log(`  offset=${offset}: ${feats.length} obs (kept ${out.size})`)
     if (passedWindowStart || feats.length < PAGE) break
   }
+  return [...out.values()].sort((a, b) => a.key.localeCompare(b.key))
+}
 
-  const rows = [...out.values()].sort((a, b) => a.key.localeCompare(b.key))
+// --- main fetch ------------------------------------------------------------
+export async function fetchWeather() {
+  const { climateId, name } = WEATHER_STATION
+  console.log(`fetch_weather: station ${name} (${climateId}), ${START_DATE} .. ${END_DATE}`)
+  const rows = await fetchStationRows(climateId)
   mkdirSync(DATA_DIR, { recursive: true })
   writeFileSync(FILES.weather, JSON.stringify(rows))
   console.log(`fetch_weather: wrote ${rows.length} hourly rows -> ${FILES.weather}`)
-  if (rows.length === 0) console.warn('  WARNING: 0 rows — check the station id / LOCAL_YEAR filter.')
+  if (rows.length === 0) console.warn('  WARNING: 0 rows — check the station id.')
   return rows
 }
 
+// --- compare candidate stations --------------------------------------------
+// Fetch each candidate and print a coverage table so you can pick the station
+// with the best hourly record for the model. Writes nothing.
+const FEATURES = ['temp_c', 'dewpoint_c', 'humidex', 'wind_kmh']
+
+async function compareStations() {
+  const windowHours =
+    Math.round(WINDOW_END.diff(WINDOW_START, 'hours').hours) + 1
+  console.log(`Comparing stations over ${START_DATE} .. ${END_DATE} (${windowHours} hours)\n`)
+
+  const table = []
+  for (const s of CANDIDATE_STATIONS) {
+    process.stdout.write(`  ${s.name} (${s.climateId})… `)
+    let rows = []
+    try {
+      rows = await fetchStationRows(s.climateId, { quiet: true })
+    } catch (e) {
+      console.log(`failed: ${e.message}`)
+      continue
+    }
+    const pct = (n) => `${(100 * (1 - n / windowHours)).toFixed(1)}%`
+    const present = (feat) => rows.filter((r) => r[feat] != null).length
+    console.log(`${rows.length} rows`)
+    table.push({
+      station: `${s.name} (${s.climateId})`,
+      rows: rows.length,
+      'temp missing': pct(present('temp_c')),
+      'dewpt missing': pct(present('dewpoint_c')),
+      'humidex missing': pct(present('humidex')),
+      'wind missing': pct(present('wind_kmh')),
+    })
+  }
+  console.log('')
+  console.table(table)
+  console.log('Lower "missing" is better. Set the winner with WEATHER_STATION_ID or in config.js.')
+}
+
 if (isMain(import.meta.url)) {
-  const run = process.argv.includes('--list-stations') ? listStations : fetchWeather
+  const arg = process.argv
+  const run = arg.includes('--list-stations')
+    ? listStations
+    : arg.includes('--compare')
+      ? compareStations
+      : fetchWeather
   run().catch((e) => {
     console.error('fetch_weather failed:', e.message)
     console.error('NOTE: verify api.weather.gc.ca egress; blocked from the Claude sandbox.')

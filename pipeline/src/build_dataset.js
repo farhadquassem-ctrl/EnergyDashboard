@@ -84,13 +84,13 @@ function printSummary(rows, peaks) {
     if (miss > 0) console.log(`  ${c.padEnd(20)} ${miss} (${((miss / n) * 100).toFixed(1)}%)`)
   }
 
-  console.log('\ntop-5 peak hours per base period (ICI Peak Tracker, status=Final):')
+  console.log('\ntop-5 peak hours per base period (ICI Peak Tracker, live=demand MW, fallback=AQEW MWh):')
   if (!peaks.peaks?.length) {
     console.log('  (none — re-check fetch_peaks / base period)')
   } else {
     for (const p of peaks.peaks) {
       console.log(
-        `  ${p.baseYear ?? '?'} #${p.rank}: ${p.date} HE${p.hour}  ${Math.round(p.value)} MW  [${p.status}]`,
+        `  ${p.baseYear ?? '?'} #${p.rank}: ${p.date} HE${p.hour}  ${Math.round(p.value)}  [${p.source ?? p.status}]`,
       )
     }
   }
