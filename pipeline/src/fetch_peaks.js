@@ -11,17 +11,47 @@
 //     > datapoint > datetimeInfo > { deliveryDate, deliveryHour }
 //                 > value, status
 //
+// Fallback: reports-public.ieso.ca has no per-year archive before 2025 (the
+// "_2024" URL serves the in-progress 2025 tracker instead of a real 2024
+// archive — confirmed by inspecting a real pull of that URL). For base years
+// where the live file 404s or has zero Final entries, we fall back to
+// fixtures/historical_peaks_top5.csv, a checked-in top-5 AQEW reference
+// covering 2010-2011 onward. Its (date, hour) pairs were spot-checked against
+// the live 2025 TOP_ONTARIO_DEMAND/Final ranking and match rank-for-rank.
+// AQEW (Allocated Quantity of Energy Withdrawn) != raw Ontario demand — it's
+// ON demand minus storage injection (batteries) minus embedded/behind-the-meter
+// generation — but it identifies the same peak hours, so using its (date, hour)
+// as the label is an apples-to-apples v1 choice; the two published values just
+// aren't numerically comparable. It has no ranks 6-10, so for any base year
+// sourced from it, is_top10_peak == is_top5_peak (not independently known).
+//
 // Output: pipeline/data/peaks.json = { top5:[key], top10:[key], peaks:[...] }
 
-import { writeFileSync, mkdirSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { XMLParser } from 'fast-xml-parser'
-import { URLS, FILES, DATA_DIR, PEAK_YEARS } from './config.js'
+import { URLS, FILES, DATA_DIR, PEAK_YEARS, HISTORICAL_TOP5_FILE } from './config.js'
 import { fetchText } from './lib/http.js'
 import { iciPeakToDateTime, utcHourKey } from './lib/time.js'
 import { isMain } from './lib/is-main.js'
 
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '', parseTagValue: true, trimValues: true })
 const toArray = (v) => (Array.isArray(v) ? v : v == null ? [] : [v])
+
+// fixtures/historical_peaks_top5.csv -> Map<baseYear, [{rank,date,hour,value}]>,
+// keyed by the base period's START year (its "Base Year" column is "2024-2025"
+// etc.; we key on the leading year to match PEAK_YEARS).
+function loadHistoricalTop5() {
+  const lines = readFileSync(HISTORICAL_TOP5_FILE, 'utf8').trim().split('\n').slice(1)
+  const byYear = new Map()
+  for (const line of lines) {
+    const [baseYear, rank, date, hour, value] = line.split(',')
+    const year = Number(baseYear.split('-')[0])
+    const rows = byYear.get(year) ?? []
+    rows.push({ rank: Number(rank), date, hour: Number(hour), value: Number(value) })
+    byYear.set(year, rows)
+  }
+  return byYear
+}
 
 // Pull the TOP_ONTARIO_DEMAND datapoints out of one parsed file.
 export function extractDatapoints(tree) {
@@ -43,34 +73,56 @@ export async function fetchPeaks() {
   const top5 = new Set()
   const top10 = new Set()
   const summary = []
+  const historical = loadHistoricalTop5()
 
   for (const year of PEAK_YEARS) {
     const url = URLS.peaksYear(year)
     console.log(`fetch_peaks: ${url}`)
-    let datapoints
+    let ranked = []
+    let datapointCount = 0
     try {
-      datapoints = extractDatapoints(parser.parse(await fetchText(url)))
+      const datapoints = extractDatapoints(parser.parse(await fetchText(url)))
+      datapointCount = datapoints.length
+      // Rank within this base period; Final only (past periods are all Final,
+      // the in-progress period contributes just its settled peaks).
+      ranked = datapoints.filter((p) => /final/i.test(p.status)).sort((a, b) => b.value - a.value)
     } catch (e) {
-      console.warn(`  skipped ${url}: ${e.message}`)
+      console.warn(`  ${url}: ${e.message}`)
+    }
+
+    if (ranked.length > 0) {
+      ranked.slice(0, 10).forEach((p, i) => {
+        const key = utcHourKey(iciPeakToDateTime(p.date, p.hour))
+        top10.add(key)
+        if (i < 5) {
+          top5.add(key)
+          summary.push({ baseYear: year, rank: i + 1, source: 'live', ...p })
+        }
+      })
+      console.log(
+        `  ${year}: ${datapointCount} datapoints, ${ranked.length} Final -> ` +
+          `top5=${Math.min(5, ranked.length)} top10=${Math.min(10, ranked.length)}`,
+      )
       continue
     }
-    // Rank within this base period; Final only (past periods are all Final,
-    // the in-progress period contributes just its settled peaks).
-    const ranked = datapoints
-      .filter((p) => /final/i.test(p.status))
-      .sort((a, b) => b.value - a.value)
 
-    ranked.slice(0, 10).forEach((p, i) => {
+    // No live Final entries (missing archive, or a pre-2025 year IESO doesn't
+    // serve at this URL) — fall back to the checked-in top-5 reference. Only
+    // ranks 1-5 are known, so top10 gets the same keys as top5 here.
+    const fallbackRows = historical.get(year) ?? []
+    if (fallbackRows.length === 0) {
+      console.warn(`  ${year}: no live Final entries and no historical fallback — skipped.`)
+      continue
+    }
+    fallbackRows.forEach((p) => {
       const key = utcHourKey(iciPeakToDateTime(p.date, p.hour))
+      top5.add(key)
       top10.add(key)
-      if (i < 5) {
-        top5.add(key)
-        summary.push({ baseYear: year, rank: i + 1, ...p })
-      }
+      summary.push({ baseYear: year, source: 'fallback-top5', ...p, status: 'Final(AQEW)' })
     })
     console.log(
-      `  ${year}: ${datapoints.length} datapoints, ${ranked.length} Final -> ` +
-        `top5=${Math.min(5, ranked.length)} top10=${Math.min(10, ranked.length)}`,
+      `  ${year}: 0 live Final entries -> using historical fallback: ` +
+        `top5=${fallbackRows.length} top10=${fallbackRows.length} (top10 unknown beyond rank 5)`,
     )
   }
 

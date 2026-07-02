@@ -16,6 +16,8 @@ export const DATA_DIR = join(here, '..', 'data')
 //   PIPELINE_START=2024-05-01    pin the start explicitly (overrides MONTHS)
 // For a 5CP backtest, prefer whole base periods (May 1 – Apr 30). Two periods:
 //   PIPELINE_START=2024-05-01 PIPELINE_END=2026-04-30  (base years 2024 + 2025)
+// Seven periods, using the historical fallback labels for 2020-2024:
+//   PIPELINE_START=2020-05-01 PIPELINE_END=2026-04-30  (base years 2020-2026)
 const WINDOW_MONTHS = Number(process.env.PIPELINE_MONTHS ?? 12)
 export const END_DATE = process.env.PIPELINE_END ?? isoToday()
 export const START_DATE = process.env.PIPELINE_START ?? shiftMonths(END_DATE, -WINDOW_MONTHS)
@@ -78,6 +80,14 @@ export const FILES = {
   peaks: join(DATA_DIR, 'peaks.json'),
   dataset: join(DATA_DIR, 'peak_dataset.csv'),
 }
+
+// Checked-in fallback labels (top-5 AQEW hours per base period, 2010-2011
+// onward) for base years where reports-public.ieso.ca has no per-year
+// PUB_ICIPeakTracker_<year>.xml archive (confirmed missing for 2024 and
+// earlier — the "_2024" URL returns the in-progress 2025 tracker instead).
+// Only ranks 1-5 are known from this source, so is_top10_peak == is_top5_peak
+// for any base year that falls back to it (see fetch_peaks.js).
+export const HISTORICAL_TOP5_FILE = join(here, '..', 'fixtures', 'historical_peaks_top5.csv')
 
 // --- small date helpers (no deps; luxon is used where DST matters) ----------
 function isoToday() {
