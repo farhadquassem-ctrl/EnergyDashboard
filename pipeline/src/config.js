@@ -31,8 +31,8 @@ export const CURRENT_BASE_YEAR = baseYearOf(END_DATE)
 // If build_dataset reports a high weather-missing %, switch to 6158731.
 // Verify coverage anytime with `npm run stations`.
 export const WEATHER_STATION = {
-  climateId: '6158355',
-  name: 'TORONTO CITY',
+  climateId: '6158731',
+  name: 'TORONTO INTL A',
 }
 
 // --- Source URLs (verified in DATA_PIPELINE.md — do not guess others) -------
