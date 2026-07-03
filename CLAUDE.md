@@ -34,6 +34,17 @@ Two independent deliverables live in this repo:
   mobile; every column needs `flex` or price columns overflow off-screen.
 - Node→zone map: `api/nodeZones.js` (generated from IESO PUB_NodeZoneMap, ~93%
   coverage). Color scale `src/utils/colorScale.js` (LMP_FLOOR=-50 negative band).
+- **Peak Forecast tab** (`src/components/PeakForecastTab.jsx`, 3rd tab): the ICI
+  5CP consumer view. Pure renderer of the pipeline's exported
+  `public/peak-forecast/forecast.json` (fetched at runtime via
+  `src/data/peakForecastClient.js`; no API). Shows the current base period's
+  running top-5 board + threshold, and up to 5 upcoming curtailment targets
+  (predicted peaks that would crack the top-5), filterable by horizon (3/7/14d,
+  a nested subset) with a **Cards/Table view toggle**. A committed sample JSON
+  (`sample:true`) ships so it renders before any real pipeline run; the pipeline
+  `npm run export:dashboard` overwrites it. Base vs billing period is surfaced
+  (base 2026 → bills Jul '27–Jun '28). Both themes; curtailment strip uses
+  semi-transparent amber (theme-agnostic).
 - **Theme toggle** (`src/theme.jsx` + header button): light/dark via Tailwind
   `darkMode:'class'`; **dark stays the hard default** (localStorage `theme`,
   OS preference deliberately ignored; index.html applies the class pre-paint).
