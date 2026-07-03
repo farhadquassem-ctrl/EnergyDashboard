@@ -10,16 +10,20 @@ Two independent deliverables live in this repo:
    official ICI peak labels) for backtesting an Ontario **5CP** model. It does
    **not** import or touch the app.
 
-> Branch convention: **`main` is the single source of truth and Vercel's
-> production branch** — every commit to it auto-deploys. The old
-> `claude/ieso-lmp-dashboard-scaffold-2j6b2j` mainline and the merged feature
-> branches (`peak-prediction-pipeline`, `peak-prediction-engine`,
-> `peak-forecast-tab`, `dashboard-theme-toggle`, `nodal-lmp-grid`) have been
-> retired. Do work on a fresh `claude/<topic>` branch off `main`, commit with
-> clear messages, push with `git push -u origin <branch>`, and merge to `main`
-> (a PR is the deploy path). Don't open PRs unless asked. Note: the session's
-> GitHub token can push/merge but **cannot delete remote branches** — prune
-> merged branches from the GitHub UI.
+> Branch convention: **`main` is the single source of truth — GitHub's default
+> branch AND Vercel's production branch** — every commit to it auto-deploys. Do
+> work on a fresh `claude/<topic>` branch off `main`, commit with clear messages,
+> push with `git push -u origin <branch>`, and merge to `main` (that push is the
+> deploy). Don't open PRs unless asked. **Full git/deploy playbook: `docs/WORKFLOW.md`.**
+>
+> The old `claude/ieso-lmp-dashboard-scaffold-2j6b2j` default and the merged
+> feature branches (`peak-prediction-pipeline`, `peak-prediction-engine`,
+> `peak-forecast-tab`, `dashboard-theme-toggle`, `nodal-lmp-grid`) are retired;
+> each is preserved as an `archive/<topic>` branch. Token constraints: the
+> session's GitHub token can push to `refs/heads/*` (branches) but **cannot push
+> tags or delete any ref** (both 403). Create refs via the GitHub MCP
+> `create_branch` (App auth); delete branches and change repo settings (e.g. the
+> default branch) from the GitHub UI.
 
 ---
 
@@ -221,13 +225,19 @@ first live-data forecast run lands (see the one outstanding item at the end of
      the regenerated JSON. The pipeline branch ships the generator only; the
      committed sample JSON lives on the dashboard side.
 
-   **Outstanding (the one real-world item):** the tab is built, merged, and live
-   (card/table toggle, running board + nested predicted peaks, plus a **Refresh**
-   button that re-reads the published `forecast.json`), but it renders the
-   committed **sample** JSON. To go real: extend the dataset to ~now, then run
-   `npm run fetch:forecast` + `npm run export:dashboard` on a machine with
-   network egress (IESO/ECCC are sandbox-blocked) and commit the regenerated
-   `public/peak-forecast/forecast.json` — it auto-deploys from `main`.
+   **✅ Live data + self-refresh — done.** The first real forecast run landed
+   (`public/peak-forecast/forecast.json`, `sample:false`), so the tab now renders
+   real numbers and shows a green **Live** pill (amber **Sample data** pill only
+   for the checked-in sample; see `PeakForecastTab.jsx` header). Freshness is now
+   automated: **`.github/workflows/refresh-forecast.yml`** runs the full chain
+   (`fetch:demand → fetch:weather → fetch:peaks → build → fetch:forecast →
+   export:dashboard`) on a GitHub runner **daily at 06:00 ET** and on manual
+   dispatch, committing `forecast.json` to `main` only when it changes → Vercel
+   auto-deploys. The runner can reach IESO/ECCC (the Claude sandbox cannot), so
+   this is the one place the live fetch chain runs unattended. The header
+   **Refresh** button still just re-reads the published file client-side (it does
+   not regenerate — that's the workflow's job). Scheduled runs require the
+   workflow to sit on the **default** branch (`main`) — satisfied.
 
 3. (Optional) Adapt Gemini's Vitest serverless-fallback integration test onto a
    dashboard branch — offered, not confirmed. Note: Gemini's draft had wrong
