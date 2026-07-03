@@ -144,6 +144,38 @@ peaks labeled correctly (Jun 24 HE19 24,862 MW, etc.).
    (R²~0.82, recall 40-100%/78-100%) on recall, worse on R² and overlap — the
    tradeoff for not silently excluding winter.
 
+   **Multi-horizon forecasts (3/7/14-day), added 2026-07:** lead time is now a
+   first-class axis, separate from risk profile (window width). New pieces, all
+   pipeline-side:
+   - `src/forecast_weather.js` — climatology (±7-day-smoothed doy×hour bins) +
+     anomaly persistence decaying as `exp(-lead/5d)` (tau env-tunable, **not**
+     tuned against recall — the degradation curve must stay honest). Wind =
+     climatology only.
+   - `src/backtest_horizons.js` (`npm run backtest:horizons`) — walk-forward
+     per lead ∈ {0,3,7,14}; lead 0 = v1 baseline. **All leads use the surrogate
+     because ECCC publishes no forecast archive** (CaSPAr is gated; documented,
+     not fudged) — so 3/7-day results are conservative lower bounds vs. the
+     live citypage path. Filters candidates on *forecast* temp (else leakage);
+     anomaly reads only obs strictly before issue time. Verified on synthetic
+     AR(1) data: recall degrades monotonically 0d→14d as designed. **Real-data
+     numbers still need a run on the user's machine.**
+   - `src/fetch_forecast.js` (`npm run fetch:forecast`) — live ECCC citypage
+     XML (Toronto `s0000458`, `dd.weather.gc.ca/today/citypage_weather/ON/{HH}/`,
+     ~7 days out; no public ECCC product reaches 14). ⚠ Written from ECCC's
+     published schema + tested only against
+     `fixtures/citypage_sample_SYNTHETIC.xml` — host is sandbox-blocked, so the
+     **first real-machine run is the verification**; replace the fixture with a
+     real capture after. Parser gotcha: attribute-bearing elements
+     (`<month name="July">7</month>`) parse to objects — unwrap `#text`.
+   - `src/forecast.js` (`npm run forecast`) — one record per lead:
+     `{ leadDays, targetDate, predictedPeakHourEnding, peakRiskDay,
+     curtailmentWindows, weatherSource, expectedAccuracy (measured, from
+     backtest_horizons.json), confidence }`. 3/7d use citypage high/low
+     downscaled via climatological diurnal shape (edge-of-coverage day: low
+     filled from climo span, labelled); 14d/fallback labelled
+     `climatology(+persistence) — NOT a weather forecast`. Skips the
+     persistence term when the dataset is >48h stale.
+
    **Next:** dashboard Tab 3 UI (needs a design decision on how the app reads
    pipeline output — no `public/` folder or serving convention exists yet).
 

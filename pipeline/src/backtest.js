@@ -19,14 +19,14 @@ import { isMain } from './lib/is-main.js'
 // "Risk profile" = curtailment-window width in hours, centered on the model's
 // highest-predicted hour for a flagged day. Narrower = less unnecessary ICI
 // curtailment cost; wider = safer catch of the actual peak hour.
-const RISK_PROFILES = [
+export const RISK_PROFILES = [
   { profile: 'Conservative', windowHours: 3 },
   { profile: 'Balanced', windowHours: 4 },
   { profile: 'Aggressive', windowHours: 5 },
 ]
 // Flagged per base period -- generous relative to the 5-10 real peaks per
 // year so the evaluation has margin, without flagging every candidate day.
-const FLAGGED_DAYS_PER_YEAR = 15
+export const FLAGGED_DAYS_PER_YEAR = 15
 
 // Raw CSV columns the model needs -- peak_model.js derives cooling_degrees/
 // heating_degrees from temp_c itself, so only the underlying source columns
@@ -34,7 +34,7 @@ const FLAGGED_DAYS_PER_YEAR = 15
 const RAW_COLUMNS = ['temp_c', 'wind_kmh', 'hour_of_day', 'is_weekend', 'is_holiday']
 const DATASET_COLUMNS = ['timestamp', 'ontario_demand_mw', 'is_top5_peak', 'is_top10_peak', ...RAW_COLUMNS]
 
-function loadDataset() {
+export function loadDataset() {
   const text = readFileSync(FILES.dataset, 'utf8')
   const { header, rows } = parseCsv(text)
   const idx = Object.fromEntries(DATASET_COLUMNS.map((c) => [c, columnIndex(header, c)]))
@@ -50,7 +50,7 @@ function loadDataset() {
     .filter((r) => r.ontario_demand_mw !== null && RAW_COLUMNS.every((c) => r[c] !== null))
 }
 
-function groupByDay(rows) {
+export function groupByDay(rows) {
   const byDay = new Map()
   for (const r of rows) {
     const list = byDay.get(r.day) ?? []
@@ -61,7 +61,7 @@ function groupByDay(rows) {
 }
 
 // Center a `width`-hour window on a flagged day's highest-predicted hour.
-function windowHoursForDay(dayRows, width) {
+export function windowHoursForDay(dayRows, width) {
   const topHour = [...dayRows].sort((a, b) => b.predicted - a.predicted)[0].hour_of_day
   const start = topHour - Math.floor((width - 1) / 2)
   return new Set(Array.from({ length: width }, (_, i) => start + i))
@@ -148,7 +148,7 @@ export function runBacktest() {
   return results
 }
 
-function fmtPct(x) {
+export function fmtPct(x) {
   return x === null ? 'n/a' : `${(x * 100).toFixed(0)}%`
 }
 

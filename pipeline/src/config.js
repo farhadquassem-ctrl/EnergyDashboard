@@ -52,6 +52,22 @@ export const WEATHER_STATION = (() => {
   return match ?? { climateId: id, name: `station ${id}` }
 })()
 
+// --- Forecast horizons -------------------------------------------------------
+// Lead times (days ahead) for the multi-horizon peak forecast + backtest.
+// FORECAST_LEAD_DAYS=3,7,14 to override.
+export const FORECAST_LEAD_DAYS = (process.env.FORECAST_LEAD_DAYS ?? '3,7,14')
+  .split(',')
+  .map((s) => Number(s.trim()))
+  .filter((n) => Number.isFinite(n) && n > 0)
+
+// ECCC citypage forecast site (live forecast weather, fetch_forecast.js).
+// s0000458 = Toronto. Full list: dd.weather.gc.ca/today/citypage_weather/siteList.xml
+export const CITYPAGE = {
+  prov: process.env.CITYPAGE_PROV ?? 'ON',
+  siteId: process.env.CITYPAGE_SITE_ID ?? 's0000458',
+  name: 'Toronto',
+}
+
 // --- Source URLs (verified in DATA_PIPELINE.md — do not guess others) -------
 export const URLS = {
   // IESO Hourly Demand (Ontario + Market demand). Current-year file:
@@ -71,6 +87,16 @@ export const URLS = {
   // MSC GeoMet OGC API (Environment Canada).
   weatherItems: 'https://api.weather.gc.ca/collections/climate-hourly/items',
   stationsItems: 'https://api.weather.gc.ca/collections/climate-stations/items',
+
+  // ECCC citypage forecast XML (MSC Datamart). Layout confirmed against ECCC's
+  // public docs (eccc-msc.github.io/open-data + dd.weather.gc.ca index pages),
+  // but NOT yet fetched end-to-end from this repo — dd.weather.gc.ca is blocked
+  // from the Claude sandbox like the other data hosts, so the first
+  // `npm run fetch:forecast` on a real machine is the verification step.
+  // Files: {ISO-timestamp}_MSC_CitypageWeather_{siteId}_en.xml under a per-
+  // UTC-emission-hour directory.
+  citypageHourDir: (prov, hh) =>
+    `https://dd.weather.gc.ca/today/citypage_weather/${prov}/${String(hh).padStart(2, '0')}/`,
 }
 
 // Intermediate + final artifact paths.
@@ -80,6 +106,9 @@ export const FILES = {
   peaks: join(DATA_DIR, 'peaks.json'),
   dataset: join(DATA_DIR, 'peak_dataset.csv'),
   backtest: join(DATA_DIR, 'backtest_results.json'),
+  backtestHorizons: join(DATA_DIR, 'backtest_horizons.json'),
+  forecastCitypage: join(DATA_DIR, 'forecast_citypage.json'),
+  forecastHorizons: join(DATA_DIR, 'forecast_horizons.json'),
 }
 
 // Checked-in fallback labels — a single consolidated reference (top-5 AQEW,

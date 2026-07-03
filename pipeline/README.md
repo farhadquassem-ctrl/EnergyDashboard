@@ -64,6 +64,46 @@ npm run fetch:demand && npm run fetch:weather && npm run fetch:peaks && npm run 
 and label each period's own top-5/top-10 (Git Bash / macOS / Linux `export`; on
 Windows PowerShell use `$env:PIPELINE_START='2024-05-01'`).
 
+## Multi-horizon peak forecasts (3 / 7 / 14 days out)
+
+Once `data/peak_dataset.csv` exists (ideally the multi-year window above):
+
+```bash
+# measure accuracy per lead time (walk-forward, adds lead 0 = v1 baseline)
+npm run backtest:horizons        # -> data/backtest_horizons.json
+
+# live: fetch ECCC's real Toronto forecast (citypage XML, ~7 days out)
+npm run fetch:forecast           # -> data/forecast_citypage.json
+
+# live: one forecast record per lead time
+npm run forecast                 # -> data/forecast_horizons.json
+```
+
+**How the weather input works, per lead — this is the honest part:**
+
+- A real N-day-ahead peak forecast needs *forecast* weather (the target day's
+  `temp_c` isn't observed yet). For live 3/7-day runs, `fetch:forecast` pulls
+  ECCC's official citypage forecast and `forecast` downscales its daily
+  high/low to hourly via the climatological diurnal shape.
+- **No public ECCC product reaches 14 days**, so the 14-day lead always uses a
+  **climatology + decaying-anomaly-persistence surrogate**
+  (`src/forecast_weather.js`) and is labelled `NOT a weather forecast`.
+- **ECCC publishes no archive of past forecasts**, so `backtest:horizons`
+  evaluates *every* lead with the surrogate. The accuracy-vs-lead degradation
+  it measures is real (each lead sees only information available that far
+  ahead); treat the 3/7-day numbers as conservative lower bounds for live runs
+  that use the real citypage feed. Accuracy is *expected* to degrade with lead
+  time — that's the finding, not a bug; nothing is tuned to flatten it.
+- Lead time (forecast horizon) and risk profile (curtailment-window width) are
+  two different axes: every lead's record carries all three window profiles.
+
+⚠ `fetch:forecast` (host `dd.weather.gc.ca`, also sandbox-blocked) is written
+against ECCC's published layout/schema and tested only on a synthetic fixture
+(`fixtures/citypage_sample_SYNTHETIC.xml`; check the parser offline with
+`node src/fetch_forecast.js --parse <file>`). The first run on a real machine
+is the verification — sanity-check its printed table against weather.gc.ca,
+and ideally replace the synthetic fixture with a real capture.
+
 ## Configuration (`src/config.js`)
 
 - **Date window:** trailing 12 months by default. `PIPELINE_END=2026-04-30`

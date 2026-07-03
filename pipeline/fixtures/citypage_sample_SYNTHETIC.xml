@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SYNTHETIC FIXTURE — hand-written from ECCC's published citypage schema
+  (dd.weather.gc.ca/today/citypage_weather/schema/, forecastFull.xsd) and docs,
+  NOT captured from the live feed (dd.weather.gc.ca is blocked from the Claude
+  sandbox). It exists so `fetch_forecast.js -\-parse` has an offline shape test.
+  Replace this file with a real capture the first time `npm run fetch:forecast`
+  succeeds on a real machine, and re-run the parse check against it.
+  Values are plausible July numbers, not real observations.
+-->
+<siteData>
+  <license>https://dd.weather.gc.ca/doc/LICENCE_GENERAL.txt</license>
+  <dateTime name="xmlCreation" zone="UTC" UTCOffset="0">
+    <year>2026</year><month name="July">7</month><day name="Friday">3</day>
+    <hour>15</hour><minute>45</minute>
+    <timeStamp>20260703154500</timeStamp>
+    <textSummary>Friday July 03, 2026 at 15:45 UTC</textSummary>
+  </dateTime>
+  <location>
+    <continent>North America</continent>
+    <country code="ca">Canada</country>
+    <province code="on">Ontario</province>
+    <name code="s0000458" lat="43.74N" lon="79.37W">Toronto</name>
+  </location>
+  <currentConditions>
+    <station code="ytz" lat="43.63N" lon="79.40W">Toronto Island Airport</station>
+    <temperature unitType="metric" units="C">28.4</temperature>
+    <dewpoint unitType="metric" units="C">19.1</dewpoint>
+    <humidex unitType="metric">35</humidex>
+    <wind>
+      <speed unitType="metric" units="km/h">17</speed>
+      <direction>SW</direction>
+    </wind>
+  </currentConditions>
+  <forecastGroup>
+    <dateTime name="forecastIssue" zone="UTC" UTCOffset="0">
+      <year>2026</year><month name="July">7</month><day name="Friday">3</day>
+      <hour>15</hour><minute>30</minute>
+      <timeStamp>20260703153000</timeStamp>
+      <textSummary>Friday July 03, 2026 at 15:30 UTC</textSummary>
+    </dateTime>
+    <dateTime name="forecastIssue" zone="EDT" UTCOffset="-4">
+      <year>2026</year><month name="July">7</month><day name="Friday">3</day>
+      <hour>11</hour><minute>30</minute>
+      <timeStamp>20260703113000</timeStamp>
+      <textSummary>Friday July 03, 2026 at 11:30 EDT</textSummary>
+    </dateTime>
+    <regionalNormals>
+      <textSummary>Low 18. High 27.</textSummary>
+      <temperature unitType="metric" units="C" class="high">27</temperature>
+      <temperature unitType="metric" units="C" class="low">18</temperature>
+    </regionalNormals>
+    <forecast>
+      <period textForecastName="Today">Friday</period>
+      <textSummary>Sunny. High 31. Humidex 38.</textSummary>
+      <temperatures>
+        <textSummary>High 31.</textSummary>
+        <temperature unitType="metric" units="C" class="high">31</temperature>
+      </temperatures>
+    </forecast>
+    <forecast>
+      <period textForecastName="Tonight">Friday night</period>
+      <textSummary>Clear. Low 21.</textSummary>
+      <temperatures>
+        <textSummary>Low 21.</textSummary>
+        <temperature unitType="metric" units="C" class="low">21</temperature>
+      </temperatures>
+    </forecast>
+    <forecast>
+      <period textForecastName="Saturday">Saturday</period>
+      <textSummary>Sunny and hot. High 33.</textSummary>
+      <temperatures>
+        <textSummary>High 33.</textSummary>
+        <temperature unitType="metric" units="C" class="high">33</temperature>
+      </temperatures>
+    </forecast>
+    <forecast>
+      <period textForecastName="Saturday night">Saturday night</period>
+      <textSummary>Clear. Low 22.</textSummary>
+      <temperatures>
+        <textSummary>Low 22.</textSummary>
+        <temperature unitType="metric" units="C" class="low">22</temperature>
+      </temperatures>
+    </forecast>
+    <forecast>
+      <period textForecastName="Sunday">Sunday</period>
+      <textSummary>Hot. High 34. Humidex 41.</textSummary>
+      <temperatures>
+        <textSummary>High 34.</textSummary>
+        <temperature unitType="metric" units="C" class="high">34</temperature>
+      </temperatures>
+    </forecast>
+    <forecast>
+      <period textForecastName="Sunday night">Sunday night</period>
+      <textSummary>Risk of a thunderstorm. Low 23.</textSummary>
+      <temperatures>
+        <textSummary>Low 23.</textSummary>
+        <temperature unitType="metric" units="C" class="low">23</temperature>
+      </temperatures>
+    </forecast>
+    <forecast>
+      <period textForecastName="Monday">Monday</period>
+      <textSummary>Showers. High 30.</textSummary>
+      <temperatures>
+        <textSummary>High 30.</textSummary>
+        <temperature unitType="metric" units="C" class="high">30</temperature>
+      </temperatures>
+    </forecast>
+    <forecast>
+      <period textForecastName="Monday night">Monday night</period>
+      <textSummary>Cloudy periods. Low 20.</textSummary>
+      <temperatures>
+        <textSummary>Low 20.</textSummary>
+        <temperature unitType="metric" units="C" class="low">20</temperature>
+      </temperatures>
+    </forecast>
+    <forecast>
+      <period textForecastName="Tuesday">Tuesday</period>
+      <textSummary>A mix of sun and cloud. High 28.</textSummary>
+      <temperatures>
+        <textSummary>High 28.</textSummary>
+        <temperature unitType="metric" units="C" class="high">28</temperature>
+      </temperatures>
+    </forecast>
+    <forecast>
+      <period textForecastName="Tuesday night">Tuesday night</period>
+      <textSummary>Clear. Low 19.</textSummary>
+      <temperatures>
+        <textSummary>Low 19.</textSummary>
+        <temperature unitType="metric" units="C" class="low">19</temperature>
+      </temperatures>
+    </forecast>
+    <forecast>
+      <period textForecastName="Wednesday">Wednesday</period>
+      <textSummary>Sunny. High 29.</textSummary>
+      <temperatures>
+        <textSummary>High 29.</textSummary>
+        <temperature unitType="metric" units="C" class="high">29</temperature>
+      </temperatures>
+    </forecast>
+    <forecast>
+      <period textForecastName="Wednesday night">Wednesday night</period>
+      <textSummary>Clear. Low 20.</textSummary>
+      <temperatures>
+        <textSummary>Low 20.</textSummary>
+        <temperature unitType="metric" units="C" class="low">20</temperature>
+      </temperatures>
+    </forecast>
+    <forecast>
+      <period textForecastName="Thursday">Thursday</period>
+      <textSummary>Sunny. High 31.</textSummary>
+      <temperatures>
+        <textSummary>High 31.</textSummary>
+        <temperature unitType="metric" units="C" class="high">31</temperature>
+      </temperatures>
+    </forecast>
+  </forecastGroup>
+</siteData>
