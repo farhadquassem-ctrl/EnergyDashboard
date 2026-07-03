@@ -18,6 +18,15 @@ const MARKER = {
   light: { neutral: '#a1a1aa' /* zinc-400 */, stroke: '#18181b' },
 }
 
+// Touch screens have no real hover, and iOS treats the first tap on a
+// hover-reactive element as hover-only (it fires the synthetic mouseover —
+// tooltip + highlight — but can swallow the click, leaving the zone
+// unselected). Confirmed on iPhone: tap showed the tooltip but the chart
+// never switched. On coarse-pointer devices, treat that first tap's
+// mouseover as selection intent too; desktop hover behavior is unchanged.
+const NO_HOVER =
+  typeof window !== 'undefined' && window.matchMedia?.('(hover: none)')?.matches
+
 /**
  * Left column: Ontario map with one colour-coded marker per IESO pricing zone.
  * Marker fill encodes the current zonal price on the indigo→blue→amber→red scale.
@@ -61,7 +70,10 @@ export default function MapPanel({ zones, selectedZoneId, onSelectZone }) {
               }}
               eventHandlers={{
                 click: () => onSelectZone(zone.id),
-                mouseover: () => setHoveredId(zone.id),
+                mouseover: () => {
+                  setHoveredId(zone.id)
+                  if (NO_HOVER) onSelectZone(zone.id)
+                },
                 mouseout: () => setHoveredId((id) => (id === zone.id ? null : id)),
               }}
             >
