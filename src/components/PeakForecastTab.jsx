@@ -341,9 +341,18 @@ export default function PeakForecastTab() {
         </div>
         <div className="flex flex-col items-end gap-1 text-right">
           <div className="flex items-center gap-2">
-            {data.sample && (
-              <span className="rounded-full bg-amber-500/15 px-2.5 py-1 text-[11px] font-semibold text-amber-700 dark:text-amber-300">
+            {data.sample ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-2.5 py-1 text-[11px] font-semibold text-amber-700 dark:text-amber-300">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                 Sample data
+              </span>
+            ) : (
+              <span
+                className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300"
+                title="Rendering a real pipeline run (not the checked-in sample)."
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                Live
               </span>
             )}
             <button
