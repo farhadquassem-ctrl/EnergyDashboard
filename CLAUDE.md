@@ -112,16 +112,24 @@ peaks labeled correctly (Jun 24 HE19 24,862 MW, etc.).
    **Model:** multivariate OLS regression (normal equations, hand-rolled —
    `simple-statistics` has no multivariate/logistic fitting, only 2-variable
    `linearRegression`; used instead for `mean`/`sampleCorrelation` diagnostics)
-   predicting `ontario_demand_mw` from complete-record features: `temp_c`,
-   `dewpoint_c`, `wind_kmh`, `hour_of_day`, `month`, `is_weekend`, `is_holiday`
-   (excludes `humidex` — ~82% missing, summer-only). Candidates are hard-filtered
-   to **HE11-HE22 and June-September** (`peak_model.js`). The month filter isn't
-   just convenience: Ontario demand-vs-month is bimodal (winter heating +
-   summer cooling both raise demand), so left unfiltered, winter data cancels
-   out `temp_c`'s real summer signal — measured R²~0.13 unfiltered vs. **~0.82**
-   once restricted to the real summer season, which covers 44/45 actual top10
-   peak hours in 2020-2025 (the one exception, a Feb-2023 cold-snap entry, is
-   an accepted v1 gap).
+   predicting `ontario_demand_mw` from `cooling_degrees` (= max(0, temp_c-25)),
+   `heating_degrees` (= max(0, 10-temp_c)), `wind_kmh`, `hour_of_day`,
+   `is_weekend`, `is_holiday`. Candidates are hard-filtered to **HE11-HE22**
+   and **temp_c ≥25°C or ≤10°C** (`peak_model.js`; both thresholds tunable,
+   starting points per the user's domain read). Two iterations to get here:
+   (1) v1 restricted candidates to June-September to dodge Ontario's bimodal
+   demand-vs-month curve (winter heating + summer cooling both raise demand,
+   so a single linear `month`/`temp_c` term can't fit both) — worked (R²~0.82)
+   but silently wrote off winter, including a real Feb-2023 cold-snap peak.
+   (2) Replaced the month filter with degree-based features (non-negative
+   distance past each threshold, so both directions of "extreme weather ->
+   more demand" get their own coefficient instead of cancelling) — this
+   properly includes winter candidates. R² dropped to ~0.53-0.61 (expected:
+   Ontario winter heating is still mostly gas furnace, weaker electricity-
+   demand link than summer AC — `HEATING_THRESHOLD_C` is expected to matter
+   more as heat-pump adoption grows). The Feb-2023 peak now ranks 19th of 272
+   candidate days by predicted score — just outside the top-15 cutoff, so
+   still not caught, but clearly not noise either.
 
    **Backtest:** walk-forward / expanding window across the 6 base periods —
    train on base years strictly before the test year (2020 is training-only,
@@ -129,20 +137,12 @@ peaks labeled correctly (Jun 24 HE19 24,862 MW, etc.).
    days by their highest-predicted hour, flag the top 15, and for each emit a
    window centered on that day's top hour at 3 widths = **risk profiles**
    (Conservative=3h, Balanced=4h, Aggressive=5h — narrower = less unnecessary
-   ICI curtailment cost, wider = safer catch). **Results (2021-2025):** R²
-   0.81-0.82 every year; top5/top10 recall inside the flagged window ranges
-   40-100% (Conservative) up to 78-100% (Aggressive), at 45-75 curtailment-hours
-   per ~1,500-hour candidate season (~3-5%). The stricter *unwindowed*
-   top-10-predicted-vs-actual-top10 overlap is lower (1-2/10) — expected, exact
-   hour-for-hour ranking across a whole season is a much harder bar than
-   "within my flagged window."
-
-   **Known v1 limitations (accepted, not bugs):** uses actual demand/weather as
-   the signal, not a forecast (real forecast-based eval is a documented future
-   refinement); assumes peaks fall in the HE11-22 / June-Sept band, which holds
-   for 44/45 hours in 2020-2025 but not universally (base year 2014-2015 peaked
-   in a Jan/Feb cold snap, outside this dataset's window — flagged so it's not
-   a silent blind spot if winter years are ever added).
+   ICI curtailment cost, wider = safer catch). **Results (2021-2025, with
+   winter candidates included):** R² 0.53-0.61; top5/top10 recall inside the
+   flagged window 40-100% (Conservative) up to 60-100% (Aggressive); top-10
+   predicted-vs-actual overlap 1-4/10. Comparable to the June-Sept-only run
+   (R²~0.82, recall 40-100%/78-100%) on recall, worse on R² and overlap — the
+   tradeoff for not silently excluding winter.
 
    **Next:** dashboard Tab 3 UI (needs a design decision on how the app reads
    pipeline output — no `public/` folder or serving convention exists yet).

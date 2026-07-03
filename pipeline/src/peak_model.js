@@ -11,22 +11,27 @@
 // Candidates are hard-filtered two ways:
 //   - Hours: HE11-HE22 (hour_of_day 10-21 in this dataset's interval-start
 //     convention) -- the historical peak-hour range across all of 2020-2025.
-//   - Months: June-September -- 44 of 45 actual top10 peak hours in the
-//     2020-2025 dataset fall here (the one exception, a Feb-2023 cold-snap
-//     entry, is an accepted v1 gap -- see CLAUDE.md). This isn't just a
-//     convenience filter: Ontario demand-vs-month is genuinely bimodal
-//     (winter heating AND summer cooling both raise demand), so a single
-//     linear `month` coefficient can't fit that curve -- left unfiltered, the
-//     winter data actively cancels out temp_c's real summer signal (measured:
-//     R²~0.13, temp_c correlation~0.04 across all months, vs. much stronger
-//     once restricted to the actual summer season).
-// Together these keep hour_of_day/month close enough to monotonic within the
-// filtered band for a linear fit, instead of the cyclic/bump-shaped problem a
-// raw 0-23 / 1-12 term hits over the full day/year.
+//   - Temperature extremity: temp_c >= COOLING_THRESHOLD_C (summer AC load) OR
+//     temp_c <= HEATING_THRESHOLD_C (winter heating load). Ontario demand-vs-
+//     temperature is bimodal (both hot AND cold raise demand vs. a mild day),
+//     so raw temp_c as a single linear feature doesn't work -- a v1 that
+//     restricted candidates to June-September dodged this but silently wrote
+//     off winter entirely (including a real Feb-2023 cold-snap peak). Fixed
+//     properly with degree-based features instead of a month filter: see
+//     cooling_degrees/heating_degrees below, each a non-negative distance past
+//     its threshold, so both directions of "extreme weather -> more demand"
+//     get their own coefficient instead of cancelling each other out.
+// Together these keep the training population non-trivial (not just mild
+// shoulder-season noise) while genuinely allowing winter candidate days.
+//
+// Winter heating in Ontario is still mostly gas furnaces (weaker electricity-
+// demand link than summer AC), so don't expect winter recall to match summer
+// out of the gate -- HEATING_THRESHOLD_C is deliberately a tunable starting
+// point, expected to matter more as heat-pump adoption grows.
 //
 // humidex is deliberately excluded: ~82% missing (only reported in warm
-// conditions), and temp_c + dewpoint_c already carry most of the heat-load
-// signal without needing imputation logic in v1.
+// conditions), and temp_c already carries the heat-load signal without
+// needing imputation logic in v1.
 //
 // Note: is_top5_peak/is_top10_peak (used only for backtest evaluation, never
 // as fit inputs) were ranked by IESO's own metric -- Ontario demand MW for
@@ -38,23 +43,30 @@
 import { mean, sampleCorrelation } from 'simple-statistics'
 
 export const CANDIDATE_HOUR_RANGE = { minHour: 10, maxHour: 21 } // hour_of_day, HE11-HE22
-export const CANDIDATE_MONTH_RANGE = { minMonth: 6, maxMonth: 9 } // June-September
+export const COOLING_THRESHOLD_C = 25 // summer AC load kicks in above this
+export const HEATING_THRESHOLD_C = 10 // winter heating load kicks in below this
 
-export const FEATURES = ['temp_c', 'dewpoint_c', 'wind_kmh', 'hour_of_day', 'month', 'is_weekend', 'is_holiday']
+export const FEATURES = ['cooling_degrees', 'heating_degrees', 'wind_kmh', 'hour_of_day', 'is_weekend', 'is_holiday']
 
 export function isCandidateRow(row) {
   const h = Number(row.hour_of_day)
-  const m = Number(row.month)
-  return (
-    h >= CANDIDATE_HOUR_RANGE.minHour &&
-    h <= CANDIDATE_HOUR_RANGE.maxHour &&
-    m >= CANDIDATE_MONTH_RANGE.minMonth &&
-    m <= CANDIDATE_MONTH_RANGE.maxMonth
-  )
+  const t = Number(row.temp_c)
+  const inHourBand = h >= CANDIDATE_HOUR_RANGE.minHour && h <= CANDIDATE_HOUR_RANGE.maxHour
+  const inTempExtreme = t >= COOLING_THRESHOLD_C || t <= HEATING_THRESHOLD_C
+  return inHourBand && inTempExtreme
+}
+
+// Non-negative distance past each threshold -- lets "hotter than 25 -> more
+// demand" and "colder than 10 -> more demand" each get their own coefficient
+// instead of a single raw temp_c term cancelling the two directions out.
+function deriveFeatureValue(row, name) {
+  if (name === 'cooling_degrees') return Math.max(0, Number(row.temp_c) - COOLING_THRESHOLD_C)
+  if (name === 'heating_degrees') return Math.max(0, HEATING_THRESHOLD_C - Number(row.temp_c))
+  return Number(row[name])
 }
 
 function featureVector(row) {
-  return FEATURES.map((f) => Number(row[f]))
+  return FEATURES.map((f) => deriveFeatureValue(row, f))
 }
 
 // Solve (XtX) beta = Xty by Gauss-Jordan elimination with partial pivoting.
@@ -116,7 +128,7 @@ export function fitModel(trainingRows) {
   const r2 = 1 - ssRes / ssTot
 
   const featureCorrelations = Object.fromEntries(
-    FEATURES.map((f) => [f, sampleCorrelation(trainingRows.map((r) => Number(r[f])), y)]),
+    FEATURES.map((f) => [f, sampleCorrelation(trainingRows.map((r) => deriveFeatureValue(r, f)), y)]),
   )
 
   return { coefficients, r2, n, featureCorrelations }

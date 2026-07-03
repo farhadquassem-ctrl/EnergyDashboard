@@ -13,7 +13,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { parseCsv, columnIndex } from './lib/csv.js'
 import { FILES, DATA_DIR, baseYearOf } from './config.js'
-import { fitModel, predict, isCandidateRow, FEATURES } from './peak_model.js'
+import { fitModel, predict, isCandidateRow } from './peak_model.js'
 import { isMain } from './lib/is-main.js'
 
 // "Risk profile" = curtailment-window width in hours, centered on the model's
@@ -28,7 +28,11 @@ const RISK_PROFILES = [
 // year so the evaluation has margin, without flagging every candidate day.
 const FLAGGED_DAYS_PER_YEAR = 15
 
-const DATASET_COLUMNS = ['timestamp', 'ontario_demand_mw', 'is_top5_peak', 'is_top10_peak', ...FEATURES]
+// Raw CSV columns the model needs -- peak_model.js derives cooling_degrees/
+// heating_degrees from temp_c itself, so only the underlying source columns
+// are loaded here, not the derived feature names.
+const RAW_COLUMNS = ['temp_c', 'wind_kmh', 'hour_of_day', 'is_weekend', 'is_holiday']
+const DATASET_COLUMNS = ['timestamp', 'ontario_demand_mw', 'is_top5_peak', 'is_top10_peak', ...RAW_COLUMNS]
 
 function loadDataset() {
   const text = readFileSync(FILES.dataset, 'utf8')
@@ -43,7 +47,7 @@ function loadDataset() {
       row.baseYear = baseYearOf(row.day)
       return row
     })
-    .filter((r) => r.ontario_demand_mw !== null && FEATURES.every((f) => r[f] !== null))
+    .filter((r) => r.ontario_demand_mw !== null && RAW_COLUMNS.every((c) => r[c] !== null))
 }
 
 function groupByDay(rows) {
