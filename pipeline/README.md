@@ -75,9 +75,34 @@ npm run backtest:horizons        # -> data/backtest_horizons.json
 # live: fetch ECCC's real Toronto forecast (citypage XML, ~7 days out)
 npm run fetch:forecast           # -> data/forecast_citypage.json
 
-# live: one forecast record per lead time
+# live: 5CP forecast vs the current base period's running board
 npm run forecast                 # -> data/forecast_horizons.json
+
+# bridge the forecast into the dashboard app (writes public/peak-forecast/)
+npm run export:dashboard         # -> ../public/peak-forecast/forecast.json
 ```
+
+**What `forecast` produces (the 5CP consumer view).** ICI consumers are billed
+next year's Peak Demand Factor based on their demand during *this* base period's
+(May 1 – Apr 30) five Coincident Peaks. So the forecast is framed as: over the
+next 14 days, which upcoming hours would crack the base period's **running
+top-5** (and are thus worth curtailing)? Output (`forecast_horizons.json`):
+
+- `basePeriod` / `billingPeriod` — the in-progress base period and the Jul–Jun
+  adjustment period its 5CP will bill.
+- `running5CP` + `threshold` — the top-5 daily peaks banked so far this period
+  (from observed demand — the live running board, which is what the ICI Peak
+  Tracker itself publishes mid-period; *not* the "re-rank raw demand" backtest
+  anti-pattern, which is about fabricating Final labels for a finished period)
+  and the 5th-place MW a new peak must beat.
+- `predictedPeaks` — up to 5 upcoming candidate-peak days, ranked, each tagged
+  with `daysOut` + `leadBucket` (so 3-/7-/14-day views are nested subsets),
+  `projectedRank` on the current board, and `wouldRankTop5` (a real curtailment
+  target vs. monitor-only). Weather + confidence degrade with `daysOut`.
+
+`export:dashboard` runs the forecast and copies it to `public/peak-forecast/`
+— the single sanctioned pipeline→app coupling — so the dashboard's Peak
+Forecast tab reads it as a static file. Commit the regenerated JSON.
 
 **How the weather input works, per lead — this is the honest part:**
 

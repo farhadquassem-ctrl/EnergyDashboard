@@ -143,3 +143,20 @@ function baseYearsForWindow(startIso, endIso) {
   for (let y = a; y <= b; y++) years.push(y)
   return years
 }
+
+// ICI base period for a base year: May 1 (baseYear) – Apr 30 (baseYear+1).
+// Its 5 Coincident Peaks set each consumer's Peak Demand Factor, which is then
+// billed over the FOLLOWING adjustment period. So curtailing the right hours in
+// this window is what reduces next year's Global Adjustment bill.
+export function basePeriodBounds(baseYear) {
+  return { start: `${baseYear}-05-01`, end: `${baseYear + 1}-04-30`, label: String(baseYear) }
+}
+
+// The Global Adjustment adjustment/billing period the given base year determines:
+// July 1 (baseYear+1) – June 30 (baseYear+2). (Base 2026 => billed Jul 2027–Jun 2028.)
+export function billingPeriodBounds(baseYear) {
+  const start = `${baseYear + 1}-07-01`
+  const end = `${baseYear + 2}-06-30`
+  const M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  return { start, end, label: `${M[6]} ${baseYear + 1} – ${M[5]} ${baseYear + 2}` }
+}

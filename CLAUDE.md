@@ -167,17 +167,32 @@ peaks labeled correctly (Jun 24 HE19 24,862 MW, etc.).
      **first real-machine run is the verification**; replace the fixture with a
      real capture after. Parser gotcha: attribute-bearing elements
      (`<month name="July">7</month>`) parse to objects — unwrap `#text`.
-   - `src/forecast.js` (`npm run forecast`) — one record per lead:
-     `{ leadDays, targetDate, predictedPeakHourEnding, peakRiskDay,
-     curtailmentWindows, weatherSource, expectedAccuracy (measured, from
-     backtest_horizons.json), confidence }`. 3/7d use citypage high/low
-     downscaled via climatological diurnal shape (edge-of-coverage day: low
-     filled from climo span, labelled); 14d/fallback labelled
-     `climatology(+persistence) — NOT a weather forecast`. Skips the
-     persistence term when the dataset is >48h stale.
+   - `src/forecast.js` (`npm run forecast`) — **reframed 2026-07 to the 5CP
+     consumer view** (was: one target day per lead). ICI consumers are billed
+     next year's Peak Demand Factor on their demand during *this* base period's
+     (May 1–Apr 30) five Coincident Peaks, so the question is "which upcoming
+     hours would crack the base period's **running top-5** and are worth
+     curtailing?" Output: `basePeriod`/`billingPeriod` (base 2026 → billed
+     Jul 2027–Jun 2028); `running5CP` + `threshold` (top-5 daily peaks banked
+     so far, from observed demand — the live running board, which is what the
+     ICI Peak Tracker itself publishes mid-period; **not** the re-rank-raw
+     anti-pattern, which is about fabricating *Final* labels for a *finished*
+     period); `predictedPeaks` (up to 5 upcoming candidate days, ranked, each
+     with `daysOut`+`leadBucket` so **3/7/14-day views are nested subsets**,
+     `projectedRank` on the board, `wouldRankTop5` = curtail vs monitor).
+     Weather+confidence degrade with `daysOut`. Base/billing helpers live in
+     `config.js` (`basePeriodBounds`/`billingPeriodBounds`).
+   - `src/export_dashboard.js` (`npm run export:dashboard`) — the **one
+     sanctioned pipeline→app coupling**: runs the forecast and writes
+     `public/peak-forecast/forecast.json` (schemaVersion 1) so the dashboard's
+     Peak Forecast tab reads it as a static file (no backend). Carries
+     `generatedAt`/`datasetThrough`/`staleNote` for a freshness banner. Commit
+     the regenerated JSON. The pipeline branch ships the generator only; the
+     committed sample JSON lives on the dashboard side.
 
-   **Next:** dashboard Tab 3 UI (needs a design decision on how the app reads
-   pipeline output — no `public/` folder or serving convention exists yet).
+   **Next:** Peak Forecast tab is built on the dashboard side (card/table
+   toggle, running board + nested predicted peaks). Real numbers need a
+   dataset extending to ~now + `export:dashboard` run on the user's machine.
 
 3. (Optional) Adapt Gemini's Vitest serverless-fallback integration test onto a
    dashboard branch — offered, not confirmed. Note: Gemini's draft had wrong
