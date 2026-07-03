@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-03T08:00:00-04:00",
+  "datasetThrough": "2026-07-02",
+  "staleNote": null,
+  "sample": true,
+  "sampleNote": "Illustrative sample data (a plausible July heatwave). Replaced by real output when `npm run export:dashboard` runs on a machine with a current dataset.",
+  "model": { "r2": 0.58, "trainRows": 8214 },
+  "basePeriod": { "start": "2026-05-01", "end": "2027-04-30", "label": "2026", "baseYear": 2026 },
+  "billingPeriod": { "start": "2027-07-01", "end": "2028-06-30", "label": "Jul 2027 – Jun 2028" },
+  "horizons": [3, 7, 14],
+  "threshold": 22980,
+  "running5CP": [
+    { "rank": 1, "date": "2026-06-24", "hourEnding": 18, "mw": 24120 },
+    { "rank": 2, "date": "2026-06-25", "hourEnding": 17, "mw": 23760 },
+    { "rank": 3, "date": "2026-06-23", "hourEnding": 18, "mw": 23410 },
+    { "rank": 4, "date": "2026-07-01", "hourEnding": 18, "mw": 23150 },
+    { "rank": 5, "date": "2026-06-26", "hourEnding": 19, "mw": 22980 }
+  ],
+  "predictedPeaks": [
+    {
+      "date": "2026-07-06", "daysOut": 3, "leadBucket": 3,
+      "weatherSource": "eccc-citypage", "isForecastWeather": true,
+      "peakRiskDay": true,
+      "predictedPeakHourStart": 17, "predictedPeakHourEnding": 18,
+      "predictedMw": 24460, "tempC": 34,
+      "projectedRank": 1, "wouldRankTop5": true, "confidence": "moderate",
+      "curtailmentWindows": [
+        { "profile": "Conservative", "windowHours": 3, "hourStart": 16, "label": "HE17–HE19" },
+        { "profile": "Balanced", "windowHours": 4, "hourStart": 16, "label": "HE17–HE20" },
+        { "profile": "Aggressive", "windowHours": 5, "hourStart": 15, "label": "HE16–HE20" }
+      ],
+      "expectedAccuracy": { "basis": "walk-forward backtest, surrogate weather", "years": 5, "balancedTop5Recall": { "min": 0.6, "mean": 0.72, "max": 0.85 } }
+    },
+    {
+      "date": "2026-07-07", "daysOut": 4, "leadBucket": 7,
+      "weatherSource": "eccc-citypage", "isForecastWeather": true,
+      "peakRiskDay": true,
+      "predictedPeakHourStart": 16, "predictedPeakHourEnding": 17,
+      "predictedMw": 23600, "tempC": 33,
+      "projectedRank": 3, "wouldRankTop5": true, "confidence": "low",
+      "curtailmentWindows": [
+        { "profile": "Conservative", "windowHours": 3, "hourStart": 15, "label": "HE16–HE18" },
+        { "profile": "Balanced", "windowHours": 4, "hourStart": 15, "label": "HE16–HE19" },
+        { "profile": "Aggressive", "windowHours": 5, "hourStart": 14, "label": "HE15–HE19" }
+      ],
+      "expectedAccuracy": { "basis": "walk-forward backtest, surrogate weather", "years": 5, "balancedTop5Recall": { "min": 0.4, "mean": 0.55, "max": 0.7 } }
+    },
+    {
+      "date": "2026-07-08", "daysOut": 5, "leadBucket": 7,
+      "weatherSource": "eccc-citypage", "isForecastWeather": true,
+      "peakRiskDay": true,
+      "predictedPeakHourStart": 17, "predictedPeakHourEnding": 18,
+      "predictedMw": 23090, "tempC": 32,
+      "projectedRank": 5, "wouldRankTop5": true, "confidence": "low",
+      "curtailmentWindows": [
+        { "profile": "Conservative", "windowHours": 3, "hourStart": 16, "label": "HE17–HE19" },
+        { "profile": "Balanced", "windowHours": 4, "hourStart": 16, "label": "HE17–HE20" },
+        { "profile": "Aggressive", "windowHours": 5, "hourStart": 15, "label": "HE16–HE20" }
+      ],
+      "expectedAccuracy": { "basis": "walk-forward backtest, surrogate weather", "years": 5, "balancedTop5Recall": { "min": 0.4, "mean": 0.55, "max": 0.7 } }
+    },
+    {
+      "date": "2026-07-14", "daysOut": 11, "leadBucket": 14,
+      "weatherSource": "climatology+persistence", "isForecastWeather": false,
+      "peakRiskDay": true,
+      "predictedPeakHourStart": 16, "predictedPeakHourEnding": 17,
+      "predictedMw": 23080, "tempC": 33,
+      "projectedRank": 5, "wouldRankTop5": true, "confidence": "very low",
+      "curtailmentWindows": [
+        { "profile": "Conservative", "windowHours": 3, "hourStart": 15, "label": "HE16–HE18" },
+        { "profile": "Balanced", "windowHours": 4, "hourStart": 15, "label": "HE16–HE19" },
+        { "profile": "Aggressive", "windowHours": 5, "hourStart": 14, "label": "HE15–HE19" }
+      ],
+      "expectedAccuracy": { "basis": "walk-forward backtest, surrogate weather", "years": 5, "balancedTop5Recall": { "min": 0.15, "mean": 0.3, "max": 0.45 } }
+    }
+  ],
+  "accuracyByLead": {
+    "3": { "basis": "walk-forward backtest, surrogate weather", "years": 5, "balancedTop5Recall": { "min": 0.6, "mean": 0.72, "max": 0.85 } },
+    "7": { "basis": "walk-forward backtest, surrogate weather", "years": 5, "balancedTop5Recall": { "min": 0.4, "mean": 0.55, "max": 0.7 } },
+    "14": { "basis": "walk-forward backtest, surrogate weather", "years": 5, "balancedTop5Recall": { "min": 0.15, "mean": 0.3, "max": 0.45 } }
+  }
+}

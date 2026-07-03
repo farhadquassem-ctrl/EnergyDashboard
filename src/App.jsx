@@ -2,13 +2,15 @@ import { lazy, Suspense, useState } from 'react'
 import OverviewTab from './components/OverviewTab'
 import { useTheme } from './theme.jsx'
 
-// Lazy-load the Nodal tab so AG Grid (heavy) stays out of the main bundle and
-// only loads when the user opens that tab.
+// Lazy-load the heavier tabs so their deps (AG Grid; the forecast JSON) stay
+// out of the main bundle and only load when the user opens that tab.
 const NodalTab = lazy(() => import('./components/NodalTab'))
+const PeakForecastTab = lazy(() => import('./components/PeakForecastTab'))
 
 const TABS = [
   { id: 'overview', label: 'Overview' },
   { id: 'nodal', label: 'Nodal' },
+  { id: 'forecast', label: 'Peak Forecast' },
 ]
 
 function ThemeToggle() {
@@ -77,9 +79,8 @@ export default function App() {
       </header>
 
       <main className="flex flex-1 flex-col p-4 lg:p-6">
-        {tab === 'overview' ? (
-          <OverviewTab />
-        ) : (
+        {tab === 'overview' && <OverviewTab />}
+        {tab === 'nodal' && (
           <Suspense
             fallback={
               <div className="flex flex-1 items-center justify-center text-sm text-zinc-500">
@@ -88,6 +89,17 @@ export default function App() {
             }
           >
             <NodalTab />
+          </Suspense>
+        )}
+        {tab === 'forecast' && (
+          <Suspense
+            fallback={
+              <div className="flex flex-1 items-center justify-center text-sm text-zinc-500">
+                Loading forecast…
+              </div>
+            }
+          >
+            <PeakForecastTab />
           </Suspense>
         )}
       </main>
