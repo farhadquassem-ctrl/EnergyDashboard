@@ -17,11 +17,15 @@ async function getJson(url) {
 }
 
 /**
+ * @param {{ bustCache?: boolean }} [opts] bustCache forces past the CDN edge
+ *   cache (s-maxage + stale-while-revalidate can re-serve a response up to
+ *   ~15 min old) — used by the explicit Refresh button, not the polling path.
  * @returns {Promise<{ rows, onzp, asOf, isLive }>}
  */
-export async function fetchNodal() {
+export async function fetchNodal({ bustCache = false } = {}) {
   try {
-    const data = await getJson('/api/ieso?report=nodal')
+    const url = `/api/ieso?report=nodal${bustCache ? `&t=${Date.now()}` : ''}`
+    const data = await getJson(url)
     if (!data.rows?.length) throw new Error('empty nodal')
     return {
       rows: data.rows,

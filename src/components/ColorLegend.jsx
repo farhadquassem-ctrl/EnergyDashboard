@@ -11,8 +11,8 @@ export default function ColorLegend() {
     .join(', ')})`
 
   return (
-    <div className="absolute bottom-4 left-4 z-[1000] rounded-lg border border-zinc-700 bg-panel/90 px-3 py-2 backdrop-blur">
-      <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-zinc-400">
+    <div className="absolute bottom-4 left-4 z-[1000] rounded-lg border border-zinc-300 bg-white/90 px-3 py-2 backdrop-blur dark:border-zinc-700 dark:bg-panel/90">
+      <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
         LMP ($/MWh)
       </div>
       <div className="h-2 w-44 rounded-full" style={{ background: gradient }} />

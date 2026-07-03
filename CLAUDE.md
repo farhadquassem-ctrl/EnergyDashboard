@@ -31,6 +31,15 @@ Two independent deliverables live in this repo:
   mobile; every column needs `flex` or price columns overflow off-screen.
 - Node→zone map: `api/nodeZones.js` (generated from IESO PUB_NodeZoneMap, ~93%
   coverage). Color scale `src/utils/colorScale.js` (LMP_FLOOR=-50 negative band).
+- **Theme toggle** (`src/theme.jsx` + header button): light/dark via Tailwind
+  `darkMode:'class'`; **dark stays the hard default** (localStorage `theme`,
+  OS preference deliberately ignored; index.html applies the class pre-paint).
+  Light values are the unprefixed classes, dark under `dark:`. JS-level colors
+  (not classes) are themed separately — AG Grid (`ag-theme-quartz[-dark]` +
+  CSS-var sets, grid remounts on theme via `key`), Recharts axis/grid/legend,
+  Leaflet marker neutral/stroke; the map tile dark-inversion filter is gated
+  under `.dark` in index.css. Adding a new component? Every hardcoded dark
+  class needs a light counterpart, and raw-color props need `useTheme()`.
 
 ---
 
