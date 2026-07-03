@@ -335,7 +335,13 @@ function parseNodal(text) {
   const lines = text.split('\n')
   const headerIdx = lines.findIndex((l) => /Pricing Location/i.test(l))
   const createdLine = lines.find((l) => /CREATED AT/i.test(l)) ?? ''
-  const asOf = (createdLine.match(/\d{4}\/\d{2}\/\d{2}\s+\d{2}:\d{2}:\d{2}/) ?? [])[0] ?? null
+  // IESO stamps "CREATED AT YYYY/MM/DD HH:MM:SS" in EST (UTC-5) year-round --
+  // no DST, matching the -0500 offset seen throughout the IESO metadata. Emit
+  // a proper instant with the -05:00 offset so the client can render it in
+  // Eastern prevailing time; the bare slash-format string would otherwise be
+  // misparsed as viewer-local and read an hour behind the wall clock in summer.
+  const c = createdLine.match(/(\d{4})\/(\d{2})\/(\d{2})\s+(\d{2}):(\d{2}):(\d{2})/)
+  const asOf = c ? `${c[1]}-${c[2]}-${c[3]}T${c[4]}:${c[5]}:${c[6]}-05:00` : null
 
   const byNode = new Map()
   for (let i = headerIdx + 1; i < lines.length; i++) {

@@ -1,3 +1,5 @@
+import { formatEasternTime } from '../utils/formatTime'
+
 /**
  * Header status pill: shows whether the dashboard is on live IESO data or
  * mock fallback, plus the "as of" time when live.
@@ -13,12 +15,7 @@ export default function StatusBadge({ isLive, loading, asOf }) {
   }
 
   if (isLive) {
-    const time = asOf
-      ? new Date(asOf).toLocaleTimeString('en-CA', {
-          hour: '2-digit',
-          minute: '2-digit',
-        })
-      : null
+    const time = formatEasternTime(asOf)
     return (
       <div className="flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-600 dark:text-emerald-400">
         <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400" />

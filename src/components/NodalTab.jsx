@@ -10,6 +10,7 @@ import { lmpToColor } from '../utils/colorScale'
 import StatusBadge from './StatusBadge'
 import { fetchNodal } from '../data/nodalClient'
 import { useTheme } from '../theme.jsx'
+import { formatEasternTime } from '../utils/formatTime'
 
 // --- shared cell helpers ---------------------------------------------------
 function hexToRgba(hex, a) {
@@ -248,9 +249,7 @@ export default function NodalTab() {
   const expandAll = () => setExpanded(new Set(collectKeys(tree)))
   const collapseAll = () => setExpanded(new Set())
 
-  const asOfText = state.asOf
-    ? new Date(state.asOf).toLocaleTimeString('en-CA', { hour12: false })
-    : '—'
+  const asOfText = formatEasternTime(state.asOf, { seconds: true }) ?? '—'
   const grouped = mode !== 'flat'
 
   return (
