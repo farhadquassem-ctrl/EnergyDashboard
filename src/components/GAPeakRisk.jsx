@@ -4,17 +4,17 @@ const STYLES = {
   Green: {
     dot: 'bg-emerald-500',
     ring: 'ring-emerald-500/30',
-    text: 'text-emerald-400',
+    text: 'text-emerald-600 dark:text-emerald-400',
   },
   Yellow: {
     dot: 'bg-amber-500',
     ring: 'ring-amber-500/30',
-    text: 'text-amber-400',
+    text: 'text-amber-600 dark:text-amber-400',
   },
   Red: {
     dot: 'bg-red-500',
     ring: 'ring-red-500/30',
-    text: 'text-red-400',
+    text: 'text-red-600 dark:text-red-400',
   },
 }
 
@@ -27,7 +27,7 @@ export default function GAPeakRisk({ demandMW }) {
 
   return (
     <div
-      className={`flex items-center gap-3 rounded-xl border border-zinc-800 bg-panel p-4 ring-1 ${style.ring}`}
+      className={`flex items-center gap-3 rounded-xl border border-zinc-300 bg-white p-4 ring-1 dark:border-zinc-800 dark:bg-panel ${style.ring}`}
     >
       <span className="relative flex h-3 w-3">
         <span
@@ -38,7 +38,7 @@ export default function GAPeakRisk({ demandMW }) {
         />
       </span>
       <div className="min-w-0">
-        <div className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
+        <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
           GA Peak Risk
         </div>
         <div className={`text-sm font-semibold ${style.text}`}>

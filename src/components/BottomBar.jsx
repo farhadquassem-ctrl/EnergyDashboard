@@ -2,9 +2,9 @@ import StatTile from './StatTile'
 import { MOCK_SNAPSHOT } from '../data/mockData'
 
 const CONDITION_ACCENT = {
-  Normal: 'text-emerald-400',
-  Tight: 'text-amber-400',
-  Emergency: 'text-red-400',
+  Normal: 'text-emerald-600 dark:text-emerald-400',
+  Tight: 'text-amber-600 dark:text-amber-400',
+  Emergency: 'text-red-600 dark:text-red-400',
 }
 
 const fmt = (v, digits = 0) =>
@@ -31,7 +31,7 @@ export default function BottomBar({ snapshot = MOCK_SNAPSHOT }) {
       <StatTile
         label="System Condition"
         value={systemCondition}
-        accentClass={CONDITION_ACCENT[systemCondition] ?? 'text-zinc-100'}
+        accentClass={CONDITION_ACCENT[systemCondition]}
       />
     </div>
   )

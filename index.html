@@ -8,6 +8,15 @@
       content="Public-facing Ontario electricity market dashboard — IESO locational marginal prices, demand, and HOEP."
     />
     <title>IESO LMP Dashboard — Ontario Electricity Market</title>
+    <!-- Apply the persisted theme before first paint (React re-applies it on
+         mount). Dark is the default; only an explicit saved 'light' wins. -->
+    <script>
+      try {
+        if (localStorage.getItem('theme') === 'light') {
+          document.documentElement.classList.remove('dark')
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

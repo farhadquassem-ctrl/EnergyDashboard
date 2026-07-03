@@ -9,15 +9,21 @@ import 'ag-grid-community/styles/ag-theme-quartz.css'
 import { lmpToColor } from '../utils/colorScale'
 import StatusBadge from './StatusBadge'
 import { fetchNodal } from '../data/nodalClient'
+import { useTheme } from '../theme.jsx'
 
 // --- shared cell helpers ---------------------------------------------------
 function hexToRgba(hex, a) {
   const n = parseInt(hex.slice(1), 16)
   return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`
 }
-function divergingCellStyle(p) {
+// Cell styles are raw colors (not classes), so the diverging-color cells need
+// a per-theme text color to stay readable over the tinted backgrounds.
+const makeDivergingCellStyle = (isDark) => (p) => {
   if (p.value == null || p.value === '') return { color: '#71717a' }
-  return { backgroundColor: hexToRgba(lmpToColor(p.value), 0.28), color: '#e4e4e7' }
+  return {
+    backgroundColor: hexToRgba(lmpToColor(p.value), 0.28),
+    color: isDark ? '#e4e4e7' : '#18181b',
+  }
 }
 const num = (p) => (p.value == null || p.value === '' ? '—' : Number(p.value).toFixed(2))
 const pct = (p) => (p.value == null || p.value === '' ? '—' : `${Math.round(p.value)}%`)
@@ -115,14 +121,14 @@ function NameCell(p) {
   const pad = (d.__depth || 0) * 14
   if (d.__kind === 'group') {
     return (
-      <span style={{ paddingLeft: pad }} className="font-semibold text-zinc-100">
-        <span className="inline-block w-4 text-zinc-400">{d.__expanded ? '▾' : '▸'}</span>
+      <span style={{ paddingLeft: pad }} className="font-semibold text-zinc-900 dark:text-zinc-100">
+        <span className="inline-block w-4 text-zinc-500 dark:text-zinc-400">{d.__expanded ? '▾' : '▸'}</span>
         {p.value} <span className="font-normal text-zinc-500">({d.count})</span>
       </span>
     )
   }
   return (
-    <span style={{ paddingLeft: pad + 18 }} className="text-zinc-300">
+    <span style={{ paddingLeft: pad + 18 }} className="text-zinc-700 dark:text-zinc-300">
       {p.value}
     </span>
   )
@@ -131,7 +137,7 @@ function NameCell(p) {
 // --- column sets -----------------------------------------------------------
 // flex on every column so the grid fills the desktop width (no horizontal
 // scroll); minWidth acts as a floor so mobile scrolls instead of crushing.
-const GROUPED_COLS = [
+const makeGroupedCols = (divergingCellStyle) => [
   { headerName: 'Group / Node', valueGetter: nameValueGetter, cellRenderer: NameCell, flex: 2.4, minWidth: 190, sortable: false },
   { headerName: 'Type', field: 'type', flex: 0.9, minWidth: 78, sortable: false },
   { headerName: 'LMP', field: 'lmp', type: 'rightAligned', valueFormatter: num, flex: 1, minWidth: 76, sortable: false },
@@ -141,7 +147,7 @@ const GROUPED_COLS = [
   { headerName: 'Basis', field: 'basis', type: 'rightAligned', valueFormatter: num, cellStyle: divergingCellStyle, flex: 1.1, minWidth: 84, sortable: false },
 ]
 
-const FLAT_COLS = [
+const makeFlatCols = (divergingCellStyle) => [
   { headerName: 'Node', field: 'nodeName', flex: 2.2, minWidth: 190, filter: 'agTextColumnFilter' },
   { headerName: 'Zone', field: 'zone', flex: 1, minWidth: 96, filter: 'agTextColumnFilter' },
   { headerName: 'Type', field: 'locationType', flex: 1, minWidth: 90, filter: 'agTextColumnFilter' },
@@ -153,15 +159,37 @@ const FLAT_COLS = [
   { headerName: 'Cong %', field: 'congestionPct', type: 'rightAligned', valueFormatter: pct, flex: 0.9, minWidth: 76 },
 ]
 
-const GRID_THEME_VARS = {
-  '--ag-background-color': '#18181b',
-  '--ag-header-background-color': '#27272a',
-  '--ag-odd-row-background-color': '#1b1b1e',
-  '--ag-row-hover-color': '#27272a',
-  '--ag-border-color': '#3f3f46',
-  '--ag-foreground-color': '#e4e4e7',
-  '--ag-header-foreground-color': '#a1a1aa',
-  '--ag-font-size': '12px',
+// Per-theme AG Grid CSS variables + the matching packaged theme class.
+// The quartz dark/light variants ship in the same ag-theme-quartz.css import.
+const GRID_THEMES = {
+  dark: {
+    themeClass: 'ag-theme-quartz-dark',
+    groupRowBg: '#1f1f23',
+    vars: {
+      '--ag-background-color': '#18181b',
+      '--ag-header-background-color': '#27272a',
+      '--ag-odd-row-background-color': '#1b1b1e',
+      '--ag-row-hover-color': '#27272a',
+      '--ag-border-color': '#3f3f46',
+      '--ag-foreground-color': '#e4e4e7',
+      '--ag-header-foreground-color': '#a1a1aa',
+      '--ag-font-size': '12px',
+    },
+  },
+  light: {
+    themeClass: 'ag-theme-quartz',
+    groupRowBg: '#ececee',
+    vars: {
+      '--ag-background-color': '#ffffff',
+      '--ag-header-background-color': '#f4f4f5',
+      '--ag-odd-row-background-color': '#fafafa',
+      '--ag-row-hover-color': '#f4f4f5',
+      '--ag-border-color': '#d4d4d8',
+      '--ag-foreground-color': '#27272a',
+      '--ag-header-foreground-color': '#52525b',
+      '--ag-font-size': '12px',
+    },
+  },
 }
 
 const MODES = [
@@ -174,6 +202,12 @@ export default function NodalTab() {
   const [state, setState] = useState({ rows: [], onzp: null, asOf: null, isLive: false, loading: true })
   const [mode, setMode] = useState('zone')
   const [expanded, setExpanded] = useState(new Set())
+  const { theme } = useTheme()
+  const gridTheme = GRID_THEMES[theme] ?? GRID_THEMES.dark
+  const { groupedCols, flatCols } = useMemo(() => {
+    const divergingCellStyle = makeDivergingCellStyle(theme === 'dark')
+    return { groupedCols: makeGroupedCols(divergingCellStyle), flatCols: makeFlatCols(divergingCellStyle) }
+  }, [theme])
 
   const load = async () => {
     setState((s) => ({ ...s, loading: true }))
@@ -217,7 +251,7 @@ export default function NodalTab() {
       {/* Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-300">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-700 dark:text-zinc-300">
             Nodal LMP — {state.loading ? '…' : state.rows.length} pricing locations
           </h2>
           <p className="text-xs text-zinc-500">
@@ -232,7 +266,7 @@ export default function NodalTab() {
           <button
             onClick={load}
             disabled={state.loading}
-            className="rounded-md border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-100 hover:bg-zinc-700 disabled:opacity-50"
+            className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
           >
             {state.loading ? 'Refreshing…' : 'Refresh'}
           </button>
@@ -241,13 +275,15 @@ export default function NodalTab() {
 
       {/* View controls */}
       <div className="flex flex-wrap items-center gap-2">
-        <div className="flex overflow-hidden rounded-md border border-zinc-700">
+        <div className="flex overflow-hidden rounded-md border border-zinc-300 dark:border-zinc-700">
           {MODES.map((m) => (
             <button
               key={m.id}
               onClick={() => setMode(m.id)}
               className={`px-3 py-1.5 text-xs font-medium ${
-                mode === m.id ? 'bg-sky-500/20 text-sky-300' : 'bg-zinc-800 text-zinc-400 hover:text-zinc-200'
+                mode === m.id
+                  ? 'bg-sky-500/15 text-sky-700 dark:bg-sky-500/20 dark:text-sky-300'
+                  : 'bg-white text-zinc-500 hover:text-zinc-800 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200'
               }`}
             >
               {m.label}
@@ -256,10 +292,10 @@ export default function NodalTab() {
         </div>
         {grouped && (
           <>
-            <button onClick={expandAll} className="rounded-md border border-zinc-700 bg-zinc-800 px-2.5 py-1.5 text-xs text-zinc-300 hover:bg-zinc-700">
+            <button onClick={expandAll} className="rounded-md border border-zinc-300 bg-white px-2.5 py-1.5 text-xs text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
               Expand all
             </button>
-            <button onClick={collapseAll} className="rounded-md border border-zinc-700 bg-zinc-800 px-2.5 py-1.5 text-xs text-zinc-300 hover:bg-zinc-700">
+            <button onClick={collapseAll} className="rounded-md border border-zinc-300 bg-white px-2.5 py-1.5 text-xs text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">
               Collapse all
             </button>
           </>
@@ -270,20 +306,20 @@ export default function NodalTab() {
           indefinite on mobile Safari and collapses the grid to zero rows, so
           use a viewport height (vh is definite) with a px floor. */}
       <div
-        className="ag-theme-quartz-dark h-[70vh] min-h-[420px] overflow-hidden rounded-xl border border-zinc-800"
-        style={GRID_THEME_VARS}
+        className={`${gridTheme.themeClass} h-[70vh] min-h-[420px] overflow-hidden rounded-xl border border-zinc-300 dark:border-zinc-800`}
+        style={gridTheme.vars}
       >
         <AgGridReact
-          key={mode}
+          key={`${mode}-${theme}`}
           rowData={displayRows}
-          columnDefs={grouped ? GROUPED_COLS : FLAT_COLS}
+          columnDefs={grouped ? groupedCols : flatCols}
           defaultColDef={{ sortable: !grouped, filter: !grouped, resizable: true, minWidth: 80 }}
           onRowClicked={grouped ? onRowClicked : undefined}
           getRowStyle={
             grouped
               ? (p) =>
                   p.data?.__kind === 'group'
-                    ? { background: '#1f1f23', fontWeight: 600, cursor: 'pointer' }
+                    ? { background: gridTheme.groupRowBg, fontWeight: 600, cursor: 'pointer' }
                     : undefined
               : undefined
           }
