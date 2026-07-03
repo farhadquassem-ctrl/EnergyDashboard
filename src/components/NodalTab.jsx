@@ -209,13 +209,20 @@ export default function NodalTab() {
     return { groupedCols: makeGroupedCols(divergingCellStyle), flatCols: makeFlatCols(divergingCellStyle) }
   }, [theme])
 
-  const load = async () => {
+  // bustCache only on the explicit Refresh click: the API's edge cache
+  // (s-maxage=300 + SWR 600) can otherwise re-serve a response up to ~15 min
+  // old, which made the button look like it did nothing.
+  const load = async ({ bustCache = false } = {}) => {
     setState((s) => ({ ...s, loading: true }))
-    const data = await fetchNodal()
+    const data = await fetchNodal({ bustCache })
     setState({ ...data, loading: false })
   }
   useEffect(() => {
     load()
+    // Same auto-refresh cadence as the Overview tab (IESO publishes ~5-min);
+    // without this the tab showed whatever was live at mount, forever.
+    const id = setInterval(load, 5 * 60 * 1000)
+    return () => clearInterval(id)
   }, [])
 
   const levels = mode === 'zone' ? ['zone', 'locationType'] : ['locationType']
@@ -264,7 +271,7 @@ export default function NodalTab() {
           <span className="text-xs text-zinc-500">as of {asOfText}</span>
           <StatusBadge isLive={state.isLive} loading={state.loading} asOf={state.asOf} />
           <button
-            onClick={load}
+            onClick={() => load({ bustCache: true })}
             disabled={state.loading}
             className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
           >
