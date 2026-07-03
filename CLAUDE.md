@@ -10,12 +10,16 @@ Two independent deliverables live in this repo:
    official ICI peak labels) for backtesting an Ontario **5CP** model. It does
    **not** import or touch the app.
 
-> Branch convention for this workstream: `claude/peak-prediction-pipeline` (data
-> pipeline, done — merged) has given way to `claude/peak-prediction-engine`
-> (the model + backtest, current work). `main` and
-> `claude/ieso-lmp-dashboard-scaffold-2j6b2j` are both fully up to date and
-> content-identical as of this branch's creation. Commit with clear messages,
-> push with `git push -u origin <branch>`. Don't open PRs unless asked.
+> Branch convention: **`main` is the single source of truth and Vercel's
+> production branch** — every commit to it auto-deploys. The old
+> `claude/ieso-lmp-dashboard-scaffold-2j6b2j` mainline and the merged feature
+> branches (`peak-prediction-pipeline`, `peak-prediction-engine`,
+> `peak-forecast-tab`, `dashboard-theme-toggle`, `nodal-lmp-grid`) have been
+> retired. Do work on a fresh `claude/<topic>` branch off `main`, commit with
+> clear messages, push with `git push -u origin <branch>`, and merge to `main`
+> (a PR is the deploy path). Don't open PRs unless asked. Note: the session's
+> GitHub token can push/merge but **cannot delete remote branches** — prune
+> merged branches from the GitHub UI.
 
 ---
 
@@ -101,7 +105,14 @@ peaks labeled correctly (Jun 24 HE19 24,862 MW, etc.).
 
 ---
 
-## Open tasks (pick up here)
+## Build log — all shipped, merged to `main`, and live
+
+Everything below is **done and deployed**. Production branch is now **`main`**
+(Vercel deploys it; the old `claude/ieso-lmp-dashboard-scaffold-2j6b2j` mainline
+and the merged feature branches were retired). Kept here as reference for the
+*why*, not as a checklist. **Next steps: TBD** — to be repopulated once the
+first live-data forecast run lands (see the one outstanding item at the end of
+§2).
 
 1. **✅ Done — 2024 (and earlier) ICI peak labels, fixed via a historical
    fallback** (`pipeline/fixtures/historical_peaks_top5.csv`, consolidated
@@ -109,11 +120,11 @@ peaks labeled correctly (Jun 24 HE19 24,862 MW, etc.).
    end-to-end on the user's machine over 2020-05-01 → 2026-04-30. PR:
    https://github.com/farhadquassem-ctrl/EnergyDashboard/pull/4
 
-2. **✅ Peak-prediction engine + backtest v1 — working, on `claude/peak-prediction-engine`.**
-   Pipeline-side CLI only so far (`npm run backtest`; `pipeline/src/peak_model.js`
-   + `pipeline/src/backtest.js`) — no dashboard UI yet, that's a later, separate
-   step now that the model's validated. Consumes `peak_dataset.csv` **directly**
-   — does **not** re-rank raw demand.
+2. **✅ Peak-prediction engine + backtest + Peak Forecast tab — shipped & live.**
+   Model + backtest CLI (`npm run backtest`; `pipeline/src/peak_model.js`
+   + `pipeline/src/backtest.js`) and the dashboard tab that renders its exported
+   output are all merged to `main` and deployed. Consumes `peak_dataset.csv`
+   **directly** — does **not** re-rank raw demand.
 
    **⚠️ Bug found and fixed while building this: every peak label in
    `peak_dataset.csv` was shifted 1 hour late, for every year.** `iciPeakToDateTime`
@@ -210,9 +221,13 @@ peaks labeled correctly (Jun 24 HE19 24,862 MW, etc.).
      the regenerated JSON. The pipeline branch ships the generator only; the
      committed sample JSON lives on the dashboard side.
 
-   **Next:** Peak Forecast tab is built on the dashboard side (card/table
-   toggle, running board + nested predicted peaks). Real numbers need a
-   dataset extending to ~now + `export:dashboard` run on the user's machine.
+   **Outstanding (the one real-world item):** the tab is built, merged, and live
+   (card/table toggle, running board + nested predicted peaks, plus a **Refresh**
+   button that re-reads the published `forecast.json`), but it renders the
+   committed **sample** JSON. To go real: extend the dataset to ~now, then run
+   `npm run fetch:forecast` + `npm run export:dashboard` on a machine with
+   network egress (IESO/ECCC are sandbox-blocked) and commit the regenerated
+   `public/peak-forecast/forecast.json` — it auto-deploys from `main`.
 
 3. (Optional) Adapt Gemini's Vitest serverless-fallback integration test onto a
    dashboard branch — offered, not confirmed. Note: Gemini's draft had wrong
