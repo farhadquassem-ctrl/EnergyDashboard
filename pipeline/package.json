@@ -9,11 +9,17 @@
     "fetch:weather": "node src/fetch_weather.js",
     "fetch:peaks": "node src/fetch_peaks.js",
     "build": "node src/build_dataset.js",
+    "backtest": "node src/backtest.js",
+    "backtest:horizons": "node src/backtest_horizons.js",
+    "fetch:forecast": "node src/fetch_forecast.js",
+    "forecast": "node src/forecast.js",
+    "export:dashboard": "node src/export_dashboard.js",
     "stations": "node src/fetch_weather.js --list-stations",
     "weather:compare": "node src/fetch_weather.js --compare"
   },
   "dependencies": {
     "fast-xml-parser": "^4.4.1",
-    "luxon": "^3.5.0"
+    "luxon": "^3.5.0",
+    "simple-statistics": "^7.9.2"
   }
 }

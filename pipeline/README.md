@@ -64,6 +64,71 @@ npm run fetch:demand && npm run fetch:weather && npm run fetch:peaks && npm run 
 and label each period's own top-5/top-10 (Git Bash / macOS / Linux `export`; on
 Windows PowerShell use `$env:PIPELINE_START='2024-05-01'`).
 
+## Multi-horizon peak forecasts (3 / 7 / 14 days out)
+
+Once `data/peak_dataset.csv` exists (ideally the multi-year window above):
+
+```bash
+# measure accuracy per lead time (walk-forward, adds lead 0 = v1 baseline)
+npm run backtest:horizons        # -> data/backtest_horizons.json
+
+# live: fetch ECCC's real Toronto forecast (citypage XML, ~7 days out)
+npm run fetch:forecast           # -> data/forecast_citypage.json
+
+# live: 5CP forecast vs the current base period's running board
+npm run forecast                 # -> data/forecast_horizons.json
+
+# bridge the forecast into the dashboard app (writes public/peak-forecast/)
+npm run export:dashboard         # -> ../public/peak-forecast/forecast.json
+```
+
+**What `forecast` produces (the 5CP consumer view).** ICI consumers are billed
+next year's Peak Demand Factor based on their demand during *this* base period's
+(May 1 – Apr 30) five Coincident Peaks. So the forecast is framed as: over the
+next 14 days, which upcoming hours would crack the base period's **running
+top-5** (and are thus worth curtailing)? Output (`forecast_horizons.json`):
+
+- `basePeriod` / `billingPeriod` — the in-progress base period and the Jul–Jun
+  adjustment period its 5CP will bill.
+- `running5CP` + `threshold` — the top-5 daily peaks banked so far this period
+  (from observed demand — the live running board, which is what the ICI Peak
+  Tracker itself publishes mid-period; *not* the "re-rank raw demand" backtest
+  anti-pattern, which is about fabricating Final labels for a finished period)
+  and the 5th-place MW a new peak must beat.
+- `predictedPeaks` — up to 5 upcoming candidate-peak days, ranked, each tagged
+  with `daysOut` + `leadBucket` (so 3-/7-/14-day views are nested subsets),
+  `projectedRank` on the current board, and `wouldRankTop5` (a real curtailment
+  target vs. monitor-only). Weather + confidence degrade with `daysOut`.
+
+`export:dashboard` runs the forecast and copies it to `public/peak-forecast/`
+— the single sanctioned pipeline→app coupling — so the dashboard's Peak
+Forecast tab reads it as a static file. Commit the regenerated JSON.
+
+**How the weather input works, per lead — this is the honest part:**
+
+- A real N-day-ahead peak forecast needs *forecast* weather (the target day's
+  `temp_c` isn't observed yet). For live 3/7-day runs, `fetch:forecast` pulls
+  ECCC's official citypage forecast and `forecast` downscales its daily
+  high/low to hourly via the climatological diurnal shape.
+- **No public ECCC product reaches 14 days**, so the 14-day lead always uses a
+  **climatology + decaying-anomaly-persistence surrogate**
+  (`src/forecast_weather.js`) and is labelled `NOT a weather forecast`.
+- **ECCC publishes no archive of past forecasts**, so `backtest:horizons`
+  evaluates *every* lead with the surrogate. The accuracy-vs-lead degradation
+  it measures is real (each lead sees only information available that far
+  ahead); treat the 3/7-day numbers as conservative lower bounds for live runs
+  that use the real citypage feed. Accuracy is *expected* to degrade with lead
+  time — that's the finding, not a bug; nothing is tuned to flatten it.
+- Lead time (forecast horizon) and risk profile (curtailment-window width) are
+  two different axes: every lead's record carries all three window profiles.
+
+⚠ `fetch:forecast` (host `dd.weather.gc.ca`, also sandbox-blocked) is written
+against ECCC's published layout/schema and tested only on a synthetic fixture
+(`fixtures/citypage_sample_SYNTHETIC.xml`; check the parser offline with
+`node src/fetch_forecast.js --parse <file>`). The first run on a real machine
+is the verification — sanity-check its printed table against weather.gc.ca,
+and ideally replace the synthetic fixture with a real capture.
+
 ## Configuration (`src/config.js`)
 
 - **Date window:** trailing 12 months by default. `PIPELINE_END=2026-04-30`

@@ -52,6 +52,22 @@ export const WEATHER_STATION = (() => {
   return match ?? { climateId: id, name: `station ${id}` }
 })()
 
+// --- Forecast horizons -------------------------------------------------------
+// Lead times (days ahead) for the multi-horizon peak forecast + backtest.
+// FORECAST_LEAD_DAYS=3,7,14 to override.
+export const FORECAST_LEAD_DAYS = (process.env.FORECAST_LEAD_DAYS ?? '3,7,14')
+  .split(',')
+  .map((s) => Number(s.trim()))
+  .filter((n) => Number.isFinite(n) && n > 0)
+
+// ECCC citypage forecast site (live forecast weather, fetch_forecast.js).
+// s0000458 = Toronto. Full list: dd.weather.gc.ca/today/citypage_weather/siteList.xml
+export const CITYPAGE = {
+  prov: process.env.CITYPAGE_PROV ?? 'ON',
+  siteId: process.env.CITYPAGE_SITE_ID ?? 's0000458',
+  name: 'Toronto',
+}
+
 // --- Source URLs (verified in DATA_PIPELINE.md — do not guess others) -------
 export const URLS = {
   // IESO Hourly Demand (Ontario + Market demand). Current-year file:
@@ -71,6 +87,16 @@ export const URLS = {
   // MSC GeoMet OGC API (Environment Canada).
   weatherItems: 'https://api.weather.gc.ca/collections/climate-hourly/items',
   stationsItems: 'https://api.weather.gc.ca/collections/climate-stations/items',
+
+  // ECCC citypage forecast XML (MSC Datamart). Layout confirmed against ECCC's
+  // public docs (eccc-msc.github.io/open-data + dd.weather.gc.ca index pages),
+  // but NOT yet fetched end-to-end from this repo — dd.weather.gc.ca is blocked
+  // from the Claude sandbox like the other data hosts, so the first
+  // `npm run fetch:forecast` on a real machine is the verification step.
+  // Files: {ISO-timestamp}_MSC_CitypageWeather_{siteId}_en.xml under a per-
+  // UTC-emission-hour directory.
+  citypageHourDir: (prov, hh) =>
+    `https://dd.weather.gc.ca/today/citypage_weather/${prov}/${String(hh).padStart(2, '0')}/`,
 }
 
 // Intermediate + final artifact paths.
@@ -79,6 +105,10 @@ export const FILES = {
   weather: join(DATA_DIR, 'weather.json'),
   peaks: join(DATA_DIR, 'peaks.json'),
   dataset: join(DATA_DIR, 'peak_dataset.csv'),
+  backtest: join(DATA_DIR, 'backtest_results.json'),
+  backtestHorizons: join(DATA_DIR, 'backtest_horizons.json'),
+  forecastCitypage: join(DATA_DIR, 'forecast_citypage.json'),
+  forecastHorizons: join(DATA_DIR, 'forecast_horizons.json'),
 }
 
 // Checked-in fallback labels — a single consolidated reference (top-5 AQEW,
@@ -101,7 +131,8 @@ function shiftMonths(iso, months) {
 // ICI files are labelled by the base period's START year: May 2025 – Apr 2026
 // is "PUB_ICIPeakTracker_2025.xml" (confirmed against the real files). So a date
 // in May–Dec belongs to that year's period; Jan–Apr to the prior year's.
-function baseYearOf(iso) {
+// Exported: also used by backtest.js to group peak_dataset.csv rows by base year.
+export function baseYearOf(iso) {
   const [y, m] = iso.split('-').map(Number)
   return m >= 5 ? y : y - 1
 }
@@ -111,4 +142,21 @@ function baseYearsForWindow(startIso, endIso) {
   const years = []
   for (let y = a; y <= b; y++) years.push(y)
   return years
+}
+
+// ICI base period for a base year: May 1 (baseYear) – Apr 30 (baseYear+1).
+// Its 5 Coincident Peaks set each consumer's Peak Demand Factor, which is then
+// billed over the FOLLOWING adjustment period. So curtailing the right hours in
+// this window is what reduces next year's Global Adjustment bill.
+export function basePeriodBounds(baseYear) {
+  return { start: `${baseYear}-05-01`, end: `${baseYear + 1}-04-30`, label: String(baseYear) }
+}
+
+// The Global Adjustment adjustment/billing period the given base year determines:
+// July 1 (baseYear+1) – June 30 (baseYear+2). (Base 2026 => billed Jul 2027–Jun 2028.)
+export function billingPeriodBounds(baseYear) {
+  const start = `${baseYear + 1}-07-01`
+  const end = `${baseYear + 2}-06-30`
+  const M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  return { start, end, label: `${M[6]} ${baseYear + 1} – ${M[5]} ${baseYear + 2}` }
 }

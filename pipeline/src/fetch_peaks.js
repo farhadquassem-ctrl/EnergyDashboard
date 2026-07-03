@@ -4,7 +4,9 @@
 // demand series ourselves. Each year file is ONE base period (May–Apr, labelled
 // by start year) and lists that period's running top-10 Ontario-demand hours.
 // We rank PER FILE (5CP is per base period), keep status=Final, and label the
-// top 5 / top 10 of each. deliveryDate/deliveryHour are EST year-round.
+// top 5 / top 10 of each. deliveryDate/deliveryHour match IESO demand's own
+// EPT (DST-aware) hour-ending convention -- see lib/time.js for how this was
+// confirmed (an earlier "EST year-round" assumption here was wrong).
 //
 // Real structure (confirmed against docs/Sample-Reports/PUB_ICIPeakTracker_*.xml):
 //   Document > DocBody > xmldata > dataset[datapointName="TOP_ONTARIO_DEMAND"]
