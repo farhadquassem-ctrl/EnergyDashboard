@@ -27,6 +27,7 @@ this folder**. Adapters resolve renderable data (live, or mock fallback with
 | `zonalSeries.js` | 24h RT 5-min series w/ DA hourly overlay (`?report=series`) | live |
 | `nodal.js` | full nodal LMP decomposition (`?report=nodal`) | live |
 | `peakForecast.js` | GA 5CP forecast (static `public/peak-forecast/forecast.json`) | live |
+| `predictionLog.js` | prospective `ModelPrediction[]` log (static `public/peak-forecast/prediction_log.json`) | live (accruing) |
 | `dayAhead.js` | standalone DA range fetch by zone | stub (Prompt 1) |
 | `operatingReserve.js` | OR price/volume | stub |
 | `historicalDemand.js` | historical demand + official 5CP determination | stub (prefer pipeline static-JSON exports) |
@@ -66,6 +67,31 @@ a light counterpart; raw-color props (Recharts/AG Grid/Leaflet) go through
 New tabs: `index.jsx` + `hooks.js` + `calculations.js` (pure functions, no
 React — all business logic lives here, unit-testable) + `components/`.
 `features/peak-forecast/` is the reference implementation.
+
+Unit tests are `*.test.js` next to the code, run with `npm test`
+(`node --test`) — both app (`features/model-backtest`) and pipeline.
+
+## 8. Model accuracy — `src/features/model-backtest/`
+
+Model-agnostic accuracy scoring (Prompt 5). `calculations.js` scores any
+model's prospective `ModelPrediction[]` log — `computeHitRate` (recall/
+precision at a probability threshold), `computeCalibration` (reliability-
+diagram bins + Brier), `computeTrendOverTime` (rolling Brier/MAE) — plus the
+presentation helpers the Peak Forecast accuracy panel was refactored onto
+(`leadRecall`/`recallColorClass`, byte-identical output).
+
+Two accuracy sources, kept separate on purpose:
+- **Backtest aggregate** (`accuracyByLead` in `forecast.json`) — walk-forward
+  recall recomputed from history each run; what the panel renders today.
+- **Prospective log** (`prediction_log.json`, shape `ModelPrediction`) — the
+  durable record the pipeline appends each run (`npm run log:predictions`) and
+  resolves as reality arrives. The generalized scorers run on this; it accrues
+  over time and lags (a 5CP outcome is only final at the base period's close).
+
+**Decision (flagged, per Prompt 5): accuracy stays embedded in Peak Forecast,
+not a standalone tab.** With one production model, a separate tab is premature
+UI. The module + schema are model-agnostic underneath, so adding a second
+model's tracking is a data-plumbing change, not a UI rebuild.
 
 ## Deviations from the contract spec (deliberate)
 

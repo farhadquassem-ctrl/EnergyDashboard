@@ -8,6 +8,7 @@ export { fetchSnapshot, snapshotToDemandInterval, snapshotToIntervalPrices } fro
 export { fetchZoneSeries, zoneSeriesToIntervalPrices } from './zonalSeries'
 export { fetchNodal, nodalToIntervalPrices, generateMockNodal } from './nodal'
 export { fetchPeakForecast, forecastToGAForecasts } from './peakForecast'
+export { fetchPredictionLog, predictionsForModel } from './predictionLog'
 // Stubs (reserved report families — throw until built):
 export { fetchDayAheadPrices } from './dayAhead'
 export { fetchOperatingReserve } from './operatingReserve'

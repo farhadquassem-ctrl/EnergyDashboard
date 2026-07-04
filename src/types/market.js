@@ -71,6 +71,28 @@ export const MARKETS = Object.freeze([
  */
 
 /**
+ * One prospective model prediction, logged when it's made and scored once the
+ * outcome is known. The model-agnostic record every model's accuracy tracking
+ * builds on (peak 5CP today; DA/RT price + storage forecasts later) — see
+ * `src/features/model-backtest/`. Written prospectively by the pipeline to
+ * `public/peak-forecast/prediction_log.json` so accuracy accrues over time
+ * (distinct from the walk-forward *backtest* aggregate in `accuracyByLead`,
+ * which is recomputed from history each run).
+ *
+ * @typedef {object} ModelPrediction
+ * @property {string} modelName e.g. 'ga-5cp-peak'
+ * @property {string} targetDate YYYY-MM-DD the prediction is about
+ * @property {string} predictedAt ISO8601 when the prediction was made
+ * @property {number} predictedValue the model's point prediction (e.g. peak MW)
+ * @property {number} [predictedProbability] calibrated P(event), when the model emits one
+ * @property {number} [actualValue] observed value, filled once the day passes
+ * @property {boolean} [actualHit] observed positive outcome (e.g. day ended up
+ *   in the base period's top-5), filled once that's finally knowable
+ * @property {boolean} resolved actualValue is known (the target day has passed)
+ * @property {number} leadTimeDays days between predictedAt and targetDate
+ */
+
+/**
  * Nodal LMP decomposition row (the Nodal tab's grid shape).
  *
  * NOTE (flagged, see Prompt 4): this predates the contract and diverges from

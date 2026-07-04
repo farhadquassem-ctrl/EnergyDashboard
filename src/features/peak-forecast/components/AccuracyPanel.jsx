@@ -1,9 +1,12 @@
+import { leadRecall, recallColorClass } from '../../model-backtest/calculations'
+
 // Measured accuracy by lead time — renders the pipeline's walk-forward
-// backtest results (accuracyByLead in forecast.json). Prompt 5 target: the
-// scoring itself lives pipeline-side (backtest_horizons.js); this panel is a
-// pure renderer of its output.
+// backtest results (accuracyByLead in forecast.json). The scoring itself lives
+// pipeline-side (backtest_horizons.js); the presentation transforms
+// (leadRecall/recallColorClass) are the model-agnostic module's, so this panel
+// stays a pure renderer of its output.
 export default function AccuracyPanel({ accuracyByLead, horizons }) {
-  const recall = (h) => accuracyByLead?.[String(h)]?.balancedTop5Recall?.mean ?? null
+  const recall = (h) => leadRecall(accuracyByLead, h)
   return (
     <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-panel">
       <div className="mb-3 flex items-baseline justify-between gap-3">
@@ -14,7 +17,7 @@ export default function AccuracyPanel({ accuracyByLead, horizons }) {
         <div className="flex items-end gap-4" style={{ height: 130 }}>
           {horizons.map((h) => {
             const r = recall(h)
-            const col = r == null ? 'bg-zinc-400' : r >= 0.6 ? 'bg-emerald-500' : r >= 0.4 ? 'bg-amber-500' : 'bg-red-500'
+            const col = recallColorClass(r)
             return (
               <div key={h} className="flex flex-1 flex-col items-center justify-end gap-2" style={{ height: '100%' }}>
                 <span className="text-sm font-bold tabular-nums text-zinc-900 dark:text-zinc-100">

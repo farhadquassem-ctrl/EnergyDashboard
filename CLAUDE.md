@@ -239,14 +239,35 @@ first live-data forecast run lands (see the one outstanding item at the end of
    real numbers and shows a green **Live** pill (amber **Sample data** pill only
    for the checked-in sample; see `src/features/peak-forecast/index.jsx` header). Freshness is now
    automated: **`.github/workflows/refresh-forecast.yml`** runs the full chain
-   (`fetch:demand → fetch:weather → fetch:peaks → build → fetch:forecast →
-   export:dashboard`) on a GitHub runner **daily at 06:00 ET** and on manual
-   dispatch, committing `forecast.json` to `main` only when it changes → Vercel
-   auto-deploys. The runner can reach IESO/ECCC (the Claude sandbox cannot), so
-   this is the one place the live fetch chain runs unattended. The header
-   **Refresh** button still just re-reads the published file client-side (it does
-   not regenerate — that's the workflow's job). Scheduled runs require the
-   workflow to sit on the **default** branch (`main`) — satisfied.
+   (`fetch:demand → fetch:weather → fetch:peaks → build → backtest:horizons →
+   calibrate → fetch:forecast → export:dashboard → log:predictions`) on a GitHub
+   runner **daily at 06:00 ET** and on manual dispatch, committing `forecast.json`
+   + `prediction_log.json` to `main` only when they change → Vercel auto-deploys.
+   The runner can reach IESO/ECCC (the Claude sandbox cannot), so this is the one
+   place the live fetch chain runs unattended. The header **Refresh** button still
+   just re-reads the published file client-side (it does not regenerate — that's
+   the workflow's job). Scheduled runs require the workflow to sit on the
+   **default** branch (`main`) — satisfied.
+
+   **Peak probability + accuracy tracker (Prompts 3 dep + 5).**
+   - `src/peak_probability.js` (`npm run calibrate`) — calibrated **P(top-5)**
+     replacing the old days-out `confidence` heuristic: empirical
+     percentile×forecast-lead model (logistic, fit from the walk-forward
+     backtest), emitted per predicted peak in `forecast.json` as `probability`.
+     Writes `data/peak_probability.json` + a self-contained
+     `data/calibration_report.html` (logistic vs isotonic vs buckets — the
+     fit-form visual compare; **logistic** is locked). Running-board
+     "days-remaining" percentiling is the deferred v2.
+   - `src/prediction_log.js` (`npm run log:predictions`) — the durable
+     **prospective** prediction log (`public/peak-forecast/prediction_log.json`,
+     shape `ModelPrediction`). Appends each run's predictions, resolves past ones
+     (actualValue when the day passes; `actualHit` only at base-period close).
+     This is the log that didn't exist before — accuracy was ONLY the recomputed
+     backtest. Model-agnostic scoring: `src/features/model-backtest/calculations.js`
+     (`computeHitRate`/`computeCalibration`/`computeTrendOverTime`). **Decision:
+     accuracy stays embedded in Peak Forecast, model-agnostic underneath — not a
+     standalone tab** (premature with one model). See `docs/ARCHITECTURE.md §8`.
+   - Both app and pipeline now have `npm test` (`node --test`).
 
 3. (Optional) Adapt Gemini's Vitest serverless-fallback integration test onto a
    dashboard branch — offered, not confirmed. Note: Gemini's draft had wrong
