@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-03T19:18:29.157-04:00",
-  "datasetThrough": "2026-07-03",
+  "generatedAt": "2026-07-04T10:51:10.105-04:00",
+  "datasetThrough": "2026-07-04",
   "staleNote": null,
   "model": {
     "r2": 0.62,
-    "trainRows": 2706
+    "trainRows": 2712
   },
   "basePeriod": {
     "start": "2026-05-01",
@@ -23,7 +23,7 @@
     7,
     14
   ],
-  "threshold": 22044,
+  "threshold": 22234,
   "running5CP": [
     {
       "rank": 1,
@@ -33,42 +33,42 @@
     },
     {
       "rank": 2,
+      "date": "2026-07-03",
+      "hourEnding": 17,
+      "mw": 23857
+    },
+    {
+      "rank": 3,
       "date": "2026-07-01",
       "hourEnding": 14,
       "mw": 23833
     },
     {
-      "rank": 3,
+      "rank": 4,
       "date": "2026-06-30",
       "hourEnding": 19,
       "mw": 23526
     },
     {
-      "rank": 4,
+      "rank": 5,
       "date": "2026-06-29",
       "hourEnding": 18,
       "mw": 22234
-    },
-    {
-      "rank": 5,
-      "date": "2026-06-11",
-      "hourEnding": 19,
-      "mw": 22044
     }
   ],
   "predictedPeaks": [
     {
       "date": "2026-07-09",
-      "daysOut": 6,
-      "weatherSource": "eccc-citypage (low filled from climo span)",
+      "daysOut": 5,
+      "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 17,
       "predictedPeakHourEnding": 18,
-      "predictedMw": 22542,
+      "predictedMw": 22445,
       "tempC": 30,
       "leadBucket": 7,
-      "projectedRank": 4,
+      "projectedRank": 5,
       "wouldRankTop5": true,
       "confidence": "low",
       "curtailmentWindows": [
@@ -94,37 +94,37 @@
       "expectedAccuracy": null
     },
     {
-      "date": "2026-07-10",
-      "daysOut": 7,
-      "weatherSource": "climatology+persistence",
-      "isForecastWeather": false,
+      "date": "2026-07-08",
+      "daysOut": 4,
+      "weatherSource": "eccc-citypage",
+      "isForecastWeather": true,
       "peakRiskDay": true,
-      "predictedPeakHourStart": 16,
-      "predictedPeakHourEnding": 17,
-      "predictedMw": 22268,
-      "tempC": 29.8,
+      "predictedPeakHourStart": 17,
+      "predictedPeakHourEnding": 18,
+      "predictedMw": 21423,
+      "tempC": 29,
       "leadBucket": 7,
-      "projectedRank": 4,
-      "wouldRankTop5": true,
+      "projectedRank": 6,
+      "wouldRankTop5": false,
       "confidence": "low",
       "curtailmentWindows": [
         {
           "profile": "Conservative",
           "windowHours": 3,
-          "hourStart": 15,
-          "label": "HE16–HE18"
+          "hourStart": 16,
+          "label": "HE17–HE19"
         },
         {
           "profile": "Balanced",
           "windowHours": 4,
-          "hourStart": 15,
-          "label": "HE16–HE19"
+          "hourStart": 16,
+          "label": "HE17–HE20"
         },
         {
           "profile": "Aggressive",
           "windowHours": 5,
-          "hourStart": 14,
-          "label": "HE15–HE19"
+          "hourStart": 15,
+          "label": "HE16–HE20"
         }
       ],
       "expectedAccuracy": null
