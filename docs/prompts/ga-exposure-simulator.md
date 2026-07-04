@@ -252,3 +252,57 @@ A `features/ga-exposure-simulator/` tab conforming to the contract, with pure
 tested `calculations.js`, the meter ingester, the two GA adapters (monthly GA;
 peak/AQEW reuse), and the per-CP savings breakdown as the hero feature. Report
 any contract deviations and every flagged methodology decision.
+
+---
+
+## SIDEBAR JOB (small, self-contained — NOT part of the GA tab)
+
+A quick fix to the existing **Peak Forecast** tab's confidence wording that can
+ride along on this branch. Independent of everything above; do it as a separate
+commit.
+
+**Finding — the labels are misleading, the math is not weak.** The number under
+the hood is a real calibrated P(top-5) (percentile×lead logistic in
+`pipeline/src/peak_probability.js`) — strictly better than the old days-out
+heuristic it replaced. What's broken is only the *label mapping*: `confidenceLabel`
+gates on **absolute** P(top-5) —
+
+```
+>= 0.5 -> moderate,  >= 0.2 -> low,  else very low
+```
+
+— but P(top-5) is intrinsically small (only ~5 winners out of dozens of candidate
+days per base period), so ~0.5 is nearly unreachable and almost everything lands
+in "very low." That collapse is a display artifact, **independent of** the
+`accuracyByLead` surrogate-weather weakness (tracked separately in
+`docs/prompts/investigate-low-accuracy-by-lead.md`) — do **not** touch the model,
+the calibration, or the tau/threshold tuning here. This is a wording change only.
+
+**Decision (owner): relabel off the normalized percentile, 3-rung ladder, drop
+"very low" (bad marketing).**
+
+```
+peakPercentile >= 0.5 -> High,  >= 0.2 -> Moderate,  else Low   (thresholds tunable)
+```
+
+`probabilityFor` **already returns `percentile`** (emitted per peak as
+`peakPercentile`), so this is near-trivial — relabel off that percentile instead
+of the raw probability. No model change, no retrain.
+
+**Touchpoints:**
+- `pipeline/src/peak_probability.js` — `confidenceLabel` (take percentile; add the
+  `high` rung, remove `very low`). Keep the days-out fallback in
+  `forecast.js:decorate` in sync with the same 3-rung wording.
+- `src/features/peak-forecast/calculations.js` — the `CONF` map: add a `high`
+  entry (color + bar), drop/repoint `very low`. `PeakCard.jsx` / `PeakTable.jsx`
+  read `CONF[p.confidence] ?? CONF.low`, so keep a safe fallback key.
+- `src/types/market.js` — update the `Confidence` enum if it lists the values.
+
+**Honesty caveat — do not skip.** A percentile label is *relative*: "High" means
+"top-ranked candidate this run," NOT "likely to actually be a top-5 peak" — a
+60th-percentile summer day may still be only ~5% to bank a CP. So (a) **keep the
+numeric `probability` visible next to the word** (the tab already surfaces it) so
+"High (P=6%)" never hides the real number, and (b) anchor the percentile on the
+**historical per-lead reference** (what `peakPercentile` already is), not today's
+batch, so "High" means the same thing run to run. Fuller ladder is fine for
+marketing — but the honest probability stays beside it.
