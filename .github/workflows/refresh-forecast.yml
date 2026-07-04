@@ -29,6 +29,13 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # Multi-year window so the walk-forward backtest + probability calibration
+    # have enough base periods to be meaningful (a trailing 12-month window
+    # leaves ~1 evaluable year -> degenerate calibration). Uses the historical
+    # fallback peak labels for 2020-2024 (see fetch_peaks). The forecast's
+    # running board + predictions still use the latest data in this window.
+    env:
+      PIPELINE_START: '2020-05-01'
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
