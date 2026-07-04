@@ -1,20 +1,12 @@
-// Client data path for the Nodal tab. Calls /api/ieso?report=nodal and falls
-// back to generated mock rows (isLive:false) so the grid always has data.
-// Fully separate from the Overview snapshot/series path.
+// Adapter: full nodal LMP decomposition (~1000 pricing locations) via
+// /api/ieso?report=nodal. Falls back to generated mock rows (isLive:false) so
+// the grid always has data. Row shape is `NodalPriceComponent` (see
+// types/market.js — flagged as diverging from IntervalPrice; a decision for
+// the Prompt 4 audit, not a silent migration).
+
+import { getJson } from './http'
 
 const TIMEOUT_MS = 12000 // ~1000 rows + server parse
-
-async function getJson(url) {
-  const ctrl = new AbortController()
-  const t = setTimeout(() => ctrl.abort(), TIMEOUT_MS)
-  try {
-    const res = await fetch(url, { signal: ctrl.signal })
-    if (!res.ok) throw new Error(`API ${res.status}`)
-    return await res.json()
-  } finally {
-    clearTimeout(t)
-  }
-}
 
 /**
  * @param {{ bustCache?: boolean }} [opts] bustCache forces past the CDN edge
@@ -25,7 +17,7 @@ async function getJson(url) {
 export async function fetchNodal({ bustCache = false } = {}) {
   try {
     const url = `/api/ieso?report=nodal${bustCache ? `&t=${Date.now()}` : ''}`
-    const data = await getJson(url)
+    const data = await getJson(url, { timeoutMs: TIMEOUT_MS })
     if (!data.rows?.length) throw new Error('empty nodal')
     return {
       rows: data.rows,
@@ -36,6 +28,26 @@ export async function fetchNodal({ bustCache = false } = {}) {
   } catch {
     return { ...generateMockNodal(), isLive: false }
   }
+}
+
+/**
+ * Normalize nodal rows to `IntervalPrice[]` (market 'RT', node-level LMP).
+ * Only the headline LMP survives — the energy/congestion/loss decomposition
+ * has no home in IntervalPrice (see the NodalPriceComponent note).
+ * @returns {import('../../types/market').IntervalPrice[]}
+ */
+export function nodalToIntervalPrices(result) {
+  const ts = result?.asOf ?? new Date().toISOString()
+  return (result?.rows ?? [])
+    .filter((r) => r.lmp != null)
+    .map((r) => ({
+      timestamp: ts,
+      zone: r.zone ?? 'unmapped',
+      node: r.nodeId,
+      market: 'RT',
+      price: r.lmp,
+      unit: '$/MWh',
+    }))
 }
 
 // ---------------------------------------------------------------------------

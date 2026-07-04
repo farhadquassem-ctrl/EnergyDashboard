@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 // Side-effect import of the packages bundle registers all community modules.
 // Without it the production build ships an unregistered grid that renders blank
@@ -8,7 +8,9 @@ import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-quartz.css'
 import { lmpToColor } from '../utils/colorScale'
 import StatusBadge from './StatusBadge'
-import { fetchNodal } from '../data/nodalClient'
+import TabShell from './TabShell'
+import { fetchNodal } from '../lib/ieso/nodal'
+import { useMarketQuery } from '../lib/query/useMarketQuery'
 import { useTheme } from '../theme.jsx'
 import { formatEasternTime } from '../utils/formatTime'
 
@@ -200,7 +202,6 @@ const MODES = [
 ]
 
 export default function NodalTab() {
-  const [state, setState] = useState({ rows: [], onzp: null, asOf: null, isLive: false, loading: true })
   const [mode, setMode] = useState('zone')
   const [expanded, setExpanded] = useState(new Set())
   const { theme } = useTheme()
@@ -210,21 +211,24 @@ export default function NodalTab() {
     return { groupedCols: makeGroupedCols(divergingCellStyle), flatCols: makeFlatCols(divergingCellStyle) }
   }, [theme])
 
-  // bustCache only on the explicit Refresh click: the API's edge cache
-  // (s-maxage=300 + SWR 600) can otherwise re-serve a response up to ~15 min
-  // old, which made the button look like it did nothing.
-  const load = async ({ bustCache = false } = {}) => {
-    setState((s) => ({ ...s, loading: true }))
-    const data = await fetchNodal({ bustCache })
-    setState({ ...data, loading: false })
+  // Shared query hook: initial load + the Overview tab's 5-min auto-refresh
+  // cadence (IESO publishes ~5-min; without it the tab showed whatever was
+  // live at mount, forever). bustCache only on the explicit Refresh click:
+  // the API's edge cache (s-maxage=300 + SWR 600) can otherwise re-serve a
+  // response up to ~15 min old, which made the button look like it did nothing.
+  const { data, loading, refreshing, refresh } = useMarketQuery(
+    { market: 'RT', zone: 'all-nodes', dateRange: 'latest' },
+    ({ bustCache }) => fetchNodal({ bustCache }),
+    { refreshMs: 5 * 60 * 1000 },
+  )
+  const state = {
+    rows: data?.rows ?? [],
+    onzp: data?.onzp ?? null,
+    asOf: data?.asOf ?? null,
+    isLive: data?.isLive ?? false,
+    loading,
   }
-  useEffect(() => {
-    load()
-    // Same auto-refresh cadence as the Overview tab (IESO publishes ~5-min);
-    // without this the tab showed whatever was live at mount, forever.
-    const id = setInterval(load, 5 * 60 * 1000)
-    return () => clearInterval(id)
-  }, [])
+  const busy = loading || refreshing
 
   const levels = mode === 'zone' ? ['zone', 'locationType'] : ['locationType']
   const tree = useMemo(
@@ -253,32 +257,31 @@ export default function NodalTab() {
   const grouped = mode !== 'flat'
 
   return (
-    <div className="flex flex-1 flex-col gap-3">
-      {/* Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-700 dark:text-zinc-300">
-            Nodal LMP — {state.loading ? '…' : state.rows.length} pricing locations
-          </h2>
-          <p className="text-xs text-zinc-500">
-            Nodal LMP = energy + congestion + loss · basis = node − Ontario Zonal
-            Price (ONZP{state.onzp != null ? ` $${state.onzp.toFixed(2)}` : ''}) ·
-            zone = IESO virtual trading zone (transmission buses show “Unmapped”)
-          </p>
-        </div>
+    <TabShell
+      gap="gap-3"
+      align="center"
+      title={`Nodal LMP — ${state.loading ? '…' : state.rows.length} pricing locations`}
+      subtitle={
+        <p className="text-xs text-zinc-500">
+          Nodal LMP = energy + congestion + loss · basis = node − Ontario Zonal
+          Price (ONZP{state.onzp != null ? ` $${state.onzp.toFixed(2)}` : ''}) ·
+          zone = IESO virtual trading zone (transmission buses show “Unmapped”)
+        </p>
+      }
+      actions={
         <div className="flex items-center gap-3">
           <span className="text-xs text-zinc-500">as of {asOfText}</span>
           <StatusBadge isLive={state.isLive} loading={state.loading} asOf={state.asOf} />
           <button
-            onClick={() => load({ bustCache: true })}
-            disabled={state.loading}
+            onClick={() => refresh({ bustCache: true })}
+            disabled={busy}
             className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
           >
-            {state.loading ? 'Refreshing…' : 'Refresh'}
+            {busy ? 'Refreshing…' : 'Refresh'}
           </button>
         </div>
-      </div>
-
+      }
+    >
       {/* View controls */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex overflow-hidden rounded-md border border-zinc-300 dark:border-zinc-700">
@@ -334,6 +337,6 @@ export default function NodalTab() {
           suppressDragLeaveHidesColumns
         />
       </div>
-    </div>
+    </TabShell>
   )
 }

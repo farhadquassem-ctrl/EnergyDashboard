@@ -9,6 +9,7 @@ import {
   Legend,
 } from 'recharts'
 import { useTheme } from '../theme.jsx'
+import { toPricePoints } from '../types/market'
 
 // Recharts takes colors as props (not classes), so axis/grid/legend colors
 // come from the active theme at render time.
@@ -38,24 +39,51 @@ function ChartTooltip({ active, payload, label }) {
   )
 }
 
+// Default series set: the Overview tab's RT-vs-DA pair. New tabs pass their
+// own descriptors instead of forking the chart.
+const DEFAULT_SERIES = [
+  { dataKey: 'zonePrice', name: 'This zone (RT)', stroke: '#38bdf8' },
+  { dataKey: 'dayAhead', name: 'Day-Ahead (Ontario)', stroke: '#f59e0b', strokeDasharray: '5 4' },
+]
+
 /**
- * Right column: rolling ~24h of 5-min real-time price for the selected zone,
- * with the province day-ahead cleared price overlaid as a per-hour reference.
+ * The shared price chart (the contract's <PriceChart>): themed line chart of
+ * one or more $/MWh series over time.
+ *
+ * Data can arrive two ways:
+ *  - `data`: PricePoint[] rows (one row per x point, one column per series) —
+ *    the base chart-row shape from types/market.js
+ *  - `intervals`: normalized IntervalPrice[] straight from a lib/ieso adapter;
+ *    pivoted here via toPricePoints (columns keyed by market, e.g. 'RT'/'DA')
+ *
+ * `series` describes the lines: [{ dataKey, name, stroke, strokeDasharray? }].
+ * Defaults preserve the Overview tab's original RT + DA rendering exactly.
  */
-export default function PriceChart({ zoneName, data = [], loading, isLive }) {
+export default function PriceChart({
+  title,
+  zoneName,
+  unitLabel = '$/MWh · 24h',
+  data = [],
+  intervals = null,
+  series = DEFAULT_SERIES,
+  loading,
+  isLive,
+}) {
   const { theme } = useTheme()
   const colors = CHART_COLORS[theme] ?? CHART_COLORS.dark
-  const empty = !loading && data.length === 0
+  const rows = intervals ? toPricePoints(intervals) : data
+  const empty = !loading && rows.length === 0
   // Thin the x-axis to ~8 labels regardless of how many 5-min points there are.
-  const tickInterval = Math.max(0, Math.floor(data.length / 8))
+  const tickInterval = Math.max(0, Math.floor(rows.length / 8))
+  const heading = title ?? `Real-Time Price — ${zoneName}`
   return (
     <div className="flex h-full flex-col rounded-xl border border-zinc-300 bg-white p-4 dark:border-zinc-800 dark:bg-panel">
       <div className="mb-3 flex items-baseline justify-between">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-          Real-Time Price — {zoneName}
+          {heading}
         </h2>
         <span className="text-xs text-zinc-500">
-          $/MWh · 24h{!loading && !isLive ? ' · mock' : ''}
+          {unitLabel}{!loading && !isLive ? ' · mock' : ''}
         </span>
       </div>
 
@@ -74,7 +102,7 @@ export default function PriceChart({ zoneName, data = [], loading, isLive }) {
       <div className={`min-h-0 flex-1 ${loading || empty ? 'hidden' : ''}`}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
-            data={data}
+            data={rows}
             margin={{ top: 8, right: 8, bottom: 0, left: -8 }}
           >
             <CartesianGrid stroke={colors.grid} strokeDasharray="3 3" />
@@ -96,27 +124,20 @@ export default function PriceChart({ zoneName, data = [], loading, isLive }) {
               wrapperStyle={{ fontSize: 12, color: colors.legend }}
               iconType="plainline"
             />
-            <Line
-              type="monotone"
-              dataKey="zonePrice"
-              name="This zone (RT)"
-              stroke="#38bdf8"
-              strokeWidth={2}
-              dot={false}
-              activeDot={{ r: 4 }}
-              connectNulls
-            />
-            <Line
-              type="monotone"
-              dataKey="dayAhead"
-              name="Day-Ahead (Ontario)"
-              stroke="#f59e0b"
-              strokeWidth={2}
-              strokeDasharray="5 4"
-              dot={false}
-              activeDot={{ r: 4 }}
-              connectNulls
-            />
+            {series.map((s) => (
+              <Line
+                key={s.dataKey}
+                type="monotone"
+                dataKey={s.dataKey}
+                name={s.name}
+                stroke={s.stroke}
+                strokeWidth={2}
+                strokeDasharray={s.strokeDasharray}
+                dot={false}
+                activeDot={{ r: 4 }}
+                connectNulls
+              />
+            ))}
           </LineChart>
         </ResponsiveContainer>
       </div>

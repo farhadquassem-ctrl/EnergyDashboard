@@ -29,6 +29,15 @@ Two independent deliverables live in this repo:
 
 ## Dashboard app — key facts
 
+- **Shared architecture contract (read before adding any tab): `docs/ARCHITECTURE.md`.**
+  Types in `src/types/market.js` (JSDoc, not TS); all IESO fetching/parsing in
+  `src/lib/ieso/` adapters; one fetch hook `src/lib/query/useMarketQuery.js`
+  (query key `[market, zone, dateRange]`); global UI state in
+  `src/store/marketStore.jsx`; page chrome via `src/components/TabShell.jsx`;
+  new tabs live at `src/features/<tab-name>/` (`index.jsx` + `hooks.js` + pure
+  `calculations.js` + `components/` — `features/peak-forecast/` is the
+  reference). Known deviations are listed in that doc — they're deliberate;
+  don't "fix" them in passing.
 - **IESO proxy:** `api/ieso.js` (Vercel serverless). Uses host
   **`reports-public.ieso.ca`** (NOT `reports.ieso.ca` — the latter is stale and
   fails). `?report=snapshot|series|nodal`, `?debug=1` for diagnostics.
@@ -42,10 +51,10 @@ Two independent deliverables live in this repo:
   mobile; every column needs `flex` or price columns overflow off-screen.
 - Node→zone map: `api/nodeZones.js` (generated from IESO PUB_NodeZoneMap, ~93%
   coverage). Color scale `src/utils/colorScale.js` (LMP_FLOOR=-50 negative band).
-- **Peak Forecast tab** (`src/components/PeakForecastTab.jsx`, 3rd tab): the ICI
+- **Peak Forecast tab** (`src/features/peak-forecast/`, 3rd tab): the ICI
   5CP consumer view. Pure renderer of the pipeline's exported
   `public/peak-forecast/forecast.json` (fetched at runtime via
-  `src/data/peakForecastClient.js`; no API). Shows the current base period's
+  `src/lib/ieso/peakForecast.js`; no API). Shows the current base period's
   running top-5 board + threshold, and up to 5 upcoming curtailment targets
   (predicted peaks that would crack the top-5), filterable by horizon (3/7/14d,
   a nested subset) with a **Cards/Table view toggle**. A committed sample JSON
@@ -228,7 +237,7 @@ first live-data forecast run lands (see the one outstanding item at the end of
    **✅ Live data + self-refresh — done.** The first real forecast run landed
    (`public/peak-forecast/forecast.json`, `sample:false`), so the tab now renders
    real numbers and shows a green **Live** pill (amber **Sample data** pill only
-   for the checked-in sample; see `PeakForecastTab.jsx` header). Freshness is now
+   for the checked-in sample; see `src/features/peak-forecast/index.jsx` header). Freshness is now
    automated: **`.github/workflows/refresh-forecast.yml`** runs the full chain
    (`fetch:demand → fetch:weather → fetch:peaks → build → fetch:forecast →
    export:dashboard`) on a GitHub runner **daily at 06:00 ET** and on manual
