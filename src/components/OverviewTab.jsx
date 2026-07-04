@@ -1,19 +1,22 @@
-import { useState } from 'react'
 import MapPanel from './MapPanel'
 import PriceChart from './PriceChart'
 import GAPeakRisk from './GAPeakRisk'
 import BottomBar from './BottomBar'
 import StatusBadge from './StatusBadge'
+import TabShell from './TabShell'
 import { ZONES } from '../data/zones'
 import { MOCK_SNAPSHOT } from '../data/mockData'
 import { useSnapshot, useZoneSeries } from '../data/useIesoData'
+import { useMarketStore } from '../store/marketStore'
 
 /**
  * Overview tab: the spatial zonal view (map + price chart + system tiles).
  * Owns the snapshot/series hooks so they only run while this tab is mounted.
+ * Zone selection lives in the shared market store so other tabs (and future
+ * TabShell zone controls) see the same selection.
  */
 export default function OverviewTab() {
-  const [selectedZoneId, setSelectedZoneId] = useState(ZONES[0].id)
+  const { selectedZoneId, setSelectedZoneId } = useMarketStore()
   const selectedZone = ZONES.find((z) => z.id === selectedZoneId) ?? ZONES[0]
 
   const { zones, snapshot, asOf, isLive, loading } = useSnapshot()
@@ -23,11 +26,7 @@ export default function OverviewTab() {
   const activeSnapshot = snapshot ?? MOCK_SNAPSHOT
 
   return (
-    <div className="flex flex-1 flex-col gap-4">
-      <div className="flex justify-end">
-        <StatusBadge isLive={isLive} loading={loading} asOf={asOf} />
-      </div>
-
+    <TabShell actions={<StatusBadge isLive={isLive} loading={loading} asOf={asOf} />}>
       <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-5">
         {/* Left column — 60% */}
         <section className="min-h-[420px] lg:col-span-3">
@@ -53,6 +52,6 @@ export default function OverviewTab() {
       </div>
 
       <BottomBar snapshot={activeSnapshot} />
-    </div>
+    </TabShell>
   )
 }

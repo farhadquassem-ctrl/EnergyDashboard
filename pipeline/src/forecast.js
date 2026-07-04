@@ -42,6 +42,7 @@ import {
 import { fitModel, predict, isCandidateRow, CANDIDATE_HOUR_RANGE } from './peak_model.js'
 import { loadDataset, RISK_PROFILES, groupByDay } from './backtest.js'
 import { buildClimatology, indexObservationsByUtcHour, anomalyAt, surrogateWeather } from './forecast_weather.js'
+import { loadCalibration, probabilityFor, confidenceLabel } from './peak_probability.js'
 import { isOntarioHoliday } from './lib/holidays.js'
 import { isMain } from './lib/is-main.js'
 
@@ -202,6 +203,12 @@ export function runForecast() {
   const citypage = loadCitypage()
   if (!citypage) console.warn('  no fresh citypage forecast — all leads fall back to the climatology surrogate')
 
+  // Empirical peak-probability calibration (npm run calibrate). Absent on a
+  // first run -> probability stays null and confidence falls back to the old
+  // days-out heuristic, so nothing breaks before the first calibration.
+  const calibration = loadCalibration()
+  if (!calibration) console.warn('  no peak_probability.json — probability absent, confidence falls back to days-out; run npm run calibrate')
+
   // Running board for the in-progress base period (as of the dataset end).
   const boardThrough = obsAgeH <= OBS_STALE_HOURS ? nowDate : datasetThrough
   const { ranked: running5CP, threshold } = runningFiveCP(rows, basePeriod.start, boardThrough)
@@ -226,15 +233,29 @@ export function runForecast() {
   // Curtailment targets = predicted peaks that would crack the running top-5,
   // capped at 5. If fewer than 2 qualify (quiet stretch / board already high),
   // pad with the next-best days as monitor-only context so the tab isn't empty.
-  const decorate = (p, selected) => ({
-    ...p,
-    leadBucket: leadBucketFor(p.daysOut),
-    projectedRank: projectedRankOf(p.predictedMw),
-    wouldRankTop5: selected,
-    confidence: p.daysOut <= 3 ? 'moderate' : p.daysOut <= 7 ? 'low' : 'very low',
-    curtailmentWindows: curtailmentWindows(p.predictedPeakHourStart),
-    expectedAccuracy: null, // filled below from backtests
-  })
+  const decorate = (p, selected) => {
+    const leadBucket = leadBucketFor(p.daysOut)
+    // Calibrated P(this day cracks the base period's top-5), from the empirical
+    // percentile×lead model. confidence is now DERIVED from that probability
+    // (was a raw days-out label); if calibration is absent, both fall back to
+    // the old heuristic so the dashboard's confidence enum keeps working.
+    const scored = probabilityFor(calibration, { predictedMw: p.predictedMw, lead: leadBucket })
+    const probability = scored ? round2(scored.probability) : null
+    const confidence = scored
+      ? confidenceLabel(scored.probability)
+      : p.daysOut <= 3 ? 'moderate' : p.daysOut <= 7 ? 'low' : 'very low'
+    return {
+      ...p,
+      leadBucket,
+      projectedRank: projectedRankOf(p.predictedMw),
+      wouldRankTop5: selected,
+      probability,
+      peakPercentile: scored ? round2(scored.percentile) : null,
+      confidence,
+      curtailmentWindows: curtailmentWindows(p.predictedPeakHourStart),
+      expectedAccuracy: null, // filled below from backtests
+    }
+  }
   const selected = dayPeaks.filter((p) => p.peakRiskDay && cracksTop5(p.predictedMw)).slice(0, MAX_PEAKS)
   const padCount = Math.max(0, 2 - selected.length)
   const pad = dayPeaks.filter((p) => !selected.includes(p)).slice(0, padCount)
@@ -298,7 +319,7 @@ function printSummary(out) {
     console.log(
       `    ${p.date} (+${p.daysOut}d, ≤${p.leadBucket}d): HE${p.predictedPeakHourEnding} ~${p.predictedMw} MW` +
         ` → would rank #${p.projectedRank}${p.wouldRankTop5 ? ' ✓ CURTAIL' : '  (monitor)'}` +
-        ` [${p.weatherSource}; ${p.confidence}]`,
+        ` [${p.weatherSource}; P(top5)=${p.probability == null ? 'n/a' : `${Math.round(p.probability * 100)}%`}; ${p.confidence}]`,
     )
   }
   console.log(`\nforecast: wrote ${out.predictedPeaks.length} predicted peaks -> ${FILES.forecastHorizons}`)

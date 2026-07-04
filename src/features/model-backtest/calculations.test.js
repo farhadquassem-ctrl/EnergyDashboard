@@ -1,0 +1,105 @@
+// Unit tests for the model-agnostic accuracy scoring. Run: npm test
+// (node --test). Plain JS (no JSX) so it runs under node's test runner.
+
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
+import {
+  leadRecall, recallColorClass, computeHitRate, computeCalibration, computeTrendOverTime,
+  RECALL_GOOD, RECALL_OK,
+} from './calculations.js'
+
+// --- extracted presentation helpers (must match the old inline logic) -------
+
+test('leadRecall reads the aggregate mean, null when absent', () => {
+  const acc = { 3: { balancedTop5Recall: { mean: 0.8 } }, 7: null }
+  assert.equal(leadRecall(acc, 3), 0.8)
+  assert.equal(leadRecall(acc, 7), null)
+  assert.equal(leadRecall(acc, 14), null)
+  assert.equal(leadRecall(null, 3), null)
+})
+
+test('recallColorClass matches the shipped thresholds', () => {
+  assert.equal(recallColorClass(null), 'bg-zinc-400')
+  assert.equal(recallColorClass(RECALL_GOOD), 'bg-emerald-500')
+  assert.equal(recallColorClass(0.9), 'bg-emerald-500')
+  assert.equal(recallColorClass(RECALL_OK), 'bg-amber-500')
+  assert.equal(recallColorClass(0.5), 'bg-amber-500')
+  assert.equal(recallColorClass(0.2), 'bg-red-500')
+})
+
+// --- generalized log scoring ------------------------------------------------
+
+const mk = (o) => ({
+  modelName: 'ga-5cp-peak', targetDate: '2026-07-10', predictedAt: '2026-07-03T10:00:00Z',
+  predictedValue: 22000, predictedProbability: 0.5, resolved: true, leadTimeDays: 7, ...o,
+})
+
+test('computeHitRate: recall & precision at a probability threshold, by model', () => {
+  const preds = [
+    mk({ predictedProbability: 0.9, actualHit: true }), // flagged hit
+    mk({ predictedProbability: 0.8, actualHit: false }), // flagged, false alarm
+    mk({ predictedProbability: 0.2, actualHit: true }), // missed positive
+    mk({ predictedProbability: 0.1, actualHit: false }), // correct reject
+    mk({ modelName: 'other', predictedProbability: 0.9, actualHit: true }), // filtered out
+  ]
+  const r = computeHitRate(preds, { modelName: 'ga-5cp-peak', threshold: 0.5 })
+  assert.equal(r.resolved, 4)
+  assert.equal(r.positives, 2)
+  assert.equal(r.flagged, 2)
+  assert.equal(r.hits, 1)
+  assert.equal(r.recall, 0.5) // 1 of 2 positives caught
+  assert.equal(r.precision, 0.5) // 1 of 2 flags correct
+})
+
+test('computeHitRate ignores unresolved (actualHit null) rows', () => {
+  const r = computeHitRate([mk({ actualHit: null }), mk({ actualHit: true, predictedProbability: 0.9 })])
+  assert.equal(r.resolved, 1)
+  assert.equal(r.recall, 1)
+})
+
+test('computeCalibration: bins, observed frequency, Brier', () => {
+  const preds = [
+    mk({ predictedProbability: 0.05, actualHit: false }),
+    mk({ predictedProbability: 0.15, actualHit: false }),
+    mk({ predictedProbability: 0.95, actualHit: true }),
+    mk({ predictedProbability: 0.85, actualHit: true }),
+  ]
+  const c = computeCalibration(preds, { bins: 10 })
+  assert.equal(c.resolved, 4)
+  // perfectly-separated & confident => low Brier
+  assert.ok(c.brier < 0.05)
+  const first = c.bins[0]
+  assert.equal(first.n, 1)
+  assert.equal(first.observedFreq, 0)
+  const last = c.bins[9]
+  assert.equal(last.n, 1)
+  assert.equal(last.observedFreq, 1)
+  // empty bins report null, not 0
+  assert.equal(c.bins[5].n, 0)
+  assert.equal(c.bins[5].observedFreq, null)
+})
+
+test('computeCalibration needs both probability and actualHit', () => {
+  const c = computeCalibration([mk({ predictedProbability: null, actualHit: true }), mk({ actualHit: null })])
+  assert.equal(c.resolved, 0)
+  assert.equal(c.brier, null)
+})
+
+test('computeTrendOverTime: monthly Brier + MAE, sorted', () => {
+  const preds = [
+    mk({ predictedAt: '2026-06-02T10:00:00Z', predictedProbability: 0.9, actualHit: true, predictedValue: 22000, actualValue: 22200 }),
+    mk({ predictedAt: '2026-06-20T10:00:00Z', predictedProbability: 0.1, actualHit: false, predictedValue: 20000, actualValue: 20100 }),
+    mk({ predictedAt: '2026-07-05T10:00:00Z', predictedProbability: 0.5, actualHit: true, predictedValue: 21000, actualValue: 23000 }),
+  ]
+  const trend = computeTrendOverTime(preds, { bucket: 'month' })
+  assert.equal(trend.length, 2)
+  assert.deepEqual(trend.map((t) => t.period), ['2026-06', '2026-07'])
+  assert.equal(trend[0].n, 2)
+  assert.equal(trend[1].mae, 2000) // |21000-23000|
+  assert.ok(trend[0].brier < trend[1].brier) // June well-predicted, July a 0.5 on a hit
+})
+
+test('computeTrendOverTime skips unresolved and bad timestamps', () => {
+  const trend = computeTrendOverTime([mk({ resolved: false }), mk({ predictedAt: 'not-a-date', resolved: true })])
+  assert.equal(trend.length, 0)
+})

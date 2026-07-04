@@ -29,6 +29,13 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # Multi-year window so the walk-forward backtest + probability calibration
+    # have enough base periods to be meaningful (a trailing 12-month window
+    # leaves ~1 evaluable year -> degenerate calibration). Uses the historical
+    # fallback peak labels for 2020-2024 (see fetch_peaks). The forecast's
+    # running board + predictions still use the latest data in this window.
+    env:
+      PIPELINE_START: '2020-05-01'
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
@@ -67,6 +74,19 @@ jobs:
         working-directory: pipeline
         run: npm run build
 
+      # Walk-forward recall backtest -> data/backtest_horizons.json, which
+      # forecast.js reads for the "Measured accuracy by lead time" panel. Not
+      # run here previously, so accuracyByLead shipped null (panel showed "—").
+      - name: Backtest accuracy by lead
+        working-directory: pipeline
+        run: npm run backtest:horizons
+
+      # Empirical peak-probability calibration -> data/peak_probability.json,
+      # which forecast.js reads to emit each peak's numeric P(top-5).
+      - name: Calibrate peak probability
+        working-directory: pipeline
+        run: npm run calibrate
+
       - name: Fetch ECCC citypage forecast
         working-directory: pipeline
         run: npm run fetch:forecast
@@ -75,16 +95,22 @@ jobs:
         working-directory: pipeline
         run: npm run export:dashboard
 
-      - name: Commit forecast.json if it changed
+      # Append this run's predictions to the durable prospective log and
+      # resolve any past ones -> public/peak-forecast/prediction_log.json.
+      - name: Update prospective prediction log
+        working-directory: pipeline
+        run: npm run log:predictions
+
+      - name: Commit forecast + prediction log if changed
         run: |
           set -euo pipefail
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- public/peak-forecast/forecast.json; then
-            echo "forecast.json unchanged — nothing to commit."
+          if git diff --quiet -- public/peak-forecast/forecast.json public/peak-forecast/prediction_log.json; then
+            echo "forecast.json + prediction_log.json unchanged — nothing to commit."
             exit 0
           fi
-          git add public/peak-forecast/forecast.json
+          git add public/peak-forecast/forecast.json public/peak-forecast/prediction_log.json
           git commit -m "chore(forecast): refresh peak forecast data [skip ci]"
           # Rebase on any concurrent main updates, then push. Retry a couple of
           # times in case main moved between fetch and push.
