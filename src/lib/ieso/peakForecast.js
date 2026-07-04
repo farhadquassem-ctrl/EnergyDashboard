@@ -30,9 +30,10 @@ export async function fetchPeakForecast({ bustCache = false } = {}) {
 
 /**
  * Normalize the forecast file's predicted peaks to the shared `GAForecast[]`
- * shape. `probability` is null until the pipeline emits calibrated numeric
- * probabilities (today it publishes categorical confidence only — flagged in
- * types/market.js; Prompt 3 depends on this).
+ * shape. `probability` is the pipeline's calibrated P(top-5) (empirical
+ * percentile×lead model) once `npm run calibrate` has run; it is null for
+ * older forecast.json that predate calibration, in which case `confidence`
+ * (categorical) still carries the signal.
  *
  * @param {{ predictedPeaks: any[] }} forecast parsed forecast.json
  * @returns {import('../../types/market').GAForecast[]}
@@ -42,7 +43,7 @@ export function forecastToGAForecasts(forecast) {
     date: p.date,
     hour: p.predictedPeakHourEnding,
     predictedRank: p.projectedRank,
-    probability: null,
+    probability: p.probability ?? null,
     confidence: p.confidence,
   }))
 }

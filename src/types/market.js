@@ -47,11 +47,10 @@ export const MARKETS = Object.freeze([
 /**
  * One GA 5CP peak prediction (a predicted-peak day/hour from the pipeline).
  *
- * NOTE (contract deviation, flagged): the pipeline currently emits a
- * categorical `confidence` ('moderate' | 'low' | 'very low'), not a numeric
- * probability. Until the model is calibrated to emit probabilities,
- * `probability` is null and `confidence` carries the signal. Prompt 3
- * (GA exposure simulator) needs numeric probabilities — pipeline work.
+ * `probability` is the pipeline's calibrated P(top-5) (empirical
+ * percentile×lead model, `npm run calibrate`); `confidence` is the categorical
+ * label now derived from it. `probability` is null only for forecast.json that
+ * predates calibration, where `confidence` still carries the signal.
  *
  * @typedef {object} GAForecast
  * @property {string} date YYYY-MM-DD target day

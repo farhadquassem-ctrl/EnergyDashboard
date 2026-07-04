@@ -39,14 +39,17 @@ import {
 } from './forecast_weather.js'
 import { isMain } from './lib/is-main.js'
 
-// Evaluate one (test year, lead) pair. For leadDays=0 the row's observed
+// Build one (test year, lead) pair's candidate day set exactly as it looks at
+// forecast time: swap in the forecast weather, THEN apply the candidate filter
+// (hour band + forecast temp extremity) — filtering on observed temp would leak
+// the answer. Returns the per-day groups (each with its highest predicted hour)
+// plus the actual official peak hours, so both the recall evaluation
+// (evaluateLead) and the probability calibration (peak_probability.js) consume
+// one construction instead of duplicating it. For leadDays=0 the row's observed
 // weather is used unchanged (v1 baseline).
-function evaluateLead({ model, climatology, obsByKey, testRows, leadDays }) {
+export function buildLeadCandidates({ model, climatology, obsByKey, testRows, leadDays }) {
   const anomalyCache = new Map() // per issue hour
 
-  // Build the candidate set as it would look at forecast time: swap in the
-  // forecast weather, THEN apply the candidate filter (hour band + forecast
-  // temp extremity). Filtering on observed temp here would leak the answer.
   const hourBandRows = testRows.filter((r) => {
     const h = Number(r.hour_of_day)
     return h >= CANDIDATE_HOUR_RANGE.minHour && h <= CANDIDATE_HOUR_RANGE.maxHour
@@ -81,13 +84,23 @@ function evaluateLead({ model, climatology, obsByKey, testRows, leadDays }) {
     topPredicted: Math.max(...rows.map((x) => x.predicted)),
   }))
   dayGroups.sort((a, b) => b.topPredicted - a.topPredicted)
-  const flaggedDays = dayGroups.slice(0, FLAGGED_DAYS_PER_YEAR)
 
   // Denominator: every actual official peak hour in the test year's hour band,
   // regardless of whether the forecast weather kept it in the candidate set —
   // a peak the forecast filtered out is a genuine miss, not an exclusion.
   const actualTop5 = hourBandRows.filter((r) => r.is_top5_peak === 1)
   const actualTop10 = hourBandRows.filter((r) => r.is_top10_peak === 1)
+
+  return { candidates, dayGroups, actualTop5, actualTop10 }
+}
+
+// Evaluate one (test year, lead) pair: recall of the official peaks inside the
+// flagged days' risk-profile windows.
+function evaluateLead({ model, climatology, obsByKey, testRows, leadDays }) {
+  const { candidates, dayGroups, actualTop5, actualTop10 } = buildLeadCandidates({
+    model, climatology, obsByKey, testRows, leadDays,
+  })
+  const flaggedDays = dayGroups.slice(0, FLAGGED_DAYS_PER_YEAR)
 
   const flaggedDaySet = new Set(flaggedDays.map((d) => d.day))
   const top5DayHits = new Set(actualTop5.filter((r) => flaggedDaySet.has(r.day)).map((r) => r.day)).size

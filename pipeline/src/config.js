@@ -109,6 +109,8 @@ export const FILES = {
   backtestHorizons: join(DATA_DIR, 'backtest_horizons.json'),
   forecastCitypage: join(DATA_DIR, 'forecast_citypage.json'),
   forecastHorizons: join(DATA_DIR, 'forecast_horizons.json'),
+  peakProbability: join(DATA_DIR, 'peak_probability.json'),
+  calibrationReport: join(DATA_DIR, 'calibration_report.html'),
 }
 
 // Checked-in fallback labels — a single consolidated reference (top-5 AQEW,
