@@ -105,8 +105,10 @@ test('probabilityFor falls back to nearest available lead', () => {
   assert.equal(probabilityFor(null, { predictedMw: 21000, lead: 3 }), null)
 })
 
-test('confidenceLabel maps probability to the dashboard enum', () => {
-  assert.equal(confidenceLabel(0.7), 'moderate')
-  assert.equal(confidenceLabel(0.3), 'low')
-  assert.equal(confidenceLabel(0.05), 'very low')
+test('confidenceLabel maps the per-lead percentile to the 3-rung ladder', () => {
+  assert.equal(confidenceLabel(0.7), 'high')
+  assert.equal(confidenceLabel(0.5), 'high')
+  assert.equal(confidenceLabel(0.3), 'moderate')
+  assert.equal(confidenceLabel(0.2), 'moderate')
+  assert.equal(confidenceLabel(0.05), 'low')
 })

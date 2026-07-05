@@ -236,12 +236,20 @@ export function probabilityFor(calibration, { predictedMw, lead }) {
   return { probability: logisticProbability(cal.logistic, percentile), percentile, lead: useLead }
 }
 
-// Categorical label kept for the existing dashboard UI (CONF map), now derived
-// from the calibrated probability instead of raw days-out. Thresholds tunable.
-export function confidenceLabel(probability) {
-  if (probability >= 0.5) return 'moderate'
-  if (probability >= 0.2) return 'low'
-  return 'very low'
+// Categorical label for the dashboard UI (CONF map), gated on the NORMALIZED
+// per-lead percentile — not the absolute P(top-5). P(top-5) is intrinsically
+// small (~5 winners out of dozens of candidate days per base period), so the
+// old absolute gates (>=0.5 moderate, >=0.2 low) collapsed everything into
+// "very low" — a display artifact, not model weakness. The percentile is
+// anchored on the fixed per-lead historical reference (probabilityFor), so
+// "High" means the same thing run to run: "top-ranked vs history at this
+// lead", NOT "likely to be a top-5 peak". The honest absolute probability
+// must stay visible next to the word wherever this label renders.
+// Thresholds tunable.
+export function confidenceLabel(percentile) {
+  if (percentile >= 0.5) return 'high'
+  if (percentile >= 0.2) return 'moderate'
+  return 'low'
 }
 
 // --- runner -----------------------------------------------------------------

@@ -12,7 +12,18 @@ on:
     # 10:00 UTC daily = 06:00 EDT / 05:00 EST — early morning ET, after the
     # prior day's demand and peaks are final. Cron is always UTC.
     - cron: '0 10 * * *'
-  workflow_dispatch: {} # allow a manual server-side refresh from the Actions tab
+  workflow_dispatch:
+    inputs:
+      # Diagnosis mode (docs/prompts/investigate-low-accuracy-by-lead.md): run
+      # the fetch -> build -> backtest -> calibrate chain from the DISPATCHED
+      # branch (so instrumented pipeline code can be exercised pre-merge),
+      # print the day-vs-window diagnostic table, dump backtest_horizons.json
+      # into the log, and stop — no export, no prediction-log append, no
+      # commit. Scheduled runs never set this, so daily behavior is unchanged.
+      diagnose_only:
+        description: 'Diagnostics only (dispatched branch; no export/commit)'
+        type: boolean
+        default: false
 
 # Only push forecast.json; nothing else. This token's push to main is what
 # triggers the Vercel deploy (Vercel's webhook fires regardless of author; the
@@ -37,10 +48,10 @@ jobs:
     env:
       PIPELINE_START: '2020-05-01'
     steps:
-      - name: Checkout main
+      - name: Checkout main (or the dispatched branch in diagnose mode)
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ inputs.diagnose_only == true && github.ref_name || 'main' }}
           # Fetch enough history that the commit-if-changed step has a base.
           fetch-depth: 0
 
@@ -87,21 +98,36 @@ jobs:
         working-directory: pipeline
         run: npm run calibrate
 
+      # Diagnose mode ends here: dump the full per-year horizons JSON into the
+      # log (it is not committed anywhere) and skip export/log/commit.
+      - name: Dump diagnostic backtest JSON
+        if: ${{ inputs.diagnose_only == true }}
+        working-directory: pipeline
+        run: |
+          echo "=== data/backtest_horizons.json ==="
+          cat data/backtest_horizons.json
+          echo "=== calibration summary (data/peak_probability.json, logistic fits) ==="
+          node -e "const j=require('./data/peak_probability.json'); for (const [l,c] of Object.entries(j.byLead)) console.log('lead', l, 'n=', c.n, 'positives=', c.positives, 'logistic b0=', c.logistic.b0.toFixed(3), 'b1=', c.logistic.b1.toFixed(3))"
+
       - name: Fetch ECCC citypage forecast
+        if: ${{ inputs.diagnose_only != true }}
         working-directory: pipeline
         run: npm run fetch:forecast
 
       - name: Export forecast.json for the dashboard
+        if: ${{ inputs.diagnose_only != true }}
         working-directory: pipeline
         run: npm run export:dashboard
 
       # Append this run's predictions to the durable prospective log and
       # resolve any past ones -> public/peak-forecast/prediction_log.json.
       - name: Update prospective prediction log
+        if: ${{ inputs.diagnose_only != true }}
         working-directory: pipeline
         run: npm run log:predictions
 
       - name: Commit forecast + prediction log if changed
+        if: ${{ inputs.diagnose_only != true }}
         run: |
           set -euo pipefail
           git config user.name  "github-actions[bot]"

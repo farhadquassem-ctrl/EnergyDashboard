@@ -4,7 +4,8 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
-  leadRecall, recallColorClass, computeHitRate, computeCalibration, computeTrendOverTime,
+  leadRecall, leadDiagnostics, leadHeadlineRecall, recallColorClass,
+  computeHitRate, computeCalibration, computeTrendOverTime,
   RECALL_GOOD, RECALL_OK,
 } from './calculations.js'
 
@@ -25,6 +26,25 @@ test('recallColorClass matches the shipped thresholds', () => {
   assert.equal(recallColorClass(RECALL_OK), 'bg-amber-500')
   assert.equal(recallColorClass(0.5), 'bg-amber-500')
   assert.equal(recallColorClass(0.2), 'bg-red-500')
+})
+
+test('leadDiagnostics reads schemaVersion-2 pooled fields, null on v1 entries', () => {
+  const v2 = { pooled: { dayRecall: 0.07, balancedRecall: 0.03, cpHourFilterSurvival: 0.55, top5Days: 29, actualTop5Hours: 29 } }
+  assert.deepEqual(leadDiagnostics(v2), {
+    dayRecall: 0.07, windowedRecall: 0.03, cpHourFilterSurvival: 0.55, top5Days: 29, actualTop5Hours: 29,
+  })
+  assert.equal(leadDiagnostics({ balancedTop5Recall: { mean: 0.03 } }), null) // v1 shape
+  assert.equal(leadDiagnostics(null), null)
+})
+
+test('leadHeadlineRecall prefers pooled (v2), falls back to yearly mean (v1)', () => {
+  const acc = {
+    3: { balancedTop5Recall: { mean: 0.05 }, pooled: { balancedRecall: 0.03 } },
+    7: { balancedTop5Recall: { mean: 0.03 } },
+  }
+  assert.equal(leadHeadlineRecall(acc, 3), 0.03) // pooled wins
+  assert.equal(leadHeadlineRecall(acc, 7), 0.03) // v1 fallback
+  assert.equal(leadHeadlineRecall(acc, 14), null)
 })
 
 // --- generalized log scoring ------------------------------------------------

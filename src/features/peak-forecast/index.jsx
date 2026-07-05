@@ -149,7 +149,11 @@ export default function PeakForecastTab() {
         <PeakTable peaks={visiblePeaks} />
       )}
 
-      <AccuracyPanel accuracyByLead={data.accuracyByLead} horizons={data.horizons} />
+      <AccuracyPanel
+        accuracyByLead={data.accuracyByLead}
+        accuracyBaseline={data.accuracyBaseline}
+        horizons={data.horizons}
+      />
 
       <p className="text-[11px] leading-relaxed text-zinc-500">
         Forecast from the peak-prediction pipeline (demand + weather OLS model), exported to

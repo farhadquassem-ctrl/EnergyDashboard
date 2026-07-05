@@ -1,4 +1,4 @@
-import { CONF, fmtDay, fmtInt } from '../calculations'
+import { CONF, fmtDay, fmtInt, fmtProb } from '../calculations'
 import CurtailStrip from './CurtailStrip'
 import SelectBadge from './SelectBadge'
 import WeatherChip from './WeatherChip'
@@ -37,7 +37,12 @@ export default function PeakTable({ peaks }) {
                   <div className="mt-1 text-xs tabular-nums text-zinc-500">{bal?.label}</div>
                 </td>
                 <td className="px-4 py-3"><WeatherChip source={p.weatherSource} isForecast={p.isForecastWeather} /></td>
-                <td className={`px-4 py-3 font-semibold ${conf.cls}`}>{conf.label}</td>
+                <td className="px-4 py-3">
+                  <span className={`font-semibold ${conf.cls}`}>{conf.label}</span>
+                  {p.probability != null && (
+                    <div className="text-xs text-zinc-500">P(top-5) {fmtProb(p.probability)}</div>
+                  )}
+                </td>
               </tr>
             )
           })}

@@ -7,11 +7,13 @@ import { useTheme } from './theme.jsx'
 // out of the main bundle and only load when the user opens that tab.
 const NodalTab = lazy(() => import('./components/NodalTab'))
 const PeakForecastTab = lazy(() => import('./features/peak-forecast/index.jsx'))
+const GAExposureTab = lazy(() => import('./features/ga-exposure-simulator/index.jsx'))
 
 const TABS = [
   { id: 'overview', label: 'Overview' },
   { id: 'nodal', label: 'Nodal' },
   { id: 'forecast', label: 'Peak Forecast' },
+  { id: 'ga-exposure', label: 'GA Exposure' },
 ]
 
 function ThemeToggle() {
@@ -89,6 +91,11 @@ export default function App() {
         {tab === 'forecast' && (
           <Suspense fallback={<TabLoading>Loading forecast…</TabLoading>}>
             <PeakForecastTab />
+          </Suspense>
+        )}
+        {tab === 'ga-exposure' && (
+          <Suspense fallback={<TabLoading>Loading GA simulator…</TabLoading>}>
+            <GAExposureTab />
           </Suspense>
         )}
       </main>

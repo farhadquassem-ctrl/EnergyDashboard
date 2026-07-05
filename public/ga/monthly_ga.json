@@ -1,0 +1,9 @@
+{
+  "source": "ILLUSTRATIVE DEFAULTS — not live IESO data. Magnitudes based on IESO public GA reporting (total GA pool historically ~$1B/month, Class A share ~20-25%, Class B rate long-run ~2-4 ¢/kWh; post-Market-Renewal 2025-26 actuals have run substantially lower, with some months near zero). Replace via the in-app assumption overrides, or regenerate from IESO's Global Adjustment monthly figures: https://www.ieso.ca/power-data/price-overview/global-adjustment",
+  "asOf": "2026-07-05",
+  "illustrative": true,
+  "annualClassAGADollars": 2600000000,
+  "classBRateDollarsPerKwh": 0.028,
+  "monthlyShape": "flat",
+  "note": "Monthly Class A totals are equal twelfths of annualClassAGADollars — a deliberately unpretentious shape. Every dollar figure computed from this file is labelled as assumption-based in the UI until real monthly figures are substituted."
+}
