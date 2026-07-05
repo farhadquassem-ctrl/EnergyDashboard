@@ -27,13 +27,20 @@ export function relTime(iso) {
   return `${Math.round(hrs / 24)} days ago`
 }
 
-// Categorical confidence tiers from the pipeline (see types/market.js
-// GAForecast note: no numeric probabilities yet).
+// Categorical confidence tiers from the pipeline. RELATIVE rungs: the label is
+// gated on the peak's normalized per-lead percentile ("top-ranked vs history at
+// this lead"), NOT the absolute P(top-5) — so components must keep the numeric
+// probability visible next to the word ("High (P=6%)"). 'very low' is retired
+// but kept mapping to the low tier so older forecast.json still renders.
 export const CONF = {
-  moderate: { label: 'Moderate', cls: 'text-sky-600 dark:text-sky-400', bar: 'bg-sky-500', w: '68%' },
-  low: { label: 'Low', cls: 'text-amber-600 dark:text-amber-400', bar: 'bg-amber-500', w: '42%' },
-  'very low': { label: 'Very low', cls: 'text-red-600 dark:text-red-400', bar: 'bg-red-500', w: '22%' },
+  high: { label: 'High', cls: 'text-emerald-600 dark:text-emerald-400', bar: 'bg-emerald-500', w: '85%' },
+  moderate: { label: 'Moderate', cls: 'text-sky-600 dark:text-sky-400', bar: 'bg-sky-500', w: '58%' },
+  low: { label: 'Low', cls: 'text-amber-600 dark:text-amber-400', bar: 'bg-amber-500', w: '30%' },
+  'very low': { label: 'Low', cls: 'text-amber-600 dark:text-amber-400', bar: 'bg-amber-500', w: '30%' },
 }
+
+/** "62%" from a 0–1 probability; null-safe ("—") for pre-calibration files. */
+export const fmtProb = (p) => (p == null ? '—' : `${Math.round(p * 100)}%`)
 
 // The 3/7/14-day views are nested subsets keyed on daysOut.
 export const HORIZON_OPTS = [3, 7, 14]

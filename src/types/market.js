@@ -49,15 +49,18 @@ export const MARKETS = Object.freeze([
  *
  * `probability` is the pipeline's calibrated P(top-5) (empirical
  * percentile×lead model, `npm run calibrate`); `confidence` is the categorical
- * label now derived from it. `probability` is null only for forecast.json that
- * predates calibration, where `confidence` still carries the signal.
+ * RELATIVE rung gated on the peak's per-lead percentile (not the absolute
+ * probability — that's intrinsically small, so always show the number beside
+ * the word). `probability` is null only for forecast.json that predates
+ * calibration, where `confidence` still carries the signal. Legacy files may
+ * carry the retired 'very low' rung.
  *
  * @typedef {object} GAForecast
  * @property {string} date YYYY-MM-DD target day
  * @property {number} hour hour-ending (HE1–HE24) of the predicted peak
  * @property {number} predictedRank projected rank on the running 5CP board
  * @property {number|null} probability
- * @property {'moderate'|'low'|'very low'} [confidence]
+ * @property {'high'|'moderate'|'low'|'very low'} [confidence]
  * @property {boolean} [actualPeak] set once the day resolves
  */
 

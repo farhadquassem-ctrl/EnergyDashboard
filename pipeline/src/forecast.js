@@ -236,14 +236,17 @@ export function runForecast() {
   const decorate = (p, selected) => {
     const leadBucket = leadBucketFor(p.daysOut)
     // Calibrated P(this day cracks the base period's top-5), from the empirical
-    // percentile×lead model. confidence is now DERIVED from that probability
-    // (was a raw days-out label); if calibration is absent, both fall back to
-    // the old heuristic so the dashboard's confidence enum keeps working.
+    // percentile×lead model. confidence is the RELATIVE rung — gated on the
+    // normalized per-lead percentile, not the absolute probability (which is
+    // intrinsically small; see confidenceLabel) — so the UI must keep the
+    // numeric probability visible beside it. If calibration is absent, both
+    // fall back to a days-out heuristic in the same 3-rung wording so the
+    // dashboard's confidence enum keeps working.
     const scored = probabilityFor(calibration, { predictedMw: p.predictedMw, lead: leadBucket })
     const probability = scored ? round2(scored.probability) : null
     const confidence = scored
-      ? confidenceLabel(scored.probability)
-      : p.daysOut <= 3 ? 'moderate' : p.daysOut <= 7 ? 'low' : 'very low'
+      ? confidenceLabel(scored.percentile)
+      : p.daysOut <= 3 ? 'high' : p.daysOut <= 7 ? 'moderate' : 'low'
     return {
       ...p,
       leadBucket,

@@ -1,4 +1,4 @@
-import { CONF, fmtDay, fmtInt } from '../calculations'
+import { CONF, fmtDay, fmtInt, fmtProb } from '../calculations'
 import CurtailStrip from './CurtailStrip'
 import SelectBadge from './SelectBadge'
 import WeatherChip from './WeatherChip'
@@ -39,7 +39,12 @@ export default function PeakCard({ p }) {
 
       <div className="mt-auto flex items-center justify-between gap-2 pt-1">
         <WeatherChip source={p.weatherSource} isForecast={p.isForecastWeather} />
-        <span className={`text-[11px] font-semibold ${conf.cls}`}>confidence: {conf.label}</span>
+        {/* The rung is relative (per-lead percentile); the honest absolute
+            P(top-5) stays beside it so "High" can never hide a small number. */}
+        <span className={`text-[11px] font-semibold ${conf.cls}`} title="Confidence rung is relative to historical candidates at this lead time; P is the calibrated probability this day ends up a top-5 peak.">
+          confidence: {conf.label}
+          {p.probability != null && <span className="font-normal text-zinc-500"> · P(top-5) {fmtProb(p.probability)}</span>}
+        </span>
       </div>
     </div>
   )
