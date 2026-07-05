@@ -10,7 +10,7 @@ forecast. Portfolio project; not affiliated with the IESO.
 
 ## The two deliverables
 
-1. **The dashboard app** (`src/`, `api/`) — three tabs, light/dark theme
+1. **The dashboard app** (`src/`, `api/`) — four tabs, light/dark theme
    (dark default, header toggle):
    - **Overview** — Ontario map (react-leaflet) with the 7 plotted pricing
      zones colour-coded by **Ontario Zonal Price** on a blue → amber → red
@@ -26,6 +26,11 @@ forecast. Portfolio project; not affiliated with the IESO.
      horizons) with curtail-vs-monitor calls, calibrated P(top-5) per peak,
      and a measured-accuracy panel. A pure renderer of the pipeline's
      exported `public/peak-forecast/forecast.json`.
+   - **GA Exposure** — the Class A (ICI) simulator: upload interval meter
+     data (client-side only), see your Peak Demand Factor, Class A vs
+     Class B GA dollars with the break-even PDF, savings decomposed by
+     coincident peak, and probability-weighted curtailment ROI on the live
+     forecast.
 2. **The peak-prediction pipeline** (`pipeline/`) — a standalone Node job that
    assembles a multi-year, hourly, time-aligned dataset (IESO demand + ECCC
    weather + official ICI peak labels), fits/backtests the peak model, and
