@@ -34,6 +34,35 @@ export function leadRecall(accuracyByLead, lead) {
   return accuracyByLead?.[String(lead)]?.balancedTop5Recall?.mean ?? null
 }
 
+/**
+ * The schemaVersion-2 diagnostic split for a lead bucket (or the lead-0
+ * `accuracyBaseline` entry passed directly): pooled Σhits/Σtruths recalls +
+ * raw counts, null-safe against v1 files that predate the fields.
+ * @returns {{ dayRecall:number|null, windowedRecall:number|null,
+ *             cpHourFilterSurvival:number|null, top5Days:number|null,
+ *             actualTop5Hours:number|null }|null}
+ */
+export function leadDiagnostics(entry) {
+  const p = entry?.pooled
+  if (!p) return null
+  return {
+    dayRecall: p.dayRecall ?? null,
+    windowedRecall: p.balancedRecall ?? null,
+    cpHourFilterSurvival: p.cpHourFilterSurvival ?? null,
+    top5Days: p.top5Days ?? null,
+    actualTop5Hours: p.actualTop5Hours ?? null,
+  }
+}
+
+/**
+ * Headline recall for a lead: the pooled Σ/Σ number when the file carries it
+ * (schemaVersion ≥ 2 — stable, count-backed), else the yearly mean (v1).
+ */
+export function leadHeadlineRecall(accuracyByLead, lead) {
+  return leadDiagnostics(accuracyByLead?.[String(lead)])?.windowedRecall
+    ?? leadRecall(accuracyByLead, lead)
+}
+
 /** Bar color class for a recall value (null = no data). Matches the panel. */
 export function recallColorClass(r) {
   if (r == null) return 'bg-zinc-400'

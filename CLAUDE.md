@@ -249,6 +249,22 @@ first live-data forecast run lands (see the one outstanding item at the end of
    the workflow's job). Scheduled runs require the workflow to sit on the
    **default** branch (`main`) — satisfied.
 
+   **✅ accuracyByLead near-zero — root-caused 2026-07, reframed not tuned.**
+   The first live `accuracyByLead` (mean ~3%, 14d = 0) triggered a diagnosis
+   (`docs/prompts/investigate-low-accuracy-by-lead.md`). Verdict, from a
+   `diagnose_only` CI run on real 2020-2026 data: **H1 dominant** (surrogate
+   weather can't rank the specific peak day: pooled day-recall 93%→7% from
+   lead 0→3d), H3 secondary (~half of CP hours fail the temp gate under
+   surrogate temps), H5 real (29 positives / 6 yrs), **H2/H6 ruled out**
+   (lead-0 reproduces the v1 40-100% baseline; day-recall ≈ windowed recall).
+   Frame A confirmed: the ~1% live P(top-5) is correct (7/14d logistic slopes
+   are ≈0/negative — no signal in the surrogate percentile, so base rate).
+   Shipped the honest reframe: forecast.json schemaVersion 2 (`pooled` counts
+   + `top5DayRecall` per lead, `accuracyBaseline` = lead-0 ceiling), and the
+   AccuracyPanel anchored on the known-weather ceiling bar with "14-day ≈ 0%
+   by design" captions. Nothing tuned (tau/thresholds/windows untouched).
+   Full table + verdict: `docs/findings/accuracy-by-lead-2026-07.md`.
+
    **Peak probability + accuracy tracker (Prompts 3 dep + 5).**
    - `src/peak_probability.js` (`npm run calibrate`) — calibrated **P(top-5)**
      replacing the old days-out `confidence` heuristic: empirical
