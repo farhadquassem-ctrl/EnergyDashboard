@@ -1,11 +1,11 @@
 {
-  "schemaVersion": 1,
-  "generatedAt": "2026-07-04T18:27:59.427-04:00",
-  "datasetThrough": "2026-07-04",
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-05T11:03:27.167-04:00",
+  "datasetThrough": "2026-07-05",
   "staleNote": null,
   "model": {
-    "r2": 0.55,
-    "trainRows": 15705
+    "r2": 0.54,
+    "trainRows": 15710
   },
   "basePeriod": {
     "start": "2026-05-01",
@@ -58,67 +58,21 @@
   ],
   "predictedPeaks": [
     {
-      "date": "2026-07-08",
+      "date": "2026-07-09",
       "daysOut": 4,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
       "peakRiskDay": true,
-      "predictedPeakHourStart": 16,
-      "predictedPeakHourEnding": 17,
-      "predictedMw": 20750,
+      "predictedPeakHourStart": 17,
+      "predictedPeakHourEnding": 18,
+      "predictedMw": 20782,
       "tempC": 29,
       "leadBucket": 7,
       "projectedRank": 6,
       "wouldRankTop5": false,
       "probability": 0.01,
       "peakPercentile": 1,
-      "confidence": "very low",
-      "curtailmentWindows": [
-        {
-          "profile": "Conservative",
-          "windowHours": 3,
-          "hourStart": 15,
-          "label": "HE16–HE18"
-        },
-        {
-          "profile": "Balanced",
-          "windowHours": 4,
-          "hourStart": 15,
-          "label": "HE16–HE19"
-        },
-        {
-          "profile": "Aggressive",
-          "windowHours": 5,
-          "hourStart": 14,
-          "label": "HE15–HE19"
-        }
-      ],
-      "expectedAccuracy": {
-        "basis": "walk-forward backtest, surrogate (climatology+persistence) weather",
-        "years": 6,
-        "balancedTop5Recall": {
-          "min": 0,
-          "mean": 0.03,
-          "max": 0.2
-        }
-      }
-    },
-    {
-      "date": "2026-07-09",
-      "daysOut": 5,
-      "weatherSource": "eccc-citypage",
-      "isForecastWeather": true,
-      "peakRiskDay": true,
-      "predictedPeakHourStart": 17,
-      "predictedPeakHourEnding": 18,
-      "predictedMw": 19727,
-      "tempC": 27.9,
-      "leadBucket": 7,
-      "projectedRank": 6,
-      "wouldRankTop5": false,
-      "probability": 0.01,
-      "peakPercentile": 0.99,
-      "confidence": "very low",
+      "confidence": "high",
       "curtailmentWindows": [
         {
           "profile": "Conservative",
@@ -146,6 +100,76 @@
           "min": 0,
           "mean": 0.03,
           "max": 0.2
+        },
+        "top5DayRecall": {
+          "min": 0,
+          "mean": 0.03,
+          "max": 0.2
+        },
+        "pooled": {
+          "dayRecall": 0.03,
+          "balancedRecall": 0.03,
+          "cpHourFilterSurvival": 0.48,
+          "top5Days": 29,
+          "actualTop5Hours": 29
+        }
+      }
+    },
+    {
+      "date": "2026-07-08",
+      "daysOut": 3,
+      "weatherSource": "eccc-citypage",
+      "isForecastWeather": true,
+      "peakRiskDay": true,
+      "predictedPeakHourStart": 16,
+      "predictedPeakHourEnding": 17,
+      "predictedMw": 20753,
+      "tempC": 29,
+      "leadBucket": 3,
+      "projectedRank": 6,
+      "wouldRankTop5": false,
+      "probability": 0.03,
+      "peakPercentile": 0.99,
+      "confidence": "high",
+      "curtailmentWindows": [
+        {
+          "profile": "Conservative",
+          "windowHours": 3,
+          "hourStart": 15,
+          "label": "HE16–HE18"
+        },
+        {
+          "profile": "Balanced",
+          "windowHours": 4,
+          "hourStart": 15,
+          "label": "HE16–HE19"
+        },
+        {
+          "profile": "Aggressive",
+          "windowHours": 5,
+          "hourStart": 14,
+          "label": "HE15–HE19"
+        }
+      ],
+      "expectedAccuracy": {
+        "basis": "walk-forward backtest, surrogate (climatology+persistence) weather",
+        "years": 6,
+        "balancedTop5Recall": {
+          "min": 0,
+          "mean": 0.03,
+          "max": 0.2
+        },
+        "top5DayRecall": {
+          "min": 0,
+          "mean": 0.07,
+          "max": 0.2
+        },
+        "pooled": {
+          "dayRecall": 0.07,
+          "balancedRecall": 0.03,
+          "cpHourFilterSurvival": 0.55,
+          "top5Days": 29,
+          "actualTop5Hours": 29
         }
       }
     }
@@ -158,6 +182,18 @@
         "min": 0,
         "mean": 0.03,
         "max": 0.2
+      },
+      "top5DayRecall": {
+        "min": 0,
+        "mean": 0.07,
+        "max": 0.2
+      },
+      "pooled": {
+        "dayRecall": 0.07,
+        "balancedRecall": 0.03,
+        "cpHourFilterSurvival": 0.55,
+        "top5Days": 29,
+        "actualTop5Hours": 29
       }
     },
     "7": {
@@ -167,6 +203,18 @@
         "min": 0,
         "mean": 0.03,
         "max": 0.2
+      },
+      "top5DayRecall": {
+        "min": 0,
+        "mean": 0.03,
+        "max": 0.2
+      },
+      "pooled": {
+        "dayRecall": 0.03,
+        "balancedRecall": 0.03,
+        "cpHourFilterSurvival": 0.48,
+        "top5Days": 29,
+        "actualTop5Hours": 29
       }
     },
     "14": {
@@ -176,7 +224,40 @@
         "min": 0,
         "mean": 0,
         "max": 0
+      },
+      "top5DayRecall": {
+        "min": 0,
+        "mean": 0,
+        "max": 0
+      },
+      "pooled": {
+        "dayRecall": 0,
+        "balancedRecall": 0,
+        "cpHourFilterSurvival": 0.55,
+        "top5Days": 29,
+        "actualTop5Hours": 29
       }
+    }
+  },
+  "accuracyBaseline": {
+    "basis": "walk-forward backtest, observed weather (v1 ceiling — not achievable at any real lead)",
+    "years": 6,
+    "balancedTop5Recall": {
+      "min": 0.4,
+      "mean": 0.72,
+      "max": 1
+    },
+    "top5DayRecall": {
+      "min": 0.75,
+      "mean": 0.93,
+      "max": 1
+    },
+    "pooled": {
+      "dayRecall": 0.93,
+      "balancedRecall": 0.72,
+      "cpHourFilterSurvival": 0.97,
+      "top5Days": 29,
+      "actualTop5Hours": 29
     }
   }
 }
