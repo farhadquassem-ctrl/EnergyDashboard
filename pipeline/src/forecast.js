@@ -271,6 +271,9 @@ export function runForecast() {
   if (!backtests) console.warn('  no backtest_horizons.json — accuracy will be absent; run npm run backtest:horizons')
   const accuracyByLead = {}
   for (const lead of FORECAST_LEAD_DAYS) accuracyByLead[lead] = backtests ? aggregateBacktest(backtests, lead) : null
+  // Lead-0 (observed weather) — the ceiling the surrogate-lead rows degrade
+  // from. Surfaced so the accuracy panel can anchor "how good can this get".
+  const accuracyBaseline = backtests ? aggregateBacktest(backtests, 0) : null
   for (const p of predictedPeaks) p.expectedAccuracy = accuracyByLead[p.leadBucket] ?? null
 
   const out = {
@@ -285,6 +288,7 @@ export function runForecast() {
     running5CP,
     predictedPeaks,
     accuracyByLead,
+    accuracyBaseline,
   }
 
   mkdirSync(DATA_DIR, { recursive: true })
@@ -295,19 +299,45 @@ export function runForecast() {
 
 function aggregateBacktest(backtests, leadDays) {
   const vals = []
+  const dayVals = []
+  // Pooled counts (Σhits/Σtruths across years): with ~5 positives per year the
+  // mean-of-yearly-ratios is dominated by small-sample noise (H5); the pooled
+  // ratio is the stable headline. Both are emitted.
+  const pooled = { top5Days: 0, top5DayHits: 0, actualTop5Hours: 0, balancedTop5Hits: 0, cpHoursSurvivingFilter: 0 }
   for (const year of backtests) {
     const h = year.horizons.find((x) => x.leadDays === leadDays)
     const balanced = h?.profileResults.find((p) => p.profile === 'Balanced')
     if (balanced?.top5Recall != null) vals.push(balanced.top5Recall)
+    if (h?.top5DayRecall != null) dayVals.push(h.top5DayRecall)
+    if (h) {
+      pooled.top5Days += h.top5Days ?? 0
+      pooled.top5DayHits += h.top5DayHits ?? 0
+      pooled.actualTop5Hours += h.actualTop5Hours ?? 0
+      pooled.balancedTop5Hits += balanced?.top5Hits ?? 0
+      pooled.cpHoursSurvivingFilter += h.cpHoursSurvivingFilter ?? 0
+    }
   }
   if (vals.length === 0) return null
+  const spread = (xs) => ({
+    min: round2(Math.min(...xs)),
+    mean: round2(xs.reduce((a, b) => a + b, 0) / xs.length),
+    max: round2(Math.max(...xs)),
+  })
   return {
-    basis: 'walk-forward backtest, surrogate (climatology+persistence) weather',
+    basis: leadDays === 0
+      ? 'walk-forward backtest, observed weather (v1 ceiling — not achievable at any real lead)'
+      : 'walk-forward backtest, surrogate (climatology+persistence) weather',
     years: vals.length,
-    balancedTop5Recall: {
-      min: round2(Math.min(...vals)),
-      mean: round2(vals.reduce((a, b) => a + b, 0) / vals.length),
-      max: round2(Math.max(...vals)),
+    balancedTop5Recall: spread(vals),
+    // Day flagged at all, before the 3–5h window — the day-vs-window split that
+    // separates "wrong day" (H1) from "right day, wrong hour" (H2).
+    top5DayRecall: dayVals.length ? spread(dayVals) : null,
+    pooled: {
+      dayRecall: pooled.top5Days ? round2(pooled.top5DayHits / pooled.top5Days) : null,
+      balancedRecall: pooled.actualTop5Hours ? round2(pooled.balancedTop5Hits / pooled.actualTop5Hours) : null,
+      cpHourFilterSurvival: pooled.actualTop5Hours ? round2(pooled.cpHoursSurvivingFilter / pooled.actualTop5Hours) : null,
+      top5Days: pooled.top5Days,
+      actualTop5Hours: pooled.actualTop5Hours,
     },
   }
 }

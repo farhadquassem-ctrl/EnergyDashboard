@@ -95,7 +95,14 @@ export function buildLeadCandidates({ model, climatology, obsByKey, testRows, le
 }
 
 // Evaluate one (test year, lead) pair: recall of the official peaks inside the
-// flagged days' risk-profile windows.
+// flagged days' risk-profile windows — plus the diagnostic split that explains
+// a low windowed number (see docs/prompts/investigate-low-accuracy-by-lead.md):
+//   * top5DayRecall — was the CP DAY flagged at all, before the 3–5h window
+//     (day ranking skill; the H1-vs-H2 discriminator).
+//   * cpHoursSurvivingFilter — how many actual CP hours the (surrogate-temp)
+//     candidate filter kept at all; an excluded CP hour can still be windowed
+//     if its day is flagged on other hours, but it can never be the predicted
+//     peak hour (H3's signature when this drops with lead).
 function evaluateLead({ model, climatology, obsByKey, testRows, leadDays }) {
   const { candidates, dayGroups, actualTop5, actualTop10 } = buildLeadCandidates({
     model, climatology, obsByKey, testRows, leadDays,
@@ -105,6 +112,9 @@ function evaluateLead({ model, climatology, obsByKey, testRows, leadDays }) {
   const flaggedDaySet = new Set(flaggedDays.map((d) => d.day))
   const top5DayHits = new Set(actualTop5.filter((r) => flaggedDaySet.has(r.day)).map((r) => r.day)).size
   const top5Days = new Set(actualTop5.map((r) => r.day)).size
+
+  const candidateTs = new Set(candidates.map((r) => r.timestamp))
+  const cpHoursSurvivingFilter = actualTop5.filter((r) => candidateTs.has(r.timestamp)).length
 
   const profileResults = RISK_PROFILES.map(({ profile, windowHours }) => {
     let top5Hits = 0
@@ -117,6 +127,7 @@ function evaluateLead({ model, climatology, obsByKey, testRows, leadDays }) {
     return {
       profile,
       windowHours,
+      top5Hits, // raw count, so pooled cross-year recall can be computed downstream
       top5Recall: actualTop5.length ? top5Hits / actualTop5.length : null,
       top10Recall: actualTop10.length ? top10Hits / actualTop10.length : null,
       curtailmentHours: flaggedDays.length * windowHours,
@@ -127,8 +138,67 @@ function evaluateLead({ model, climatology, obsByKey, testRows, leadDays }) {
     leadDays,
     weatherSource: leadDays === 0 ? 'observed (v1 baseline)' : 'climatology+persistence surrogate',
     candidateHours: candidates.length,
+    actualTop5Hours: actualTop5.length,
+    top5Days,
+    top5DayHits,
+    cpHoursSurvivingFilter,
+    cpHoursExcludedByFilter: actualTop5.length - cpHoursSurvivingFilter,
     top5DayRecall: top5Days ? top5DayHits / top5Days : null, // day flagged at all, before windowing
     profileResults,
+  }
+}
+
+// Pool the per-year counts into one per-lead diagnostic row (Σhits/Σtruths, not
+// mean-of-yearly-ratios — with ~5 positives/year the mean over-weights noise).
+export function poolDiagnostics(results) {
+  const byLead = new Map()
+  for (const year of results) {
+    for (const h of year.horizons) {
+      const agg = byLead.get(h.leadDays) ?? {
+        leadDays: h.leadDays, years: 0, top5Days: 0, top5DayHits: 0,
+        actualTop5Hours: 0, cpHoursSurvivingFilter: 0, balancedTop5Hits: 0,
+      }
+      const balanced = h.profileResults.find((p) => p.profile === 'Balanced')
+      agg.years += 1
+      agg.top5Days += h.top5Days
+      agg.top5DayHits += h.top5DayHits
+      agg.actualTop5Hours += h.actualTop5Hours
+      agg.cpHoursSurvivingFilter += h.cpHoursSurvivingFilter
+      agg.balancedTop5Hits += balanced?.top5Hits ?? 0
+      byLead.set(h.leadDays, agg)
+    }
+  }
+  return [...byLead.values()]
+    .sort((a, b) => a.leadDays - b.leadDays)
+    .map((a) => ({
+      ...a,
+      pooledDayRecall: a.top5Days ? a.top5DayHits / a.top5Days : null,
+      pooledBalancedRecall: a.actualTop5Hours ? a.balancedTop5Hits / a.actualTop5Hours : null,
+      cpHourFilterSurvival: a.actualTop5Hours ? a.cpHoursSurvivingFilter / a.actualTop5Hours : null,
+    }))
+}
+
+// The decisive table: which hypothesis branch the numbers pick (H1 surrogate
+// degradation / H2 window misalignment / H3 filter loss / H6 regression).
+function printDiagnostics(results) {
+  const pooled = poolDiagnostics(results)
+  console.log('\n=== DIAGNOSTIC: day-vs-window split, pooled across base years ===')
+  console.log('lead | day-recall (flagged at all) | balanced windowed recall | CP-hour filter survival')
+  for (const p of pooled) {
+    console.log(
+      `  ${String(p.leadDays).padStart(2)}d |` +
+        ` ${fmtPct(p.pooledDayRecall).padStart(6)} (${p.top5DayHits}/${p.top5Days} days) |` +
+        ` ${fmtPct(p.pooledBalancedRecall).padStart(6)} (${p.balancedTop5Hits}/${p.actualTop5Hours} hrs) |` +
+        ` ${fmtPct(p.cpHourFilterSurvival).padStart(6)} (${p.cpHoursSurvivingFilter}/${p.actualTop5Hours} hrs)`,
+    )
+  }
+  const lead0 = pooled.find((p) => p.leadDays === 0)
+  console.log('\nbranch guide: lead-0 is the ceiling (should reproduce the v1 40-100% recall).')
+  console.log('  day-recall decent, windowed ~0  -> H2 (hour-window misalignment)')
+  console.log('  day-recall ~0 too, lead-0 fine  -> H1 (surrogate flattens extremes) / H3 (filter loss)')
+  console.log('  lead-0 also ~0                  -> H6 (REGRESSION - stop ship)')
+  if (lead0?.pooledBalancedRecall != null && lead0.pooledBalancedRecall < 0.3) {
+    console.log('  ⚠ lead-0 pooled recall is LOW — investigate H6 before anything else.')
   }
 }
 
@@ -168,6 +238,8 @@ export function runHorizonBacktest() {
       )
     }
   }
+
+  printDiagnostics(results)
 
   mkdirSync(DATA_DIR, { recursive: true })
   writeFileSync(FILES.backtestHorizons, JSON.stringify(results, null, 2))

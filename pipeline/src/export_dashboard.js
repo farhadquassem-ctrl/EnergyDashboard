@@ -18,7 +18,10 @@ import { dirname, join } from 'node:path'
 import { runForecast } from './forecast.js'
 import { isMain } from './lib/is-main.js'
 
-const SCHEMA_VERSION = 1
+// v2: accuracyByLead entries gain top5DayRecall + pooled counts, and the
+// envelope gains accuracyBaseline (lead-0 ceiling). Additive — v1 consumers
+// that only read balancedTop5Recall keep working.
+const SCHEMA_VERSION = 2
 const here = dirname(fileURLToPath(import.meta.url))
 // pipeline/src -> repo root -> public/peak-forecast
 const PUBLIC_DIR = join(here, '..', '..', 'public', 'peak-forecast')
