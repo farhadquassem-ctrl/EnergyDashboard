@@ -1,0 +1,617 @@
+{
+  "source": "IESO ICI Peak Tracker final rankings (consolidated fixture pipeline/fixtures/historical_peaks_top5.csv); ranks 1-5, AQEW_MWh",
+  "note": "hourEnding is on the DST-aware Eastern clock (America/Toronto), not fixed EST — see pipeline lib/time.js iciPeakToDateTime.",
+  "generatedAt": "2026-07-05T02:19:47.924Z",
+  "baseYears": [
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "byBaseYear": {
+    "2010": [
+      {
+        "rank": 1,
+        "date": "2010-07-07",
+        "hourEnding": 16,
+        "ontarioMw": 24456.468,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 2,
+        "date": "2010-07-08",
+        "hourEnding": 15,
+        "ontarioMw": 24432.434,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 3,
+        "date": "2010-08-31",
+        "hourEnding": 16,
+        "ontarioMw": 24010.299,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 4,
+        "date": "2010-07-06",
+        "hourEnding": 16,
+        "ontarioMw": 23914.747,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 5,
+        "date": "2010-09-01",
+        "hourEnding": 16,
+        "ontarioMw": 23822.773,
+        "metric": "AQEW_MWh"
+      }
+    ],
+    "2011": [
+      {
+        "rank": 1,
+        "date": "2011-07-21",
+        "hourEnding": 16,
+        "ontarioMw": 24706.556,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 2,
+        "date": "2011-07-20",
+        "hourEnding": 17,
+        "ontarioMw": 23720.265,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 3,
+        "date": "2011-07-18",
+        "hourEnding": 16,
+        "ontarioMw": 23151.788,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 4,
+        "date": "2011-07-19",
+        "hourEnding": 17,
+        "ontarioMw": 22517.184,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 5,
+        "date": "2011-07-22",
+        "hourEnding": 12,
+        "ontarioMw": 22401.165,
+        "metric": "AQEW_MWh"
+      }
+    ],
+    "2012": [
+      {
+        "rank": 1,
+        "date": "2012-07-17",
+        "hourEnding": 16,
+        "ontarioMw": 23953.751,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 2,
+        "date": "2012-07-04",
+        "hourEnding": 17,
+        "ontarioMw": 23355.412,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 3,
+        "date": "2012-06-20",
+        "hourEnding": 16,
+        "ontarioMw": 23238.928,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 4,
+        "date": "2012-07-23",
+        "hourEnding": 14,
+        "ontarioMw": 23059.72,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 5,
+        "date": "2012-07-06",
+        "hourEnding": 16,
+        "ontarioMw": 22991.191,
+        "metric": "AQEW_MWh"
+      }
+    ],
+    "2013": [
+      {
+        "rank": 1,
+        "date": "2013-07-17",
+        "hourEnding": 17,
+        "ontarioMw": 24141.286,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 2,
+        "date": "2013-07-16",
+        "hourEnding": 17,
+        "ontarioMw": 23551.148,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 3,
+        "date": "2013-07-18",
+        "hourEnding": 17,
+        "ontarioMw": 23503.678,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 4,
+        "date": "2013-07-19",
+        "hourEnding": 14,
+        "ontarioMw": 23234.069,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 5,
+        "date": "2013-07-15",
+        "hourEnding": 17,
+        "ontarioMw": 23106.646,
+        "metric": "AQEW_MWh"
+      }
+    ],
+    "2014": [
+      {
+        "rank": 1,
+        "date": "2015-01-07",
+        "hourEnding": 19,
+        "ontarioMw": 21118.57,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 2,
+        "date": "2015-02-19",
+        "hourEnding": 20,
+        "ontarioMw": 20976.264,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 3,
+        "date": "2014-08-26",
+        "hourEnding": 17,
+        "ontarioMw": 20967.233,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 4,
+        "date": "2015-02-23",
+        "hourEnding": 20,
+        "ontarioMw": 20862.399,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 5,
+        "date": "2014-09-05",
+        "hourEnding": 17,
+        "ontarioMw": 20830.888,
+        "metric": "AQEW_MWh"
+      }
+    ],
+    "2015": [
+      {
+        "rank": 1,
+        "date": "2015-07-28",
+        "hourEnding": 17,
+        "ontarioMw": 22015.634,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 2,
+        "date": "2015-07-29",
+        "hourEnding": 17,
+        "ontarioMw": 21899.846,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 3,
+        "date": "2015-08-17",
+        "hourEnding": 17,
+        "ontarioMw": 21882.182,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 4,
+        "date": "2015-07-27",
+        "hourEnding": 18,
+        "ontarioMw": 21561.628,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 5,
+        "date": "2015-09-03",
+        "hourEnding": 14,
+        "ontarioMw": 21428.697,
+        "metric": "AQEW_MWh"
+      }
+    ],
+    "2016": [
+      {
+        "rank": 1,
+        "date": "2016-08-10",
+        "hourEnding": 18,
+        "ontarioMw": 22636.692,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 2,
+        "date": "2016-09-07",
+        "hourEnding": 17,
+        "ontarioMw": 22526.876,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 3,
+        "date": "2016-08-11",
+        "hourEnding": 17,
+        "ontarioMw": 22317.771,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 4,
+        "date": "2016-07-13",
+        "hourEnding": 18,
+        "ontarioMw": 22188.464,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 5,
+        "date": "2016-08-12",
+        "hourEnding": 17,
+        "ontarioMw": 21904.371,
+        "metric": "AQEW_MWh"
+      }
+    ],
+    "2017": [
+      {
+        "rank": 1,
+        "date": "2017-09-25",
+        "hourEnding": 17,
+        "ontarioMw": 21170.494,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 2,
+        "date": "2017-09-26",
+        "hourEnding": 17,
+        "ontarioMw": 21038.558,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 3,
+        "date": "2017-06-12",
+        "hourEnding": 17,
+        "ontarioMw": 20701.997,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 4,
+        "date": "2018-01-05",
+        "hourEnding": 18,
+        "ontarioMw": 20238.28,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 5,
+        "date": "2017-07-19",
+        "hourEnding": 18,
+        "ontarioMw": 20122.46,
+        "metric": "AQEW_MWh"
+      }
+    ],
+    "2018": [
+      {
+        "rank": 1,
+        "date": "2018-09-05",
+        "hourEnding": 17,
+        "ontarioMw": 22551.315,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 2,
+        "date": "2018-07-05",
+        "hourEnding": 15,
+        "ontarioMw": 22415.022,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 3,
+        "date": "2018-07-04",
+        "hourEnding": 18,
+        "ontarioMw": 22122.73,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 4,
+        "date": "2018-08-28",
+        "hourEnding": 17,
+        "ontarioMw": 21643.799,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 5,
+        "date": "2018-09-04",
+        "hourEnding": 17,
+        "ontarioMw": 21379.327,
+        "metric": "AQEW_MWh"
+      }
+    ],
+    "2019": [
+      {
+        "rank": 1,
+        "date": "2019-07-05",
+        "hourEnding": 17,
+        "ontarioMw": 21274.851,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 2,
+        "date": "2019-07-20",
+        "hourEnding": 17,
+        "ontarioMw": 21147.253,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 3,
+        "date": "2019-07-29",
+        "hourEnding": 17,
+        "ontarioMw": 21067.57,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 4,
+        "date": "2019-07-19",
+        "hourEnding": 12,
+        "ontarioMw": 21006.403,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 5,
+        "date": "2019-07-04",
+        "hourEnding": 18,
+        "ontarioMw": 20956.127,
+        "metric": "AQEW_MWh"
+      }
+    ],
+    "2020": [
+      {
+        "rank": 1,
+        "date": "2020-07-09",
+        "hourEnding": 17,
+        "ontarioMw": 23936.069,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 2,
+        "date": "2020-07-07",
+        "hourEnding": 17,
+        "ontarioMw": 23557.52,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 3,
+        "date": "2020-07-27",
+        "hourEnding": 17,
+        "ontarioMw": 23319.214,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 4,
+        "date": "2020-07-10",
+        "hourEnding": 14,
+        "ontarioMw": 23270.848,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 5,
+        "date": "2020-07-08",
+        "hourEnding": 18,
+        "ontarioMw": 23239.833,
+        "metric": "AQEW_MWh"
+      }
+    ],
+    "2021": [
+      {
+        "rank": 1,
+        "date": "2021-08-24",
+        "hourEnding": 17,
+        "ontarioMw": 22428.11,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 2,
+        "date": "2021-08-26",
+        "hourEnding": 14,
+        "ontarioMw": 22424.464,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 3,
+        "date": "2021-08-23",
+        "hourEnding": 17,
+        "ontarioMw": 22055.276,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 4,
+        "date": "2021-08-09",
+        "hourEnding": 17,
+        "ontarioMw": 21812.52,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 5,
+        "date": "2021-08-25",
+        "hourEnding": 20,
+        "ontarioMw": 21734.689,
+        "metric": "AQEW_MWh"
+      }
+    ],
+    "2022": [
+      {
+        "rank": 1,
+        "date": "2022-07-19",
+        "hourEnding": 18,
+        "ontarioMw": 22127.03,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 2,
+        "date": "2022-06-22",
+        "hourEnding": 17,
+        "ontarioMw": 21340.494,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 3,
+        "date": "2022-08-29",
+        "hourEnding": 17,
+        "ontarioMw": 21169.932,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 4,
+        "date": "2022-07-20",
+        "hourEnding": 16,
+        "ontarioMw": 21394.446,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 5,
+        "date": "2022-08-07",
+        "hourEnding": 17,
+        "ontarioMw": 21073.3,
+        "metric": "AQEW_MWh"
+      }
+    ],
+    "2023": [
+      {
+        "rank": 1,
+        "date": "2023-09-05",
+        "hourEnding": 17,
+        "ontarioMw": 22876.173,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 2,
+        "date": "2023-09-06",
+        "hourEnding": 17,
+        "ontarioMw": 22040.072,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 3,
+        "date": "2023-07-05",
+        "hourEnding": 18,
+        "ontarioMw": 22005.904,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 4,
+        "date": "2023-07-06",
+        "hourEnding": 12,
+        "ontarioMw": 21248.848,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 5,
+        "date": "2023-09-04",
+        "hourEnding": 18,
+        "ontarioMw": 21234.153,
+        "metric": "AQEW_MWh"
+      }
+    ],
+    "2024": [
+      {
+        "rank": 1,
+        "date": "2024-06-19",
+        "hourEnding": 17,
+        "ontarioMw": 23074.004,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 2,
+        "date": "2024-07-31",
+        "hourEnding": 17,
+        "ontarioMw": 22469.101,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 3,
+        "date": "2024-08-01",
+        "hourEnding": 17,
+        "ontarioMw": 22392.041,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 4,
+        "date": "2024-06-18",
+        "hourEnding": 16,
+        "ontarioMw": 22406.657,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 5,
+        "date": "2024-08-27",
+        "hourEnding": 17,
+        "ontarioMw": 21880.129,
+        "metric": "AQEW_MWh"
+      }
+    ],
+    "2025": [
+      {
+        "rank": 1,
+        "date": "2025-06-24",
+        "hourEnding": 19,
+        "ontarioMw": 23446.783,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 2,
+        "date": "2025-08-11",
+        "hourEnding": 18,
+        "ontarioMw": 23659.008,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 3,
+        "date": "2025-06-23",
+        "hourEnding": 19,
+        "ontarioMw": 24080.402,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 4,
+        "date": "2025-07-24",
+        "hourEnding": 17,
+        "ontarioMw": 23700.363,
+        "metric": "AQEW_MWh"
+      },
+      {
+        "rank": 5,
+        "date": "2025-07-28",
+        "hourEnding": 16,
+        "ontarioMw": 23613.16,
+        "metric": "AQEW_MWh"
+      }
+    ]
+  }
+}

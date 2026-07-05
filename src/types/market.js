@@ -61,6 +61,10 @@ export const MARKETS = Object.freeze([
  * @property {number} predictedRank projected rank on the running 5CP board
  * @property {number|null} probability
  * @property {'high'|'moderate'|'low'|'very low'} [confidence]
+ * @property {number} [daysOut] lead time to the target day
+ * @property {number} [predictedMw] predicted Ontario peak MW for the day
+ * @property {boolean} [wouldRankTop5] would crack the running 5CP board (a
+ *   curtailment target, not just a warm day) — the GA exposure tab's signal
  * @property {boolean} [actualPeak] set once the day resolves
  */
 

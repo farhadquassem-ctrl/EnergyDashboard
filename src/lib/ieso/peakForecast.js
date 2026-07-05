@@ -45,5 +45,8 @@ export function forecastToGAForecasts(forecast) {
     predictedRank: p.projectedRank,
     probability: p.probability ?? null,
     confidence: p.confidence,
+    daysOut: p.daysOut,
+    predictedMw: p.predictedMw,
+    wouldRankTop5: p.wouldRankTop5 ?? false,
   }))
 }

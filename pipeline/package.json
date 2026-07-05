@@ -15,6 +15,7 @@
     "fetch:forecast": "node src/fetch_forecast.js",
     "forecast": "node src/forecast.js",
     "export:dashboard": "node src/export_dashboard.js",
+    "export:historical5cp": "node src/export_historical_5cp.js",
     "log:predictions": "node src/prediction_log.js",
     "stations": "node src/fetch_weather.js --list-stations",
     "weather:compare": "node src/fetch_weather.js --compare",
