@@ -1,11 +1,11 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-05T11:03:27.167-04:00",
-  "datasetThrough": "2026-07-05",
+  "generatedAt": "2026-07-06T14:21:09.801-04:00",
+  "datasetThrough": "2026-07-06",
   "staleNote": null,
   "model": {
     "r2": 0.54,
-    "trainRows": 15710
+    "trainRows": 15718
   },
   "basePeriod": {
     "start": "2026-05-01",
@@ -58,78 +58,20 @@
   ],
   "predictedPeaks": [
     {
-      "date": "2026-07-09",
-      "daysOut": 4,
-      "weatherSource": "eccc-citypage",
-      "isForecastWeather": true,
-      "peakRiskDay": true,
-      "predictedPeakHourStart": 17,
-      "predictedPeakHourEnding": 18,
-      "predictedMw": 20782,
-      "tempC": 29,
-      "leadBucket": 7,
-      "projectedRank": 6,
-      "wouldRankTop5": false,
-      "probability": 0.01,
-      "peakPercentile": 1,
-      "confidence": "high",
-      "curtailmentWindows": [
-        {
-          "profile": "Conservative",
-          "windowHours": 3,
-          "hourStart": 16,
-          "label": "HE17–HE19"
-        },
-        {
-          "profile": "Balanced",
-          "windowHours": 4,
-          "hourStart": 16,
-          "label": "HE17–HE20"
-        },
-        {
-          "profile": "Aggressive",
-          "windowHours": 5,
-          "hourStart": 15,
-          "label": "HE16–HE20"
-        }
-      ],
-      "expectedAccuracy": {
-        "basis": "walk-forward backtest, surrogate (climatology+persistence) weather",
-        "years": 6,
-        "balancedTop5Recall": {
-          "min": 0,
-          "mean": 0.03,
-          "max": 0.2
-        },
-        "top5DayRecall": {
-          "min": 0,
-          "mean": 0.03,
-          "max": 0.2
-        },
-        "pooled": {
-          "dayRecall": 0.03,
-          "balancedRecall": 0.03,
-          "cpHourFilterSurvival": 0.48,
-          "top5Days": 29,
-          "actualTop5Hours": 29
-        }
-      }
-    },
-    {
       "date": "2026-07-08",
-      "daysOut": 3,
+      "daysOut": 2,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 16,
       "predictedPeakHourEnding": 17,
-      "predictedMw": 20753,
-      "tempC": 29,
+      "predictedMw": 21788,
+      "tempC": 30,
       "leadBucket": 3,
       "projectedRank": 6,
       "wouldRankTop5": false,
       "probability": 0.03,
-      "peakPercentile": 0.99,
+      "peakPercentile": 1,
       "confidence": "high",
       "curtailmentWindows": [
         {
@@ -149,6 +91,64 @@
           "windowHours": 5,
           "hourStart": 14,
           "label": "HE15–HE19"
+        }
+      ],
+      "expectedAccuracy": {
+        "basis": "walk-forward backtest, surrogate (climatology+persistence) weather",
+        "years": 6,
+        "balancedTop5Recall": {
+          "min": 0,
+          "mean": 0.03,
+          "max": 0.2
+        },
+        "top5DayRecall": {
+          "min": 0,
+          "mean": 0.07,
+          "max": 0.2
+        },
+        "pooled": {
+          "dayRecall": 0.07,
+          "balancedRecall": 0.03,
+          "cpHourFilterSurvival": 0.55,
+          "top5Days": 29,
+          "actualTop5Hours": 29
+        }
+      }
+    },
+    {
+      "date": "2026-07-09",
+      "daysOut": 3,
+      "weatherSource": "eccc-citypage",
+      "isForecastWeather": true,
+      "peakRiskDay": true,
+      "predictedPeakHourStart": 17,
+      "predictedPeakHourEnding": 18,
+      "predictedMw": 20791,
+      "tempC": 29,
+      "leadBucket": 3,
+      "projectedRank": 6,
+      "wouldRankTop5": false,
+      "probability": 0.03,
+      "peakPercentile": 0.99,
+      "confidence": "high",
+      "curtailmentWindows": [
+        {
+          "profile": "Conservative",
+          "windowHours": 3,
+          "hourStart": 16,
+          "label": "HE17–HE19"
+        },
+        {
+          "profile": "Balanced",
+          "windowHours": 4,
+          "hourStart": 16,
+          "label": "HE17–HE20"
+        },
+        {
+          "profile": "Aggressive",
+          "windowHours": 5,
+          "hourStart": 15,
+          "label": "HE16–HE20"
         }
       ],
       "expectedAccuracy": {
