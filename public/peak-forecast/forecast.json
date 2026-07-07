@@ -1,11 +1,11 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-06T14:21:09.801-04:00",
-  "datasetThrough": "2026-07-06",
+  "generatedAt": "2026-07-07T13:36:54.005-04:00",
+  "datasetThrough": "2026-07-07",
   "staleNote": null,
   "model": {
     "r2": 0.54,
-    "trainRows": 15718
+    "trainRows": 15724
   },
   "basePeriod": {
     "start": "2026-05-01",
@@ -23,7 +23,7 @@
     7,
     14
   ],
-  "threshold": 22234,
+  "threshold": 22353,
   "running5CP": [
     {
       "rank": 1,
@@ -51,21 +51,21 @@
     },
     {
       "rank": 5,
-      "date": "2026-06-29",
+      "date": "2026-07-06",
       "hourEnding": 18,
-      "mw": 22234
+      "mw": 22353
     }
   ],
   "predictedPeaks": [
     {
       "date": "2026-07-08",
-      "daysOut": 2,
+      "daysOut": 1,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 16,
       "predictedPeakHourEnding": 17,
-      "predictedMw": 21788,
+      "predictedMw": 21790,
       "tempC": 30,
       "leadBucket": 3,
       "projectedRank": 6,
@@ -108,47 +108,47 @@
         },
         "pooled": {
           "dayRecall": 0.07,
-          "balancedRecall": 0.03,
-          "cpHourFilterSurvival": 0.55,
-          "top5Days": 29,
-          "actualTop5Hours": 29
+          "balancedRecall": 0.04,
+          "cpHourFilterSurvival": 0.57,
+          "top5Days": 28,
+          "actualTop5Hours": 28
         }
       }
     },
     {
-      "date": "2026-07-09",
-      "daysOut": 3,
-      "weatherSource": "eccc-citypage",
+      "date": "2026-07-13",
+      "daysOut": 6,
+      "weatherSource": "eccc-citypage (low filled from climo span)",
       "isForecastWeather": true,
       "peakRiskDay": true,
-      "predictedPeakHourStart": 17,
-      "predictedPeakHourEnding": 18,
-      "predictedMw": 20791,
-      "tempC": 29,
-      "leadBucket": 3,
+      "predictedPeakHourStart": 16,
+      "predictedPeakHourEnding": 17,
+      "predictedMw": 21784,
+      "tempC": 30,
+      "leadBucket": 7,
       "projectedRank": 6,
       "wouldRankTop5": false,
-      "probability": 0.03,
-      "peakPercentile": 0.99,
+      "probability": 0.01,
+      "peakPercentile": 1,
       "confidence": "high",
       "curtailmentWindows": [
         {
           "profile": "Conservative",
           "windowHours": 3,
-          "hourStart": 16,
-          "label": "HE17–HE19"
+          "hourStart": 15,
+          "label": "HE16–HE18"
         },
         {
           "profile": "Balanced",
           "windowHours": 4,
-          "hourStart": 16,
-          "label": "HE17–HE20"
+          "hourStart": 15,
+          "label": "HE16–HE19"
         },
         {
           "profile": "Aggressive",
           "windowHours": 5,
-          "hourStart": 15,
-          "label": "HE16–HE20"
+          "hourStart": 14,
+          "label": "HE15–HE19"
         }
       ],
       "expectedAccuracy": {
@@ -161,15 +161,15 @@
         },
         "top5DayRecall": {
           "min": 0,
-          "mean": 0.07,
+          "mean": 0.03,
           "max": 0.2
         },
         "pooled": {
-          "dayRecall": 0.07,
-          "balancedRecall": 0.03,
-          "cpHourFilterSurvival": 0.55,
-          "top5Days": 29,
-          "actualTop5Hours": 29
+          "dayRecall": 0.04,
+          "balancedRecall": 0.04,
+          "cpHourFilterSurvival": 0.5,
+          "top5Days": 28,
+          "actualTop5Hours": 28
         }
       }
     }
@@ -190,10 +190,10 @@
       },
       "pooled": {
         "dayRecall": 0.07,
-        "balancedRecall": 0.03,
-        "cpHourFilterSurvival": 0.55,
-        "top5Days": 29,
-        "actualTop5Hours": 29
+        "balancedRecall": 0.04,
+        "cpHourFilterSurvival": 0.57,
+        "top5Days": 28,
+        "actualTop5Hours": 28
       }
     },
     "7": {
@@ -210,11 +210,11 @@
         "max": 0.2
       },
       "pooled": {
-        "dayRecall": 0.03,
-        "balancedRecall": 0.03,
-        "cpHourFilterSurvival": 0.48,
-        "top5Days": 29,
-        "actualTop5Hours": 29
+        "dayRecall": 0.04,
+        "balancedRecall": 0.04,
+        "cpHourFilterSurvival": 0.5,
+        "top5Days": 28,
+        "actualTop5Hours": 28
       }
     },
     "14": {
@@ -233,9 +233,9 @@
       "pooled": {
         "dayRecall": 0,
         "balancedRecall": 0,
-        "cpHourFilterSurvival": 0.55,
-        "top5Days": 29,
-        "actualTop5Hours": 29
+        "cpHourFilterSurvival": 0.57,
+        "top5Days": 28,
+        "actualTop5Hours": 28
       }
     }
   },
@@ -243,21 +243,21 @@
     "basis": "walk-forward backtest, observed weather (v1 ceiling — not achievable at any real lead)",
     "years": 6,
     "balancedTop5Recall": {
-      "min": 0.4,
-      "mean": 0.72,
+      "min": 0.33,
+      "mean": 0.69,
       "max": 1
     },
     "top5DayRecall": {
-      "min": 0.75,
-      "mean": 0.93,
+      "min": 0.67,
+      "mean": 0.91,
       "max": 1
     },
     "pooled": {
       "dayRecall": 0.93,
-      "balancedRecall": 0.72,
-      "cpHourFilterSurvival": 0.97,
-      "top5Days": 29,
-      "actualTop5Hours": 29
+      "balancedRecall": 0.71,
+      "cpHourFilterSurvival": 0.96,
+      "top5Days": 28,
+      "actualTop5Hours": 28
     }
   }
 }
