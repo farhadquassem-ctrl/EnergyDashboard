@@ -1,0 +1,21 @@
+{
+  "//": "Scoped TypeScript config. The app is otherwise plain JS + JSDoc (see docs/ARCHITECTURE.md deviation #1); TS is introduced ONLY for the usage-review anomaly engine, which the Retail/Homeowner spec mandates be strict TypeScript with no `any`. Vite/esbuild transpiles .ts in the app bundle without type-checking, so `npm run typecheck` (tsc --noEmit) is what actually enforces strictness in CI. Tests run through Node 22's native type-stripping.",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["node"],
+    "strict": true,
+    "noImplicitAny": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": false,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": true
+  },
+  "include": ["src/**/*.ts"]
+}

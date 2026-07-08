@@ -8,7 +8,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test \"src/**/*.test.js\""
+    "typecheck": "tsc --noEmit",
+    "refresh:programs": "node scripts/programs/refresh.mjs",
+    "test": "node --test \"src/**/*.test.js\" \"src/**/*.test.ts\" \"scripts/**/*.test.mjs\""
   },
   "dependencies": {
     "ag-grid-community": "^32.3.3",
@@ -19,14 +21,17 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-leaflet": "^4.2.1",
-    "recharts": "^2.12.7"
+    "recharts": "^2.12.7",
+    "tesseract.js": "^5.1.1"
   },
   "devDependencies": {
+    "@types/node": "^22.20.0",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.19",
     "playwright-core": "^1.61.1",
     "postcss": "^8.4.39",
     "tailwindcss": "^3.4.6",
+    "typescript": "^5.9.3",
     "vite": "^5.3.4"
   }
 }
