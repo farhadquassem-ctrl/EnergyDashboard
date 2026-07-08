@@ -68,8 +68,16 @@ New tabs: `index.jsx` + `hooks.js` + `calculations.js` (pure functions, no
 React — all business logic lives here, unit-testable) + `components/`.
 `features/peak-forecast/` is the reference implementation.
 
-Unit tests are `*.test.js` next to the code, run with `npm test`
-(`node --test`) — both app (`features/model-backtest`) and pipeline.
+Unit tests are `*.test.js` (or `*.test.ts`) next to the code, run with
+`npm test` (`node --test`) — both app (`features/model-backtest`) and pipeline.
+
+Current feature tabs, grouped into two audience sections in `App.jsx`:
+- _Industrial & Commercial_: `overview`, `nodal`, `peak-forecast`, `ga-exposure-simulator`.
+- _Retail & Homeowner_: `conservation-navigator` (curated program catalog +
+  rate comparator; static JSON in `public/programs/`, adapter `lib/programs.js`,
+  weekly-refreshed by `scripts/programs/` on CI) and `usage-review` (bill OCR +
+  the strict-TS anomaly engine; Phase-2 fallback via the ephemeral
+  `api/parse-bill.js` vision route — no image or PII is ever persisted/logged).
 
 ## 8. Model accuracy — `src/features/model-backtest/`
 
@@ -95,9 +103,14 @@ model's tracking is a data-plumbing change, not a UI rebuild.
 
 ## Deviations from the contract spec (deliberate)
 
-1. **JSDoc, not TypeScript.** The repo is plain JS with no TS toolchain;
-   converting was out of scope for a no-behavior-change pass. Typedefs in
-   `types/market.js` convert 1:1 to `types/market.ts` if TS is adopted.
+1. **JSDoc, not TypeScript — with one scoped exception.** The repo is plain JS;
+   typedefs in `types/market.js` convert 1:1 to `types/market.ts` if TS is
+   adopted wholesale. The **Usage Review** anomaly engine
+   (`features/usage-review/*.ts`) is the exception: its spec mandates strict TS
+   with no `any`, so it introduced a scoped `tsconfig.json` (strict, `noEmit`)
+   and `npm run typecheck`. Vite/esbuild transpiles the `.ts` in the bundle;
+   Node 22's native type-stripping runs the `.test.ts` files under `npm test`.
+   The rest of the app stays JSDoc-JS.
 2. **No React Query/SWR.** The contract said "pick whichever the GA tool
    already uses" — it used neither. `useMarketQuery` centralizes the existing
    hand-rolled pattern behind the query-key convention; swapping its

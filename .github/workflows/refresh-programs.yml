@@ -1,0 +1,62 @@
+name: Refresh conservation programs
+
+# Weekly refresh of the Conservation Navigator's curated catalog. Diffs the DOM
+# of the Save on Energy program + "News and Updates" pages (and OEB/IESO feeds
+# when configured), flags any program whose source page changed, and bumps the
+# catalog's freshness. GitHub runners can reach these hosts; the Claude sandbox
+# cannot — so this is the only place the scrape runs unattended. Vercel
+# auto-deploys on the resulting push to main.
+
+on:
+  schedule:
+    # 11:00 UTC every Monday = 07:00 EDT / 06:00 EST.
+    - cron: '0 11 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-programs
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # No dependencies to install — the refresh script uses only Node builtins.
+      - name: Refresh program catalog (scrape + diff)
+        env:
+          # Set these repo secrets/vars if/when stable feed URLs are confirmed.
+          OEB_RATES_URL: ${{ vars.OEB_RATES_URL }}
+          IESO_GA_URL: ${{ vars.IESO_GA_URL }}
+        run: npm run refresh:programs
+
+      - name: Commit catalog changes if any
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- public/programs scripts/programs/snapshots; then
+            echo "No program changes this week."
+            exit 0
+          fi
+          git add public/programs scripts/programs/snapshots
+          git commit -m "chore(programs): weekly conservation catalog refresh [skip ci]"
+          for attempt in 1 2 3; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            echo "push attempt $attempt failed; retrying…"
+            sleep $((attempt * 3))
+          done
+          echo "::error::could not push refreshed program catalog after retries"
+          exit 1

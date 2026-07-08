@@ -8,12 +8,31 @@ import { useTheme } from './theme.jsx'
 const NodalTab = lazy(() => import('./components/NodalTab'))
 const PeakForecastTab = lazy(() => import('./features/peak-forecast/index.jsx'))
 const GAExposureTab = lazy(() => import('./features/ga-exposure-simulator/index.jsx'))
+const ConservationNavigatorTab = lazy(() => import('./features/conservation-navigator/index.jsx'))
+const UsageReviewTab = lazy(() => import('./features/usage-review/index.jsx'))
 
-const TABS = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'nodal', label: 'Nodal' },
-  { id: 'forecast', label: 'Peak Forecast' },
-  { id: 'ga-exposure', label: 'GA Exposure' },
+// Two audience sections. The Industrial & Commercial set is the original
+// dashboard (Class A / market operators); Retail & Homeowner is the Class B /
+// residential section (Conservation Navigator + Usage Review).
+const SECTIONS = [
+  {
+    id: 'industrial',
+    label: 'Industrial & Commercial',
+    tabs: [
+      { id: 'overview', label: 'Overview' },
+      { id: 'nodal', label: 'Nodal' },
+      { id: 'forecast', label: 'Peak Forecast' },
+      { id: 'ga-exposure', label: 'GA Exposure' },
+    ],
+  },
+  {
+    id: 'retail',
+    label: 'Retail & Homeowner',
+    tabs: [
+      { id: 'conservation', label: 'Conservation' },
+      { id: 'usage-review', label: 'Usage Review' },
+    ],
+  },
 ]
 
 function ThemeToggle() {
@@ -58,21 +77,30 @@ export default function App() {
           </p>
         </div>
 
-        <div className="flex items-end gap-3">
-          {/* Tab nav */}
-          <nav className="flex gap-1">
-            {TABS.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => setTab(t.id)}
-                className={`rounded-t-md border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
-                  tab === t.id
-                    ? 'border-sky-500 text-zinc-900 dark:border-sky-400 dark:text-zinc-100'
-                    : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
-                }`}
-              >
-                {t.label}
-              </button>
+        <div className="flex items-end gap-4">
+          {/* Grouped tab nav — two audience sections */}
+          <nav className="flex flex-wrap items-end gap-x-5 gap-y-2">
+            {SECTIONS.map((section) => (
+              <div key={section.id} className="flex flex-col gap-1">
+                <span className="px-1 text-[10px] font-semibold uppercase tracking-wide text-zinc-400 dark:text-zinc-500">
+                  {section.label}
+                </span>
+                <div className="flex gap-1">
+                  {section.tabs.map((t) => (
+                    <button
+                      key={t.id}
+                      onClick={() => setTab(t.id)}
+                      className={`rounded-t-md border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
+                        tab === t.id
+                          ? 'border-sky-500 text-zinc-900 dark:border-sky-400 dark:text-zinc-100'
+                          : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+                      }`}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             ))}
           </nav>
           <div className="pb-2">
@@ -96,6 +124,16 @@ export default function App() {
         {tab === 'ga-exposure' && (
           <Suspense fallback={<TabLoading>Loading GA simulator…</TabLoading>}>
             <GAExposureTab />
+          </Suspense>
+        )}
+        {tab === 'conservation' && (
+          <Suspense fallback={<TabLoading>Loading programs…</TabLoading>}>
+            <ConservationNavigatorTab onNavigateTab={setTab} />
+          </Suspense>
+        )}
+        {tab === 'usage-review' && (
+          <Suspense fallback={<TabLoading>Loading usage review…</TabLoading>}>
+            <UsageReviewTab />
           </Suspense>
         )}
       </main>
