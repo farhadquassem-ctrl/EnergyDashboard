@@ -29,6 +29,30 @@ Two independent deliverables live in this repo:
 
 ## Dashboard app — key facts
 
+- **Two audience sections (`App.jsx`):** _Industrial & Commercial_ (Overview,
+  Nodal, Peak Forecast, GA Exposure) and _Retail & Homeowner_ (Conservation
+  Navigator, Usage Review). Same tab contract; grouped nav only.
+- **Retail/Homeowner section (Class B / residential), shipped:**
+  - **Conservation Navigator** (`src/features/conservation-navigator/`) — curated,
+    use-case-organized program catalog + a TOU/ULO/Tiered rate comparator (after
+    OER). Static JSON in `public/programs/` (adapter `src/lib/programs.js`),
+    refreshed **weekly** by `scripts/programs/refresh.mjs` (DOM-diff scraper of
+    Save on Energy pages; runs on CI via `.github/workflows/refresh-programs.yml`
+    — the sandbox can't reach those hosts). The scraper **detects + dates**
+    changes and flags programs; it deliberately does **not** auto-rewrite curated
+    copy (rebate nuance → human-in-the-loop). Rates JSON is ILLUSTRATIVE until an
+    OEB feed URL is wired (`OEB_RATES_URL`).
+  - **Usage Review** (`src/features/usage-review/`) — bill photo → OCR → anomaly
+    detection. **`analyzeAnomalies.ts` is strict TypeScript** (spec mandate) — the
+    one scoped TS exception in a JSDoc repo (`tsconfig.json`, `npm run typecheck`;
+    tests run via Node 22 type-stripping). Phase 1 client OCR (Tesseract.js, lazy);
+    Phase 2 fallback = canvas PII-redaction → **`api/parse-bill.js`** (Claude
+    vision, `VISION_MODEL` env, default Sonnet). ⚑ **Ephemerality is a
+    non-negotiable**: that route writes nothing and logs nothing derived from the
+    image/PII — preserve both if you touch it. Dormant (501) until
+    `ANTHROPIC_API_KEY` is set; OCR path works without it. Engine runs on
+    daily-average kWh; Check-3 velocity switches to YoY (N−12) at ≥12 bills so
+    seasonal swings don't false-trigger.
 - **Shared architecture contract (read before adding any tab): `docs/ARCHITECTURE.md`.**
   Types in `src/types/market.js` (JSDoc, not TS); all IESO fetching/parsing in
   `src/lib/ieso/` adapters; one fetch hook `src/lib/query/useMarketQuery.js`

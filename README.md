@@ -10,8 +10,10 @@ forecast. Portfolio project; not affiliated with the IESO.
 
 ## The two deliverables
 
-1. **The dashboard app** (`src/`, `api/`) — four tabs, light/dark theme
-   (dark default, header toggle):
+1. **The dashboard app** (`src/`, `api/`) — six tabs in two audience sections,
+   light/dark theme (dark default, header toggle).
+
+   _Industrial & Commercial_ (Class A / market operators):
    - **Overview** — Ontario map (react-leaflet) with the 7 plotted pricing
      zones colour-coded by **Ontario Zonal Price** on a blue → amber → red
      gradient; 24h Real-Time vs Day-Ahead price chart (Recharts) for the
@@ -31,6 +33,19 @@ forecast. Portfolio project; not affiliated with the IESO.
      Class B GA dollars with the break-even PDF, savings decomposed by
      coincident peak, and probability-weighted curtailment ROI on the live
      forecast.
+
+   _Retail & Homeowner_ (Class B / residential / building managers):
+   - **Conservation** — a use-case-organized navigator for Ontario conservation
+     and billing programs (Peak Perks, HRSP, EAP, OER, Save on Energy Retrofit,
+     GA tracking…), with an interactive **TOU vs. ULO vs. Tiered** rate-plan
+     comparator (after the OER credit). Curated from a weekly-refreshed catalog
+     (`public/programs/`, kept current by `scripts/programs/` on CI).
+   - **Usage Review** — snap phone photos of electricity bills → in-browser OCR
+     (Tesseract.js) → structured usage → **anomaly detection** (volume spike,
+     on-peak shift, month-over-month/YoY velocity) charted over time. Low-
+     confidence reads fall back to a PII-redaction canvas + an ephemeral
+     serverless vision route (`api/parse-bill.js`). The anomaly engine is strict
+     TypeScript (`analyzeAnomalies.ts`).
 2. **The peak-prediction pipeline** (`pipeline/`) — a standalone Node job that
    assembles a multi-year, hourly, time-aligned dataset (IESO demand + ECCC
    weather + official ICI peak labels), fits/backtests the peak model, and
@@ -51,6 +66,9 @@ forecast. Portfolio project; not affiliated with the IESO.
 | Charts    | Recharts                              |
 | Grid      | AG Grid Community (Nodal tab)         |
 | Styling   | Tailwind CSS (`darkMode: 'class'`)    |
+| OCR       | Tesseract.js (client-side, Usage Review) |
+| Types     | JSDoc app-wide; strict TS for the anomaly engine (`npm run typecheck`) |
+| Serverless| Vercel functions (`api/ieso.js`, `api/parse-bill.js`) |
 | Pipeline  | Node + luxon + fast-xml-parser        |
 | Deploy    | Vercel (production branch: `main`)    |
 
