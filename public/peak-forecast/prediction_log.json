@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-07-10T17:14:26.203Z",
+  "updatedAt": "2026-07-11T14:35:18.526Z",
   "models": [
     "ga-5cp-peak"
   ],
@@ -128,6 +128,17 @@
     },
     {
       "modelName": "ga-5cp-peak",
+      "targetDate": "2026-07-13",
+      "predictedAt": "2026-07-11T10:35:18.085-04:00",
+      "predictedValue": 23876,
+      "predictedProbability": 0.04,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 2
+    },
+    {
+      "modelName": "ga-5cp-peak",
       "targetDate": "2026-07-14",
       "predictedAt": "2026-07-08T12:18:25.776-04:00",
       "predictedValue": 22815,
@@ -161,6 +172,17 @@
     },
     {
       "modelName": "ga-5cp-peak",
+      "targetDate": "2026-07-14",
+      "predictedAt": "2026-07-11T10:35:18.085-04:00",
+      "predictedValue": 25941,
+      "predictedProbability": 0.04,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 3
+    },
+    {
+      "modelName": "ga-5cp-peak",
       "targetDate": "2026-07-15",
       "predictedAt": "2026-07-10T13:14:25.768-04:00",
       "predictedValue": 23875,
@@ -169,6 +191,17 @@
       "actualHit": null,
       "resolved": false,
       "leadTimeDays": 5
+    },
+    {
+      "modelName": "ga-5cp-peak",
+      "targetDate": "2026-07-15",
+      "predictedAt": "2026-07-11T10:35:18.085-04:00",
+      "predictedValue": 23876,
+      "predictedProbability": 0.01,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 4
     }
   ]
 }
