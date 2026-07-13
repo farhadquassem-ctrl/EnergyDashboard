@@ -1,13 +1,26 @@
 {
   "source": "ILLUSTRATIVE reference rates (2026) — NOT live OEB data. Regulated Price Plan (RPP) prices are set by the Ontario Energy Board and change ~twice a year (Nov 1 / May 1). Verify against the OEB before relying on any figure: https://www.oeb.ca/consumer-information-and-protection/electricity-rates . The weekly refresh job (scripts/programs/fetch_rates.mjs) overwrites this file from the OEB feed when it runs on CI.",
   "illustrative": true,
-  "asOf": "2026-07-05",
+  "asOf": "2026-07-13",
   "effectiveDate": "2026-05-01",
   "oerPercent": 0.235,
   "oerNote": "Ontario Electricity Rebate — an automatic pre-tax credit on eligible bills (~23.5% at time of writing).",
-  "tou": { "offPeak": 0.076, "midPeak": 0.122, "onPeak": 0.158 },
-  "ulo": { "ulo": 0.039, "offPeak": 0.076, "midPeak": 0.122, "onPeak": 0.391 },
-  "tiered": { "threshold": 600, "tier1": 0.093, "tier2": 0.108 },
+  "tou": {
+    "offPeak": 0.076,
+    "midPeak": 0.122,
+    "onPeak": 0.158
+  },
+  "ulo": {
+    "ulo": 0.039,
+    "offPeak": 0.076,
+    "midPeak": 0.122,
+    "onPeak": 0.391
+  },
+  "tiered": {
+    "threshold": 600,
+    "tier1": 0.093,
+    "tier2": 0.108
+  },
   "windows": {
     "touNote": "On-peak weekdays 7–11a & 5–7p; mid-peak weekdays 11a–5p; off-peak nights/weekends/holidays.",
     "uloNote": "Ultra-low overnight 11p–7a every day; on-peak weekdays 4–9p; the rest weekend/off."

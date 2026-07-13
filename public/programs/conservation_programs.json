@@ -1,119 +1,220 @@
 {
   "source": "Curated by the EnergyDashboard team from IESO Save on Energy, OEB, and Enbridge Gas program pages. Organized by use case — NOT a verbatim mirror. These are 2026 reference points; every 'keyDetail' is marked verify:true until the weekly refresh job reconciles it against source (scripts/programs/). Not affiliated with the IESO, OEB, or any utility.",
-  "asOf": "2026-07-05",
+  "asOf": "2026-07-13",
   "refreshCadence": "weekly",
   "programs": [
     {
       "id": "rate-plan-optimization",
       "name": "Rate Plan Optimization (TOU vs. ULO vs. Tiered)",
-      "audience": ["residential"],
+      "audience": [
+        "residential"
+      ],
       "category": "billing",
       "useCase": "Homeowners time-shifting load (EV charging, pool pumps, laundry)",
       "keyDetail": "Ultra-Low Overnight (ULO) prices overnight energy at roughly 3.9¢/kWh versus about 39.1¢/kWh on-peak — a large gap that rewards moving flexible load to nights.",
-      "tags": ["ev", "time-of-use", "ulo", "tiered", "billing"],
+      "tags": [
+        "ev",
+        "time-of-use",
+        "ulo",
+        "tiered",
+        "billing"
+      ],
       "sourceName": "OEB Residential Rates",
       "sourceUrl": "https://www.oeb.ca/consumer-information-and-protection/electricity-rates",
       "refreshSource": "oeb-rates",
-      "action": { "type": "internal", "label": "Compare my rate plans", "target": "rate-comparator" },
+      "action": {
+        "type": "internal",
+        "label": "Compare my rate plans",
+        "target": "rate-comparator"
+      },
       "verify": true
     },
     {
       "id": "ontario-electricity-rebate",
       "name": "Ontario Electricity Rebate (OER)",
-      "audience": ["residential", "commercial"],
+      "audience": [
+        "residential",
+        "commercial"
+      ],
       "category": "billing",
       "useCase": "General bill relief + reading your bill accurately",
       "keyDetail": "An automatic ~23.5% pre-tax credit applied to eligible residential and small-business bills. No application needed; it appears as a line item.",
-      "tags": ["rebate", "bill-relief", "oer", "credit"],
+      "tags": [
+        "rebate",
+        "bill-relief",
+        "oer",
+        "credit"
+      ],
       "sourceName": "OEB / IESO published rate",
       "sourceUrl": "https://www.oeb.ca/consumer-information-and-protection/electricity-rates/ontario-electricity-rebate",
       "refreshSource": "oeb-rates",
-      "action": { "type": "internal", "label": "See it in the comparator", "target": "rate-comparator" },
+      "action": {
+        "type": "internal",
+        "label": "See it in the comparator",
+        "target": "rate-comparator"
+      },
       "verify": true
     },
     {
       "id": "home-renovation-savings",
       "name": "Home Renovation Savings Program (HRSP)",
-      "audience": ["residential"],
+      "audience": [
+        "residential"
+      ],
       "category": "rebate",
       "useCase": "Homeowners planning insulation, heat pumps, or window upgrades",
       "keyDetail": "Two paths: a 'Single Upgrade' path (no energy audit required) and a 'Bundled' path that requires a pre- and post-work EnerGuide audit but unlocks larger, stacked rebates.",
-      "tags": ["heat-pump", "insulation", "windows", "rebate", "energuide"],
+      "tags": [
+        "heat-pump",
+        "insulation",
+        "windows",
+        "rebate",
+        "energuide"
+      ],
       "sourceName": "Save on Energy HRSP + Enbridge Gas",
       "sourceUrl": "https://www.saveonenergy.ca/en/For-Your-Home/Home-Renovation-Savings-Program",
       "refreshSource": "saveonenergy-scrape",
-      "action": { "type": "external", "label": "Open program page", "target": "https://www.saveonenergy.ca/en/For-Your-Home/Home-Renovation-Savings-Program" },
+      "action": {
+        "type": "external",
+        "label": "Open program page",
+        "target": "https://www.saveonenergy.ca/en/For-Your-Home/Home-Renovation-Savings-Program"
+      },
       "verify": true
     },
     {
       "id": "peak-perks",
       "name": "Peak Perks",
-      "audience": ["residential"],
+      "audience": [
+        "residential"
+      ],
       "category": "demand-response",
       "useCase": "Households with central A/C and a smart thermostat",
       "keyDetail": "About $75 to enroll and roughly $20/year to allow small summer peak thermostat adjustments (up to ~2°C). You can override any event.",
-      "tags": ["thermostat", "summer", "demand-response", "ac", "peaksaver"],
+      "tags": [
+        "thermostat",
+        "summer",
+        "demand-response",
+        "ac",
+        "peaksaver"
+      ],
       "sourceName": "Save on Energy Peak Perks",
       "sourceUrl": "https://www.saveonenergy.ca/en/For-Your-Home/Peak-Perks",
       "refreshSource": "saveonenergy-scrape",
-      "action": { "type": "external", "label": "Open program page", "target": "https://www.saveonenergy.ca/en/For-Your-Home/Peak-Perks" },
+      "action": {
+        "type": "external",
+        "label": "Open program page",
+        "target": "https://www.saveonenergy.ca/en/For-Your-Home/Peak-Perks"
+      },
       "verify": true
     },
     {
       "id": "energy-affordability",
       "name": "Energy Affordability Program (EAP)",
-      "audience": ["residential"],
+      "audience": [
+        "residential"
+      ],
       "category": "rebate",
       "useCase": "Income-eligible households needing efficiency upgrades",
       "keyDetail": "Up to 100% cost coverage for measures like attic insulation, draft-proofing, and efficient appliances for qualifying households.",
-      "tags": ["income-eligible", "insulation", "appliances", "affordability", "free"],
+      "tags": [
+        "income-eligible",
+        "insulation",
+        "appliances",
+        "affordability",
+        "free"
+      ],
       "sourceName": "Save on Energy EAP",
       "sourceUrl": "https://www.saveonenergy.ca/en/For-Your-Home/Energy-Affordability-Program",
       "refreshSource": "saveonenergy-scrape",
-      "action": { "type": "external", "label": "Check eligibility", "target": "https://www.saveonenergy.ca/en/For-Your-Home/Energy-Affordability-Program" },
+      "action": {
+        "type": "external",
+        "label": "Check eligibility",
+        "target": "https://www.saveonenergy.ca/en/For-Your-Home/Energy-Affordability-Program"
+      },
       "verify": true
     },
     {
       "id": "retrofit-program",
       "name": "Save on Energy Retrofit Program",
-      "audience": ["commercial"],
+      "audience": [
+        "commercial"
+      ],
       "category": "rebate",
       "useCase": "Facility managers upgrading HVAC, lighting, or DERs",
       "keyDetail": "Prescriptive incentives for HVAC, lighting controls, and PTHPs. The 2026 update split PTHP tiers (new construction vs. replacement) and adjusted small/medium solar DER incentives.",
-      "tags": ["hvac", "lighting", "der", "retrofit", "prescriptive", "pthp"],
+      "tags": [
+        "hvac",
+        "lighting",
+        "der",
+        "retrofit",
+        "prescriptive",
+        "pthp"
+      ],
       "sourceName": "Save on Energy — News and Updates",
       "sourceUrl": "https://www.saveonenergy.ca/en/For-Your-Business/Programs-and-Incentives/Retrofit-Program",
       "refreshSource": "saveonenergy-scrape",
-      "action": { "type": "external", "label": "Open program page", "target": "https://www.saveonenergy.ca/en/For-Your-Business/Programs-and-Incentives/Retrofit-Program" },
+      "action": {
+        "type": "external",
+        "label": "Open program page",
+        "target": "https://www.saveonenergy.ca/en/For-Your-Business/Programs-and-Incentives/Retrofit-Program"
+      },
       "verify": true
     },
     {
       "id": "ga-tracking",
       "name": "Global Adjustment (GA) Tracking",
-      "audience": ["commercial"],
+      "audience": [
+        "commercial"
+      ],
       "category": "tracking",
       "useCase": "FP&A, settlements, and operational forecasting",
       "keyDetail": "Not a subsidy — but tracking the monthly Class B GA rate alongside conservation activity is the single highest-value data point for this audience. For Class A exposure, use the GA Exposure tab.",
-      "tags": ["ga", "settlements", "forecasting", "class-b", "tracking"],
+      "tags": [
+        "ga",
+        "settlements",
+        "forecasting",
+        "class-b",
+        "tracking"
+      ],
       "sourceName": "IESO Data Directory (GA CSV/XML)",
       "sourceUrl": "https://www.ieso.ca/power-data/price-overview/global-adjustment",
       "refreshSource": "ieso-ga",
-      "action": { "type": "tab", "label": "Open GA Exposure tab", "target": "ga-exposure" },
+      "action": {
+        "type": "tab",
+        "label": "Open GA Exposure tab",
+        "target": "ga-exposure"
+      },
       "verify": true
     },
     {
       "id": "small-business-peak-perks",
       "name": "Small Business Peak Perks",
-      "audience": ["commercial"],
+      "audience": [
+        "commercial"
+      ],
       "category": "demand-response",
       "useCase": "Demand response for small commercial sites",
       "keyDetail": "Open to businesses with roughly 50 or fewer on-site employees; mirrors the residential smart-thermostat program with summer peak adjustments.",
-      "tags": ["thermostat", "demand-response", "small-business", "summer"],
+      "tags": [
+        "thermostat",
+        "demand-response",
+        "small-business",
+        "summer"
+      ],
       "sourceName": "Save on Energy — Business pages",
       "sourceUrl": "https://www.saveonenergy.ca/en/For-Your-Business",
       "refreshSource": "saveonenergy-scrape",
-      "action": { "type": "external", "label": "Open program page", "target": "https://www.saveonenergy.ca/en/For-Your-Business" },
+      "action": {
+        "type": "external",
+        "label": "Open program page",
+        "target": "https://www.saveonenergy.ca/en/For-Your-Business"
+      },
       "verify": true
     }
-  ]
+  ],
+  "watch": {
+    "lastRun": "2026-07-13",
+    "changedPages": [],
+    "changedPrograms": []
+  }
 }
