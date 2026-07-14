@@ -31,7 +31,10 @@ Two independent deliverables live in this repo:
 
 - **Two audience sections (`App.jsx`):** _Industrial & Commercial_ (Overview,
   Nodal, Peak Forecast, GA Exposure) and _Retail & Homeowner_ (Conservation
-  Navigator, Usage Review). Same tab contract; grouped nav only.
+  Navigator, Usage Review). Same tab contract; grouped nav only. Visited tabs
+  stay **mounted but hidden** (not unmounted) so user-entered state — uploaded
+  bills, meter CSVs — survives tab switches; lazy chunks still load on first
+  visit only.
 - **Retail/Homeowner section (Class B / residential), shipped:**
   - **Conservation Navigator** (`src/features/conservation-navigator/`) — curated,
     use-case-organized program catalog + a TOU/ULO/Tiered rate comparator (after
@@ -41,7 +44,11 @@ Two independent deliverables live in this repo:
     — the sandbox can't reach those hosts). The scraper **detects + dates**
     changes and flags programs; it deliberately does **not** auto-rewrite curated
     copy (rebate nuance → human-in-the-loop). Rates JSON is ILLUSTRATIVE until an
-    OEB feed URL is wired (`OEB_RATES_URL`).
+    OEB feed URL is wired (`OEB_RATES_URL`). ⚠ Save on Energy serves **soft 404s**
+    (HTTP 200 "page doesn't exist") — the scraper guards with
+    `looksLikeErrorPage()` and must never baseline/diff an error body (the first
+    live run baselined three dead URLs before this guard existed; watchlist URLs
+    re-verified 2026-07-14).
   - **Usage Review** (`src/features/usage-review/`) — bill photo → OCR → anomaly
     detection. **`analyzeAnomalies.ts` is strict TypeScript** (spec mandate) — the
     one scoped TS exception in a JSDoc repo (`tsconfig.json`, `npm run typecheck`;

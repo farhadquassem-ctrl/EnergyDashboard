@@ -72,12 +72,12 @@
         "energuide"
       ],
       "sourceName": "Save on Energy HRSP + Enbridge Gas",
-      "sourceUrl": "https://www.saveonenergy.ca/en/For-Your-Home/Home-Renovation-Savings-Program",
+      "sourceUrl": "https://www.saveonenergy.ca/homerenovationsavings",
       "refreshSource": "saveonenergy-scrape",
       "action": {
         "type": "external",
         "label": "Open program page",
-        "target": "https://www.saveonenergy.ca/en/For-Your-Home/Home-Renovation-Savings-Program"
+        "target": "https://www.saveonenergy.ca/homerenovationsavings"
       },
       "verify": true
     },
@@ -151,12 +151,12 @@
         "pthp"
       ],
       "sourceName": "Save on Energy — News and Updates",
-      "sourceUrl": "https://www.saveonenergy.ca/en/For-Your-Business/Programs-and-Incentives/Retrofit-Program",
+      "sourceUrl": "https://www.saveonenergy.ca/en/For-Business-and-Industry/Programs-and-incentives/Retrofit-Program",
       "refreshSource": "saveonenergy-scrape",
       "action": {
         "type": "external",
         "label": "Open program page",
-        "target": "https://www.saveonenergy.ca/en/For-Your-Business/Programs-and-Incentives/Retrofit-Program"
+        "target": "https://www.saveonenergy.ca/en/For-Business-and-Industry/Programs-and-incentives/Retrofit-Program"
       },
       "verify": true
     },
@@ -202,12 +202,12 @@
         "summer"
       ],
       "sourceName": "Save on Energy — Business pages",
-      "sourceUrl": "https://www.saveonenergy.ca/en/For-Your-Business",
+      "sourceUrl": "https://www.saveonenergy.ca/en/For-Business-and-Industry/Programs-and-incentives",
       "refreshSource": "saveonenergy-scrape",
       "action": {
         "type": "external",
         "label": "Open program page",
-        "target": "https://www.saveonenergy.ca/en/For-Your-Business"
+        "target": "https://www.saveonenergy.ca/en/For-Business-and-Industry/Programs-and-incentives"
       },
       "verify": true
     }

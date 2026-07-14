@@ -13,7 +13,7 @@
 // never blocks the refresh.
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises'
-import { htmlToText, contentHash, diffText } from './lib/domText.mjs'
+import { htmlToText, contentHash, diffText, looksLikeErrorPage } from './lib/domText.mjs'
 import { WATCH, OEB_RATES_URL } from './watchlist.mjs'
 
 const ROOT = new URL('../../', import.meta.url)
@@ -56,6 +56,13 @@ async function main() {
     const html = await fetchText(w.url)
     if (html == null) { nextSnap[w.url] = snap[w.url] ?? { hash: null, lastChanged: null }; continue }
     const text = htmlToText(html)
+    // Save on Energy serves "page doesn't exist" with HTTP 200 — never baseline
+    // or diff an error body (a dead link is a skip, not a content change).
+    if (looksLikeErrorPage(text)) {
+      console.warn(`  skip ${w.url} — soft 404 ("page doesn't exist" body)`)
+      nextSnap[w.url] = snap[w.url] ?? { hash: null, lastChanged: null }
+      continue
+    }
     const hash = contentHash(text)
     const prev = snap[w.url]
     const changed = prev?.hash ? prev.hash !== hash : false
