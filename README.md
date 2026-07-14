@@ -120,6 +120,15 @@ EnergyDashboard/
 types, adapters, fetching, state, and folder layout. Git/deploy conventions
 live in `docs/WORKFLOW.md`.
 
+### Documentation & collateral
+
+| Doc | What it covers |
+| --- | --- |
+| [`docs/DESIGN.md`](docs/DESIGN.md) | Product design rationale — the observability thesis, audience split, privacy-first choices |
+| [`docs/TECH-SPECS.md`](docs/TECH-SPECS.md) | Full technical specification (enhanced README) — stack, data sources, pipeline, security model |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Per-tab architecture contract |
+| [`docs/collateral/`](docs/collateral/) | User manual (PDF), pitch deck (PDF), and ready-to-post social copy |
+
 ## Deploying to Vercel
 
 This repo is preconfigured for Vercel via `vercel.json` (framework preset
