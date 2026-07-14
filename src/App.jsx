@@ -63,11 +63,20 @@ function ThemeToggle() {
 
 export default function App() {
   const [tab, setTab] = useState('overview')
+  // Keep visited tabs mounted (hidden, not unmounted) so user-entered state —
+  // uploaded bills, meter CSVs, comparator inputs — survives tab switches.
+  // Lazy loading is preserved: a tab's chunk still only loads on first visit.
+  const [visited, setVisited] = useState(() => new Set(['overview']))
+  const openTab = (id) => {
+    setVisited((prev) => (prev.has(id) ? prev : new Set(prev).add(id)))
+    setTab(id)
+  }
+  const paneCls = (id) => (tab === id ? 'flex flex-1 flex-col' : 'hidden')
 
   return (
     <div className="flex min-h-screen flex-col bg-zinc-100 text-zinc-800 dark:bg-canvas dark:text-zinc-200">
       {/* Header */}
-      <header className="flex flex-wrap items-end justify-between gap-3 border-b border-zinc-300 px-6 pt-4 dark:border-zinc-800">
+      <header className="flex flex-wrap items-end justify-between gap-3 border-b border-zinc-300 px-4 pt-4 sm:px-6 dark:border-zinc-800">
         <div className="pb-3">
           <h1 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
             IESO LMP Dashboard
@@ -77,7 +86,9 @@ export default function App() {
           </p>
         </div>
 
-        <div className="flex items-end gap-4">
+        {/* min-w-0 + wrap everywhere so the nav + toggle never force the page
+            wider than a phone viewport (the whole app used to side-scroll) */}
+        <div className="flex min-w-0 flex-wrap items-end gap-4">
           {/* Grouped tab nav — two audience sections */}
           <nav className="flex flex-wrap items-end gap-x-5 gap-y-2">
             {SECTIONS.map((section) => (
@@ -85,11 +96,11 @@ export default function App() {
                 <span className="px-1 text-[10px] font-semibold uppercase tracking-wide text-zinc-400 dark:text-zinc-500">
                   {section.label}
                 </span>
-                <div className="flex gap-1">
+                <div className="flex flex-wrap gap-1">
                   {section.tabs.map((t) => (
                     <button
                       key={t.id}
-                      onClick={() => setTab(t.id)}
+                      onClick={() => openTab(t.id)}
                       className={`rounded-t-md border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
                         tab === t.id
                           ? 'border-sky-500 text-zinc-900 dark:border-sky-400 dark:text-zinc-100'
@@ -110,31 +121,43 @@ export default function App() {
       </header>
 
       <main className="flex flex-1 flex-col p-4 lg:p-6">
-        {tab === 'overview' && <OverviewTab />}
-        {tab === 'nodal' && (
-          <Suspense fallback={<TabLoading>Loading nodal grid…</TabLoading>}>
-            <NodalTab />
-          </Suspense>
+        <div className={paneCls('overview')}>
+          <OverviewTab />
+        </div>
+        {visited.has('nodal') && (
+          <div className={paneCls('nodal')}>
+            <Suspense fallback={<TabLoading>Loading nodal grid…</TabLoading>}>
+              <NodalTab />
+            </Suspense>
+          </div>
         )}
-        {tab === 'forecast' && (
-          <Suspense fallback={<TabLoading>Loading forecast…</TabLoading>}>
-            <PeakForecastTab />
-          </Suspense>
+        {visited.has('forecast') && (
+          <div className={paneCls('forecast')}>
+            <Suspense fallback={<TabLoading>Loading forecast…</TabLoading>}>
+              <PeakForecastTab />
+            </Suspense>
+          </div>
         )}
-        {tab === 'ga-exposure' && (
-          <Suspense fallback={<TabLoading>Loading GA simulator…</TabLoading>}>
-            <GAExposureTab />
-          </Suspense>
+        {visited.has('ga-exposure') && (
+          <div className={paneCls('ga-exposure')}>
+            <Suspense fallback={<TabLoading>Loading GA simulator…</TabLoading>}>
+              <GAExposureTab />
+            </Suspense>
+          </div>
         )}
-        {tab === 'conservation' && (
-          <Suspense fallback={<TabLoading>Loading programs…</TabLoading>}>
-            <ConservationNavigatorTab onNavigateTab={setTab} />
-          </Suspense>
+        {visited.has('conservation') && (
+          <div className={paneCls('conservation')}>
+            <Suspense fallback={<TabLoading>Loading programs…</TabLoading>}>
+              <ConservationNavigatorTab onNavigateTab={openTab} />
+            </Suspense>
+          </div>
         )}
-        {tab === 'usage-review' && (
-          <Suspense fallback={<TabLoading>Loading usage review…</TabLoading>}>
-            <UsageReviewTab />
-          </Suspense>
+        {visited.has('usage-review') && (
+          <div className={paneCls('usage-review')}>
+            <Suspense fallback={<TabLoading>Loading usage review…</TabLoading>}>
+              <UsageReviewTab />
+            </Suspense>
+          </div>
         )}
       </main>
 

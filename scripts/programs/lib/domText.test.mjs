@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { htmlToText, contentHash, diffText } from './domText.mjs'
+import { htmlToText, contentHash, diffText, looksLikeErrorPage } from './domText.mjs'
 
 const PAGE_V1 = `
 <html><head><title>ignored</title><style>.x{color:red}</style></head>
@@ -53,4 +53,16 @@ test('a real criteria change flips the hash and the diff reports it', () => {
 
 test('diffText: identical text → no change', () => {
   assert.equal(diffText('a\nb', 'a\nb').changed, false)
+})
+
+test('looksLikeErrorPage catches the Save on Energy soft 404 (HTTP 200 body)', () => {
+  // Verbatim shape of what the first live cron run baselined for three moved URLs
+  const soft404 = htmlToText(`<html><body><div>Home</div>
+    <h1>Sorry but it looks like this page doesn't exist</h1>
+    <p>Don't let this drain your energy. Please return to our homepage .</p></body></html>`)
+  assert.equal(looksLikeErrorPage(soft404), true)
+  // A real program page must NOT be treated as dead
+  assert.equal(looksLikeErrorPage(htmlToText(PAGE_V1)), false)
+  // Long marketing copy that happens to include "not found" is still a real page
+  assert.equal(looksLikeErrorPage('page not found '.padEnd(2000, 'x')), false)
 })

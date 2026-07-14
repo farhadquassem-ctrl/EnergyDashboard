@@ -34,6 +34,19 @@ export function htmlToText(html) {
   return s.split('\n').map((l) => l.replace(/\s+/g, ' ').trim()).filter(Boolean).join('\n')
 }
 
+/**
+ * Detect a soft-404: Save on Energy serves its "page doesn't exist" body with
+ * HTTP 200, so `res.ok` alone can't catch a moved/dead page. Baseline-hashing
+ * an error page poisons change detection (the first live run did exactly this
+ * for three restructured URLs), so the refresh job skips pages that match.
+ * Heuristic on the *normalized* text: a not-found phrase in a very short body.
+ */
+export function looksLikeErrorPage(text) {
+  const s = String(text ?? '')
+  if (s.length > 1500) return false // real program pages are thousands of chars
+  return /(page\s+(doesn'?t|does\s+not)\s+exist|page\s+(was\s+)?not\s+found|\b404\b)/i.test(s)
+}
+
 export function contentHash(text) {
   return createHash('sha256').update(String(text ?? '')).digest('hex')
 }

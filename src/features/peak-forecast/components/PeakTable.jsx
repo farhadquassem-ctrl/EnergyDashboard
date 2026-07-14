@@ -25,7 +25,7 @@ export default function PeakTable({ peaks }) {
               <tr key={p.date} className="border-b border-zinc-100 last:border-none dark:border-zinc-800">
                 <td className="px-4 py-3">
                   <div className="font-semibold text-zinc-900 dark:text-zinc-100">{fmtDay(p.date)}</div>
-                  <div className="text-xs text-zinc-500">in {p.daysOut} days</div>
+                  <div className="text-xs text-zinc-500">in {p.daysOut} {p.daysOut === 1 ? 'day' : 'days'}</div>
                 </td>
                 <td className="px-4 py-3">
                   <div className="font-bold text-zinc-900 dark:text-zinc-100">HE{p.predictedPeakHourEnding}</div>

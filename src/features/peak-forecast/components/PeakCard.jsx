@@ -16,7 +16,7 @@ export default function PeakCard({ p }) {
       <div className="flex items-start justify-between gap-2">
         <div>
           <div className="text-base font-bold text-zinc-900 dark:text-zinc-100">{fmtDay(p.date)}</div>
-          <div className="text-xs text-zinc-500">in {p.daysOut} days</div>
+          <div className="text-xs text-zinc-500">in {p.daysOut} {p.daysOut === 1 ? 'day' : 'days'}</div>
         </div>
         <SelectBadge selected={p.wouldRankTop5} rank={p.projectedRank} />
       </div>
