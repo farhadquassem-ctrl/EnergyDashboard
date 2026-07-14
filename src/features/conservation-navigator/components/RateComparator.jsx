@@ -85,7 +85,7 @@ export default function RateComparator({ rates }) {
       <p className="mt-3 text-[11px] leading-relaxed text-zinc-500">
         Cheapest for this profile: <b className="text-zinc-700 dark:text-zinc-300">{PLAN_LABEL[result.recommended]}</b>
         {result.annualSavingsVsWorst > 1 && <> — about <b className="text-emerald-600 dark:text-emerald-400">{fmtDollars(result.annualSavingsVsWorst)}/yr</b> versus the priciest plan for you.</>}
-        {' '}Energy charges only (ULO overnight {fmtCents(rates.ulo.ulo)} vs. on-peak {fmtCents(rates.ulo.onPeak)}); after the {Math.round((rates.oerPercent ?? 0) * 100)}% OER credit; delivery/regulatory charges excluded. Illustrative — confirm current rates with the OEB.
+        {' '}Energy charges only (ULO overnight {fmtCents(rates.ulo.ulo)} vs. on-peak {fmtCents(rates.ulo.onPeak)}); after the {Math.round((rates.oerPercent ?? 0) * 1000) / 10}% OER credit; delivery/regulatory charges excluded. Illustrative — confirm current rates with the OEB.
       </p>
     </div>
   )
