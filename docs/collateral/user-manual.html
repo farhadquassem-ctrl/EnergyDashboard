@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>EnergyDashboard — User Manual</title>
+<style>
+  @page { size: A4 portrait; margin: 18mm 16mm 20mm; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #27272a; line-height: 1.55; font-size: 10.5pt; margin: 0;
+  }
+  h1, h2, h3 { color: #18181b; line-height: 1.2; }
+  a { color: #0369a1; text-decoration: none; }
+  .muted { color: #71717a; }
+  .accent { color: #0284c7; }
+
+  /* ---------- cover ---------- */
+  .cover {
+    height: 253mm; display: flex; flex-direction: column; justify-content: center;
+    page-break-after: always; text-align: left;
+  }
+  .cover .kicker { font-size: 11pt; letter-spacing: .18em; text-transform: uppercase; color: #0284c7; font-weight: 700; }
+  .cover h1 { font-size: 40pt; margin: 6mm 0 3mm; letter-spacing: -.02em; }
+  .cover .sub { font-size: 15pt; color: #52525b; max-width: 150mm; }
+  .cover .rule { height: 4px; width: 60mm; background: linear-gradient(90deg,#0ea5e9,#10b981); margin: 8mm 0; border-radius: 2px; }
+  .cover .meta { margin-top: 14mm; font-size: 10pt; color: #71717a; }
+  .badges { margin-top: 6mm; display: flex; gap: 6px; flex-wrap: wrap; }
+  .pill { font-size: 8.5pt; font-weight: 600; padding: 3px 9px; border-radius: 999px; border: 1px solid #d4d4d8; color: #3f3f46; }
+  .pill.live { background: #dcfce7; border-color:#86efac; color:#15803d; }
+
+  /* ---------- toc ---------- */
+  .toc { page-break-after: always; }
+  .toc ol { list-style: none; padding: 0; counter-reset: t; }
+  .toc li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dotted #d4d4d8; counter-increment: t; }
+  .toc li::before { content: counter(t) ".  "; color: #0284c7; font-weight: 700; }
+  .toc li span:first-of-type { flex: 1; }
+
+  /* ---------- sections ---------- */
+  section { page-break-before: always; }
+  h2.sec { font-size: 20pt; margin: 0 0 1mm; }
+  h2.sec .tag { font-size: 9pt; font-weight: 600; color: #fff; background: #0284c7; padding: 2px 8px; border-radius: 4px; vertical-align: middle; margin-left: 6px; }
+  h2.sec .tag.retail { background: #059669; }
+  .lede { color: #52525b; font-size: 11pt; margin: 0 0 5mm; }
+  h3 { font-size: 12pt; margin: 6mm 0 2mm; }
+  figure { margin: 4mm 0; page-break-inside: avoid; }
+  figure img { width: auto; max-width: 100%; max-height: 150mm; display: block; margin: 0 auto;
+    border: 1px solid #e4e4e7; border-radius: 6px; }
+  figcaption { font-size: 8.5pt; color: #a1a1aa; text-align: center; margin-top: 2mm; }
+  ol.steps { padding-left: 5mm; margin: 2mm 0; }
+  ol.steps li { margin: 1.5mm 0; }
+  ul.tight { margin: 2mm 0; padding-left: 5mm; }
+  ul.tight li { margin: 1mm 0; }
+  .callout { border-left: 3px solid #0ea5e9; background: #f0f9ff; padding: 3mm 4mm; margin: 4mm 0; border-radius: 0 6px 6px 0; font-size: 9.5pt; }
+  .callout.privacy { border-color: #10b981; background: #ecfdf5; }
+  .callout .lbl { font-weight: 700; color: #0369a1; }
+  .callout.privacy .lbl { color: #047857; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+  .card { border: 1px solid #e4e4e7; border-radius: 6px; padding: 3mm 4mm; }
+  .card h4 { margin: 0 0 1mm; font-size: 10.5pt; color: #18181b; }
+  .card p { margin: 0; font-size: 9pt; color: #52525b; }
+  table.ref { width: 100%; border-collapse: collapse; font-size: 9pt; margin: 3mm 0; }
+  table.ref th, table.ref td { text-align: left; padding: 2mm 2mm; border-bottom: 1px solid #e4e4e7; vertical-align: top; }
+  table.ref th { color: #71717a; font-weight: 600; text-transform: uppercase; font-size: 7.5pt; letter-spacing: .04em; }
+  .foot { margin-top: 8mm; font-size: 8pt; color: #a1a1aa; border-top: 1px solid #e4e4e7; padding-top: 3mm; }
+</style>
+</head>
+<body>
+
+<!-- ===================== COVER ===================== -->
+<div class="cover">
+  <div class="kicker">User Manual</div>
+  <h1>EnergyDashboard</h1>
+  <div class="rule"></div>
+  <div class="sub">An Ontario electricity-market observability platform — real-time prices,
+    5CP peak forecasting, Global Adjustment exposure, and private bill analysis, in one place.</div>
+  <div class="badges">
+    <span class="pill">Industrial &amp; Commercial</span>
+    <span class="pill">Retail &amp; Homeowner</span>
+    <span class="pill live">● Live IESO data</span>
+    <span class="pill">Privacy-first</span>
+  </div>
+  <div class="meta">
+    Version 1.0 &nbsp;·&nbsp; Six tabs, two audience sections &nbsp;·&nbsp; Not affiliated with the IESO
+  </div>
+</div>
+
+<!-- ===================== TOC ===================== -->
+<div class="toc">
+  <h2 class="sec">Contents</h2>
+  <ol>
+    <li><span>Getting started</span><span class="muted">Navigation, theme, live vs mock</span></li>
+    <li><span>Overview — the live market at a glance</span><span class="muted">I&amp;C</span></li>
+    <li><span>Nodal — where the price comes from</span><span class="muted">I&amp;C</span></li>
+    <li><span>Peak Forecast — when to curtail</span><span class="muted">I&amp;C</span></li>
+    <li><span>GA Exposure — what it costs you</span><span class="muted">I&amp;C</span></li>
+    <li><span>Conservation — programs &amp; rate plans</span><span class="muted">Retail</span></li>
+    <li><span>Usage Review — read your bill</span><span class="muted">Retail</span></li>
+    <li><span>Privacy &amp; your data</span><span class="muted">Reference</span></li>
+    <li><span>Troubleshooting &amp; FAQ</span><span class="muted">Reference</span></li>
+  </ol>
+</div>
+
+<!-- ===================== 1. GETTING STARTED ===================== -->
+<section>
+  <h2 class="sec">1 · Getting started</h2>
+  <p class="lede">EnergyDashboard is a web app — nothing to install. Open it in any modern
+    browser on desktop or phone.</p>
+
+  <h3>The two sections</h3>
+  <p>The header groups six tabs into two audiences. Pick the row that matches you:</p>
+  <div class="grid2">
+    <div class="card"><h4>Industrial &amp; Commercial</h4><p>Overview · Nodal · Peak Forecast · GA Exposure.
+      For Class A (ICI) participants, energy managers, and market operators.</p></div>
+    <div class="card"><h4>Retail &amp; Homeowner</h4><p>Conservation · Usage Review.
+      For households, renters, and small-business / building managers.</p></div>
+  </div>
+
+  <h3>Switching tabs keeps your work</h3>
+  <p>Anything you enter — an uploaded meter file, bill photos, comparator inputs — stays put
+    when you move between tabs and come back. Nothing is lost until you reload the page.</p>
+
+  <h3>Light / dark theme</h3>
+  <p>Use the sun / moon button at the top-right to switch themes. Dark is the default; your
+    choice is remembered on this device.</p>
+
+  <h3>Live vs mock data</h3>
+  <p>The Overview and Nodal tabs read live IESO market reports. A coloured pill tells you which
+    feed you're seeing:</p>
+  <table class="ref">
+    <tr><th>Badge</th><th>Meaning</th></tr>
+    <tr><td><b>● Live</b> (green)</td><td>Data is coming straight from the IESO public reports.</td></tr>
+    <tr><td><b>● Mock</b> (amber)</td><td>The live feed was unreachable, so realistic sample data is shown so the UI still works. Try again shortly.</td></tr>
+  </table>
+  <div class="callout"><span class="lbl">Tip.</span> Real-time market reports update roughly every
+    five minutes. The app re-fetches on that cadence automatically — no need to refresh the page.</div>
+</section>
+
+<!-- ===================== 2. OVERVIEW ===================== -->
+<section>
+  <h2 class="sec">2 · Overview <span class="tag">Industrial &amp; Commercial</span></h2>
+  <p class="lede">The "what's happening right now" glance — the whole Ontario market made legible in five seconds.</p>
+  <figure><img src="assets/overview.png" alt="Overview tab" /><figcaption>The Overview tab: zone map, 24h price curve, GA peak-risk, and the demand / price / condition bar.</figcaption></figure>
+  <h3>What you're looking at</h3>
+  <ul class="tight">
+    <li><b>Ontario pricing-zone map</b> — the 7 plotted zones, each dot coloured by its Ontario Zonal Price on a blue → amber → red scale.</li>
+    <li><b>Real-time vs Day-Ahead chart</b> — a rolling ~24h of the selected zone's real-time price against the Ontario day-ahead price.</li>
+    <li><b>GA Peak Risk</b> — a green/yellow/red indicator of how likely the current hours are to become a coincident peak.</li>
+    <li><b>Stat bar</b> — Ontario demand (MW), the headline zonal price, and the system condition (Normal / Tight).</li>
+  </ul>
+  <h3>How to use it</h3>
+  <ol class="steps">
+    <li>Click any zone dot on the map to load that zone's real-time price series in the chart.</li>
+    <li>Watch the <b>GA Peak Risk</b> tile — when it turns yellow or red, jump to <b>Peak Forecast</b> for the detail.</li>
+  </ol>
+</section>
+
+<!-- ===================== 3. NODAL ===================== -->
+<section>
+  <h2 class="sec">3 · Nodal <span class="tag">Industrial &amp; Commercial</span></h2>
+  <p class="lede">The depth view — every pricing node on the grid, decomposed into its parts.</p>
+  <figure><img src="assets/nodal.png" alt="Nodal tab" /><figcaption>The Nodal grid: 900+ pricing locations pivoted Zone → Type → Node.</figcaption></figure>
+  <h3>What you're looking at</h3>
+  <p>Since Market Renewal (May 2025), Ontario prices energy at hundreds of individual nodes. Each
+    node's Locational Marginal Price breaks down as <b>LMP = energy + congestion + loss</b>, and its
+    <b>basis</b> is how far it sits from the province-wide Ontario Zonal Price
+    (<b>basis = LMP − OZP</b>).</p>
+  <h3>How to use it</h3>
+  <ol class="steps">
+    <li>Use the grouping buttons (<b>Zone ▸ Type ▸ Node</b>, <b>Type ▸ Node</b>, or <b>Flat</b>) to pivot the table.</li>
+    <li><b>Expand all</b> / <b>Collapse all</b> to open or close every group at once.</li>
+    <li>Read the <b>Congestion</b> and <b>Basis</b> columns to see <em>where</em> on the grid the price pressure is.</li>
+  </ol>
+  <div class="callout"><span class="lbl">Note.</span> Nodes the map can't place in a virtual zone appear
+    under "Unmapped" — coverage of the published node-to-zone map is roughly 93%.</div>
+</section>
+
+<!-- ===================== 4. PEAK FORECAST ===================== -->
+<section>
+  <h2 class="sec">4 · Peak Forecast <span class="tag">Industrial &amp; Commercial</span></h2>
+  <p class="lede">The flagship signal — which upcoming hours are likely to become one of this base period's
+    five coincident peaks, and whether they're worth curtailing.</p>
+  <figure><img src="assets/peak-forecast.png" alt="Peak Forecast tab" /><figcaption>Running top-5 board, upcoming predicted peaks with curtail/monitor calls, and the measured-accuracy panel.</figcaption></figure>
+  <h3>Why 5CP matters</h3>
+  <p>ICI consumers are billed next year's Peak Demand Factor based on their demand during <em>this</em>
+    base period's five Coincident Peaks (5CP). Curtailing through those five hours is the single biggest
+    lever on a Class A Global Adjustment bill — so the whole game is knowing which upcoming hours will
+    land in the top five.</p>
+  <h3>Reading the tab</h3>
+  <ul class="tight">
+    <li><b>Current base-period peaks</b> — the running top-5 board banked so far, with the <b>threshold to beat</b>.</li>
+    <li><b>Upcoming predicted peaks</b> — up to five candidate days, each tagged <b>CURTAIL</b> (would crack the top-5) or <b>MONITOR</b>, with a calibrated <b>P(top-5)</b> probability and a suggested curtailment window.</li>
+    <li><b>Horizon filter</b> — 3 / 7 / 14 days; the shorter views are nested subsets of the longer one. Toggle <b>Cards / Table</b> for the layout you prefer.</li>
+    <li><b>Measured accuracy by lead</b> — honest, backtested recall at each lead time.</li>
+  </ul>
+  <div class="callout"><span class="lbl">Read this honestly.</span> 14-day accuracy sits near zero <em>by design</em>:
+    two weeks out there is no real weather forecast, only climatology, so the model can't name the exact peak day.
+    The panel shows the known-weather ceiling next to it so you always see the real ceiling, not a flattering number.</div>
+  <div class="callout privacy"><span class="lbl">Live vs Sample.</span> A green <b>Live</b> pill means real
+    pipeline output. An amber <b>Sample data</b> pill means the shipped example is showing (before the first
+    real run of your deployment).</div>
+</section>
+
+<!-- ===================== 5. GA EXPOSURE ===================== -->
+<section>
+  <h2 class="sec">5 · GA Exposure <span class="tag">Industrial &amp; Commercial</span></h2>
+  <p class="lede">The money tab — turn your own interval meter data into dollars: your Peak Demand Factor,
+    Class A vs Class B exposure, and what curtailing each peak is worth.</p>
+  <figure><img src="assets/ga-exposure.png" alt="GA Exposure tab" /><figcaption>Peak Demand Factor, Class A vs Class B with break-even, per-peak savings, and curtailment ROI.</figcaption></figure>
+  <div class="callout privacy"><span class="lbl">Your data never leaves your browser.</span> The meter file
+    you upload is parsed and analysed entirely on your device. Nothing is uploaded, stored, or logged. See §8.</div>
+  <h3>How to use it</h3>
+  <ol class="steps">
+    <li>Click <b>Choose file…</b> and select your interval meter export (MV-90, Itron, or a utility CSV). No file handy? Click <b>Load sample profile</b> to explore with realistic data.</li>
+    <li>Confirm the column mapping (date, time, reading column, interval length, units). The tab auto-detects most exports and tells you what it inferred.</li>
+    <li>Read your results:
+      <ul class="tight">
+        <li><b>Peak Demand Factor</b> — your MW share across the five coincident peaks.</li>
+        <li><b>Class A vs Class B</b> — annual GA dollars each way, with the <b>break-even PDF</b> that flips which class wins.</li>
+        <li><b>Savings by coincident peak</b> — set a curtailment target and see the banked saving per CP.</li>
+        <li><b>Curtailment ROI</b> — expected value of curtailing each upcoming predicted peak, using its P(top-5).</li>
+      </ul>
+    </li>
+    <li>Switch <b>Forward (this base period)</b> vs <b>Actual</b> to score against the live running board or a finished period's official peaks.</li>
+  </ol>
+  <div class="callout"><span class="lbl">A negative ROI is a real answer.</span> When the probability-weighted
+    saving doesn't beat the cost of a curtailment event, the ROI shows negative and the call is <b>monitor</b> — an
+    honest "don't bother" rather than a nudge to act.</div>
+  <p class="muted" style="font-size:9pt">GA pool and rate assumptions are illustrative and adjustable in the
+    "GA dollar assumptions" panel; the settlement math follows the published ICI rules. Not billing advice.</p>
+</section>
+
+<!-- ===================== 6. CONSERVATION ===================== -->
+<section>
+  <h2 class="sec">6 · Conservation <span class="tag retail">Retail &amp; Homeowner</span></h2>
+  <p class="lede">Ontario's conservation and billing programs, organised by what you're trying to do — plus a
+    rate-plan comparator that tells you which plan is cheapest for how you actually use power.</p>
+  <figure><img src="assets/conservation.png" alt="Conservation tab" /><figcaption>Rate-plan comparator on top; the program catalog grouped by use case below.</figcaption></figure>
+  <h3>Finding a program</h3>
+  <ol class="steps">
+    <li>Filter by audience — <b>All</b>, <b>Residential</b>, or <b>Business</b>.</li>
+    <li>Search by keyword (e.g. <em>heat pump</em>, <em>thermostat</em>, <em>EV</em>) to narrow the catalog.</li>
+    <li>Each card shows the key detail, tags, and a link to the official program page. Details marked <em>verify at source</em> are 2026 reference points — always confirm eligibility and amounts on the official page before acting.</li>
+  </ol>
+  <h3>Comparing rate plans</h3>
+  <ol class="steps">
+    <li>Enter your <b>monthly kWh</b> and how it splits across off / mid / on-peak.</li>
+    <li>Drag the <b>overnight-shift slider</b> to model how much load you could move to overnight (this is what makes Ultra-Low Overnight pay off).</li>
+    <li>The bars show each plan's monthly cost after the Ontario Electricity Rebate; the cheapest is marked ✓, with the annual gap versus the priciest plan.</li>
+  </ol>
+  <div class="callout"><span class="lbl">Illustrative rates.</span> The plan structure (TOU / ULO / Tiered windows)
+    is correct; the cents-per-kWh are reference points badged <em>illustrative</em> until a live OEB feed is wired.
+    Confirm current prices with the OEB.</div>
+</section>
+
+<!-- ===================== 7. USAGE REVIEW ===================== -->
+<section>
+  <h2 class="sec">7 · Usage Review <span class="tag retail">Retail &amp; Homeowner</span></h2>
+  <p class="lede">Snap a photo of your electricity bill and get it read, charted, and checked for anomalies —
+    entirely in your browser.</p>
+  <figure><img src="assets/usage-review.png" alt="Usage Review tab" /><figcaption>Time-of-use usage over time, detected anomalies explained in plain language, and the billing-period table.</figcaption></figure>
+  <div class="callout privacy"><span class="lbl">Your bill stays on your device.</span> Reading happens with
+    on-device OCR — the image never leaves your browser. Only if OCR can't read a bill confidently are you offered
+    an optional cloud read, and only <em>after</em> you black out any personal details yourself. See §8.</div>
+  <h3>How to use it</h3>
+  <ol class="steps">
+    <li>Click <b>Choose photo…</b> or <b>Take photo</b> (on a phone). No bill handy? Click <b>Load sample bills</b> to see it work.</li>
+    <li>The app reads the meter ID, billing dates, and off/mid/on-peak kWh, then asks you to confirm or correct them.</li>
+    <li>Add more bills over time — they group by meter and build a timeline.</li>
+  </ol>
+  <h3>What it flags</h3>
+  <table class="ref">
+    <tr><th>Anomaly</th><th>What it means</th></tr>
+    <tr><td><b>Usage spike</b></td><td>Your daily usage this period is well above your own historical average.</td></tr>
+    <tr><td><b>On-peak heavy</b></td><td>You're using more of your power during expensive on-peak hours than usual — with a tip to shift load after 7 PM or consider ULO.</td></tr>
+    <tr><td><b>Rapid increase</b></td><td>A sharp month-over-month jump — or, once you have a year of bills, a year-over-year jump so seasonal swings don't false-trigger.</td></tr>
+  </table>
+  <p class="muted" style="font-size:9pt">Analysis is generated from OCR and may contain errors. It's informational
+    only, not financial advice, and doesn't replace official utility data.</p>
+</section>
+
+<!-- ===================== 8. PRIVACY ===================== -->
+<section>
+  <h2 class="sec">8 · Privacy &amp; your data</h2>
+  <p class="lede">The two most sensitive things you can bring — your interval meter data and a photo of your
+    bill — never leave your browser by default. This is built into how the app works, not just promised.</p>
+  <div class="grid2">
+    <div class="card"><h4>GA Exposure</h4><p>Your meter CSV is parsed and analysed entirely on your device with
+      pure client-side code. There is no upload, no storage, and no analytics tracking of your data.</p></div>
+    <div class="card"><h4>Usage Review</h4><p>Bills are read with on-device OCR. The image stays in your browser
+      and is held only in memory for the current session.</p></div>
+  </div>
+  <h3>The one optional exception — and how it's contained</h3>
+  <p>If on-device OCR can't read a bill confidently, you may <em>choose</em> a cloud-assisted read. Before anything
+    is sent, you black out personal details on a redaction canvas. The server route that performs the read is
+    <b>ephemeral by design</b>: it parses the image in memory, returns the extracted numbers, and terminates. It
+    writes nothing to any database, file, or log, and it never records anything derived from your image or personal
+    information. This path is entirely optional — the on-device reader works without it.</p>
+  <div class="callout privacy"><span class="lbl">In short.</span> No accounts. No server-side store of your energy
+    data. No third-party analytics on what you upload. Reload the page and your session data is simply gone.</div>
+</section>
+
+<!-- ===================== 9. FAQ ===================== -->
+<section>
+  <h2 class="sec">9 · Troubleshooting &amp; FAQ</h2>
+  <table class="ref">
+    <tr><th>Question</th><th>Answer</th></tr>
+    <tr><td>The badge says "Mock data."</td><td>The live IESO feed was briefly unreachable; the app shows realistic
+      sample data so it still works. It re-tries automatically — check back in a few minutes.</td></tr>
+    <tr><td>My meter file didn't map correctly.</td><td>Use the column-mapping dropdowns in the GA Exposure tab to
+      point at the right date, time, reading, and unit columns. The panel tells you what it inferred and how many rows it read.</td></tr>
+    <tr><td>OCR misread my bill.</td><td>Confirm-and-correct the fields before saving — you're always shown the extracted
+      values first. For a tough photo, use the optional redact-then-cloud-read fallback.</td></tr>
+    <tr><td>Are the rate figures current?</td><td>The plan structure is correct; the cents-per-kWh are illustrative
+      reference points (badged as such). Confirm live prices with the OEB.</td></tr>
+    <tr><td>Why is 14-day forecast accuracy so low?</td><td>By design — there's no real weather forecast two weeks out,
+      only climatology. The app shows this honestly rather than inflating the number.</td></tr>
+    <tr><td>Does this bill me or connect to my utility account?</td><td>No. It's an observability tool. It reads public
+      market data and whatever <em>you</em> choose to bring; it is not connected to any billing system.</td></tr>
+  </table>
+  <div class="foot">
+    EnergyDashboard User Manual v1.0 · Ontario electricity-market observability · Portfolio project, not affiliated
+    with the IESO, OEB, or any utility · All market data is public. Figures shown are illustrative unless a live feed is indicated.
+  </div>
+</section>
+
+</body>
+</html>

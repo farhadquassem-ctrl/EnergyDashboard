@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>EnergyDashboard — Pitch Deck</title>
+<style>
+  @page { size: 13.333in 7.5in; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+  .slide {
+    position: relative; width: 13.333in; height: 7.5in; overflow: hidden;
+    background: #0a0a0b; color: #e4e4e7; padding: 0.7in 0.85in;
+    page-break-after: always; display: flex; flex-direction: column;
+  }
+  .slide:last-child { page-break-after: auto; }
+  .slide::before { /* top accent rule */
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 6px;
+    background: linear-gradient(90deg, #0ea5e9 0%, #10b981 55%, #f59e0b 100%);
+  }
+  .kicker { font-size: 12pt; letter-spacing: .2em; text-transform: uppercase; color: #38bdf8; font-weight: 700; }
+  .kicker.emerald { color: #34d399; }
+  .kicker.amber { color: #fbbf24; }
+  h1 { font-size: 46pt; letter-spacing: -.02em; color: #fafafa; line-height: 1.05; }
+  h2 { font-size: 30pt; letter-spacing: -.01em; color: #fafafa; line-height: 1.12; }
+  .lede { font-size: 15pt; color: #a1a1aa; line-height: 1.5; max-width: 9.5in; }
+  .big { font-size: 17pt; color: #d4d4d8; line-height: 1.5; }
+  .pagenum { position: absolute; bottom: 0.35in; right: 0.5in; font-size: 9pt; color: #52525b; }
+  .brandfoot { position: absolute; bottom: 0.35in; left: 0.85in; font-size: 9pt; color: #52525b; letter-spacing: .04em; }
+  .spacer { flex: 1; }
+
+  .stat-row { display: flex; gap: 0.5in; margin-top: 0.4in; }
+  .stat { flex: 1; }
+  .stat .n { font-size: 34pt; font-weight: 800; color: #fafafa; letter-spacing: -.02em; }
+  .stat .n.sky { color: #38bdf8; } .stat .n.emerald { color: #34d399; } .stat .n.amber { color: #fbbf24; }
+  .stat .l { font-size: 11pt; color: #a1a1aa; margin-top: 2mm; line-height: 1.35; }
+
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 0.3in; margin-top: 0.35in; }
+  .cards.three { grid-template-columns: 1fr 1fr 1fr; }
+  .card { background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 0.28in 0.32in; }
+  .card .h { font-size: 14pt; font-weight: 700; color: #fafafa; margin-bottom: 2mm; }
+  .card .h .dot { color: #38bdf8; }
+  .card p { font-size: 10.5pt; color: #a1a1aa; line-height: 1.45; }
+  .card.sky { border-color: #0c4a6e; } .card.emerald { border-color: #064e3b; } .card.amber { border-color: #78350f; }
+
+  ul.check { list-style: none; margin-top: 0.3in; }
+  ul.check li { font-size: 13.5pt; color: #d4d4d8; margin: 4mm 0; padding-left: 9mm; position: relative; line-height: 1.4; }
+  ul.check li::before { content: "→"; position: absolute; left: 0; color: #34d399; font-weight: 700; }
+  ul.check li b { color: #fafafa; }
+
+  .split { display: flex; gap: 0.5in; flex: 1; align-items: center; }
+  .split .txt { flex: 1.05; }
+  .split .shot { flex: 1; }
+  .shotframe { border: 1px solid #27272a; border-radius: 12px; overflow: hidden; background: #18181b; height: 5.1in; }
+  .shotframe img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+
+  .quote { font-size: 22pt; line-height: 1.4; color: #fafafa; max-width: 10.5in; font-weight: 500; }
+  .quote .accent { color: #38bdf8; }
+  .attrib { font-size: 12pt; color: #71717a; margin-top: 0.35in; }
+
+  .cta-box { background: #18181b; border: 1px solid #27272a; border-radius: 14px; padding: 0.4in 0.5in; margin-top: 0.35in; display: inline-block; }
+  .cta-box .row { font-size: 13pt; color: #d4d4d8; margin: 2.5mm 0; }
+  .cta-box .row b { color: #fafafa; }
+  .cta-box .row .k { color: #38bdf8; font-weight: 700; display: inline-block; width: 1.6in; }
+</style>
+</head>
+<body>
+
+<!-- 1 · COVER -->
+<div class="slide">
+  <div class="spacer"></div>
+  <div class="kicker">Ontario electricity-market intelligence</div>
+  <h1 style="margin:5mm 0 4mm">EnergyDashboard</h1>
+  <div class="lede">Turn Ontario's public electricity market into decisions. Real-time prices,
+    5CP peak forecasting, and Global Adjustment exposure — one screen, live data, no spreadsheets.</div>
+  <div class="stat-row" style="margin-top:0.5in">
+    <div class="stat"><div class="n sky">5CP</div><div class="l">The five coincident peaks that set your bill</div></div>
+    <div class="stat"><div class="n emerald">Live</div><div class="l">Straight from the IESO public reports</div></div>
+    <div class="stat"><div class="n amber">In&nbsp;browser</div><div class="l">Your meter data never leaves your device</div></div>
+  </div>
+  <div class="spacer"></div>
+  <div class="brandfoot">EnergyDashboard · Investor / customer overview</div>
+  <div class="pagenum">01</div>
+</div>
+
+<!-- 2 · THE PROBLEM -->
+<div class="slide">
+  <div class="kicker amber">The problem</div>
+  <h2 style="margin:5mm 0 6mm; max-width:11in">Ontario's market is fully transparent —<br/>and almost impossible to act on in time.</h2>
+  <div class="big" style="max-width:10.5in">The IESO publishes every price, every peak, every megawatt. The settlement rules are
+    in public manuals. Yet the one number that decides a large consumer's bill — their share of the
+    year's <b style="color:#fafafa">five coincident peaks</b> — hides inside a firehose of XML reports
+    that no one is watching at 4 p.m. on the day it matters.</div>
+  <div class="cards three" style="margin-top:0.45in">
+    <div class="card amber"><div class="h">Too much data</div><p>Hundreds of nodal prices, demand feeds, and peak trackers — updated every five minutes, formatted for machines.</p></div>
+    <div class="card amber"><div class="h">Too little time</div><p>A coincident peak lasts one hour. You either curtailed through it or you didn't — and you find out months later on the bill.</p></div>
+    <div class="card amber"><div class="h">High stakes</div><p>For a Class A consumer, getting the 5CP wrong is a six-figure swing in Global Adjustment — every single year.</p></div>
+  </div>
+  <div class="brandfoot">EnergyDashboard</div><div class="pagenum">02</div>
+</div>
+
+<!-- 3 · THE STAKES -->
+<div class="slide">
+  <div class="kicker amber">Why it's worth solving</div>
+  <h2 style="margin:5mm 0 4mm">Global Adjustment is the biggest line on the bill —<br/>and the most controllable.</h2>
+  <div class="lede">Under the Industrial Conservation Initiative, a Class A consumer's GA for the whole
+    year is set by their demand during just five hours. Move load out of those five hours and the
+    savings compound across all twelve months of the billing period.</div>
+  <div class="stat-row">
+    <div class="stat"><div class="n">5 hours</div><div class="l">Set your Peak Demand Factor for the entire next year</div></div>
+    <div class="stat"><div class="n amber">6 figures</div><div class="l">Typical annual GA swing from getting the 5CP right vs. wrong</div></div>
+    <div class="stat"><div class="n emerald">12 months</div><div class="l">Every avoided peak-hour MW pays back across the full billing period</div></div>
+  </div>
+  <div class="big" style="margin-top:0.45in; max-width:10.5in; color:#a1a1aa">
+    The lever exists. What's missing is <b style="color:#fafafa">knowing which upcoming hour is the peak</b>
+    — early enough, and with enough confidence, to act.</div>
+  <div class="brandfoot">EnergyDashboard</div><div class="pagenum">03</div>
+</div>
+
+<!-- 4 · THE SOLUTION -->
+<div class="slide">
+  <div class="kicker">The solution</div>
+  <h2 style="margin:5mm 0 5mm">Observability for the Ontario market.</h2>
+  <div class="big" style="max-width:10.5in">The math isn't the moat — it's all in the market manuals.
+    The value is <b style="color:#fafafa">noticing</b>: the same public data and public formulas, rendered
+    as a timely decision instead of a document, for the person who has to act.</div>
+  <ul class="check">
+    <li><b>See the market live</b> — zonal price map, 24h price curve, demand, and a peak-risk indicator at a glance.</li>
+    <li><b>Forecast the peaks</b> — which upcoming hours are likely to crack this period's top-5, with a calibrated probability.</li>
+    <li><b>Price your exposure</b> — upload your meter data and see Class A vs Class B dollars, per-peak savings, and curtailment ROI.</li>
+    <li><b>Act with the cost in view</b> — every recommendation carries its own downside, including an honest "don't bother."</li>
+  </ul>
+  <div class="brandfoot">EnergyDashboard</div><div class="pagenum">04</div>
+</div>
+
+<!-- 5 · PEAK FORECAST -->
+<div class="slide">
+  <div class="kicker">Product · the signal</div>
+  <h2 style="margin:4mm 0 5mm">Peak Forecast — when to curtail</h2>
+  <div class="split">
+    <div class="txt">
+      <div class="big" style="color:#a1a1aa">A running board of the peaks banked so far, the threshold to
+        beat, and up to five upcoming candidate days — each tagged <b style="color:#fbbf24">CURTAIL</b> or
+        <b style="color:#fafafa">MONITOR</b> with a calibrated <b style="color:#38bdf8">P(top-5)</b>.</div>
+      <ul class="check" style="margin-top:0.3in">
+        <li><b>3 / 7 / 14-day horizons</b> — plan ahead, nested cleanly.</li>
+        <li><b>Measured accuracy</b> — backtested recall, shown honestly.</li>
+        <li><b>Refreshes nightly</b> — demand + weather model, unattended.</li>
+      </ul>
+    </div>
+    <div class="shot"><div class="shotframe"><img src="assets/peak-forecast.png" alt="Peak Forecast" /></div></div>
+  </div>
+  <div class="brandfoot">EnergyDashboard</div><div class="pagenum">05</div>
+</div>
+
+<!-- 6 · GA EXPOSURE -->
+<div class="slide">
+  <div class="kicker emerald">Product · the money</div>
+  <h2 style="margin:4mm 0 5mm">GA Exposure — what it costs you</h2>
+  <div class="split">
+    <div class="txt">
+      <div class="big" style="color:#a1a1aa">Upload your interval meter data and see it in dollars: your
+        Peak Demand Factor, <b style="color:#fafafa">Class A vs Class B</b> with the break-even, savings
+        decomposed per coincident peak, and probability-weighted curtailment ROI on the live forecast.</div>
+      <ul class="check" style="margin-top:0.3in">
+        <li><b>Your data stays in your browser</b> — nothing uploaded, ever.</li>
+        <li><b>Break-even PDF</b> — see exactly where Class A stops paying off.</li>
+        <li><b>ROI per event</b> — curtail only when it beats the cost.</li>
+      </ul>
+    </div>
+    <div class="shot"><div class="shotframe"><img src="assets/ga-exposure.png" alt="GA Exposure" /></div></div>
+  </div>
+  <div class="brandfoot">EnergyDashboard</div><div class="pagenum">06</div>
+</div>
+
+<!-- 7 · WHY CREDIBLE -->
+<div class="slide">
+  <div class="kicker">Why it's trustworthy</div>
+  <h2 style="margin:5mm 0 5mm">Credibility is the product.</h2>
+  <div class="cards">
+    <div class="card sky"><div class="h">Live public data</div><p>Straight from the IESO public reports — the same source the market settles on. A badge tells you Live vs fallback at all times.</p></div>
+    <div class="card emerald"><div class="h">Private by construction</div><p>Meter data and bill photos are analysed on your device. No accounts, no server-side store of your energy data, no third-party analytics.</p></div>
+    <div class="card amber"><div class="h">Honest by design</div><p>When the model can't see far enough to be sure, it says so — the 14-day forecast reports near-zero skill rather than a flattering number.</p></div>
+    <div class="card sky"><div class="h">Grounded in the rules</div><p>Peak labels come from the IESO's official ranking; the settlement math follows the published ICI rules. Nothing is fabricated.</p></div>
+  </div>
+  <div class="brandfoot">EnergyDashboard</div><div class="pagenum">07</div>
+</div>
+
+<!-- 8 · ALSO RETAIL -->
+<div class="slide">
+  <div class="kicker emerald">Beyond the enterprise</div>
+  <h2 style="margin:5mm 0 5mm">The same engine serves homeowners<br/>and building managers.</h2>
+  <div class="lede">The market is one system — so the platform also opens to a Class B / retail audience,
+    widening the top of the funnel with the same trustworthy, private tooling.</div>
+  <div class="cards" style="margin-top:0.4in">
+    <div class="card emerald"><div class="h">Conservation &amp; rate plans</div><p>Ontario rebate and demand-response programs organised by use case, plus a TOU vs ULO vs Tiered comparator that finds the cheapest plan for how you actually use power.</p></div>
+    <div class="card emerald"><div class="h">Usage Review</div><p>Snap a photo of a bill → on-device OCR → anomaly detection (volume spike, on-peak shift, year-over-year jump) explained in one sentence. The bill never leaves the browser.</p></div>
+  </div>
+  <div class="brandfoot">EnergyDashboard</div><div class="pagenum">08</div>
+</div>
+
+<!-- 9 · HOW IT RUNS -->
+<div class="slide">
+  <div class="kicker">How it runs</div>
+  <h2 style="margin:5mm 0 5mm">Lightweight to deploy, honest to operate.</h2>
+  <ul class="check">
+    <li><b>A web app</b> — nothing to install; works on desktop and phone, light or dark.</li>
+    <li><b>Live edge proxy</b> — caches the IESO feed at the edge; no key, no database.</li>
+    <li><b>Nightly pipeline</b> — refreshes the forecast from IESO demand + weather + official peaks, unattended, on CI.</li>
+    <li><b>No user-data backend</b> — the sensitive analysis is client-side, so the compliance surface stays small.</li>
+  </ul>
+  <div class="brandfoot">EnergyDashboard</div><div class="pagenum">09</div>
+</div>
+
+<!-- 10 · CLOSE / CTA -->
+<div class="slide">
+  <div class="spacer"></div>
+  <div class="kicker">See it live</div>
+  <h1 style="margin:5mm 0 5mm; font-size:38pt">Stop finding out on the bill.</h1>
+  <div class="lede">See the peak coming, price your exposure before you act, and curtail only when it pays.</div>
+  <div class="cta-box">
+    <div class="row"><span class="k">Try it</span> <b>[ your-live-url ]</b></div>
+    <div class="row"><span class="k">Talk to us</span> <b>[ your-contact-email ]</b></div>
+    <div class="row"><span class="k">Learn more</span> Technical spec &amp; design docs available on request</div>
+  </div>
+  <div class="spacer"></div>
+  <div class="brandfoot">EnergyDashboard · Ontario electricity-market observability · Not affiliated with the IESO</div>
+  <div class="pagenum">10</div>
+</div>
+
+</body>
+</html>
