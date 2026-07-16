@@ -1,11 +1,11 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-15T11:15:09.295-04:00",
-  "datasetThrough": "2026-07-15",
+  "generatedAt": "2026-07-16T11:50:21.248-04:00",
+  "datasetThrough": "2026-07-16",
   "staleNote": null,
   "model": {
     "r2": 0.54,
-    "trainRows": 15796
+    "trainRows": 15804
   },
   "basePeriod": {
     "start": "2026-05-01",
@@ -58,20 +58,20 @@
   ],
   "predictedPeaks": [
     {
-      "date": "2026-07-16",
+      "date": "2026-07-17",
       "daysOut": 1,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 16,
       "predictedPeakHourEnding": 17,
-      "predictedMw": 22822,
-      "tempC": 31,
+      "predictedMw": 19735,
+      "tempC": 28,
       "leadBucket": 3,
       "projectedRank": 6,
       "wouldRankTop5": false,
       "probability": 0.04,
-      "peakPercentile": 1,
+      "peakPercentile": 0.97,
       "confidence": "high",
       "curtailmentWindows": [
         {
@@ -116,20 +116,20 @@
       }
     },
     {
-      "date": "2026-07-22",
+      "date": "2026-07-23",
       "daysOut": 7,
       "weatherSource": "climatology+persistence",
       "isForecastWeather": false,
       "peakRiskDay": true,
       "predictedPeakHourStart": 16,
       "predictedPeakHourEnding": 17,
-      "predictedMw": 20290,
-      "tempC": 28.5,
+      "predictedMw": 19200,
+      "tempC": 27.5,
       "leadBucket": 7,
       "projectedRank": 6,
       "wouldRankTop5": false,
       "probability": 0.01,
-      "peakPercentile": 0.99,
+      "peakPercentile": 0.98,
       "confidence": "high",
       "curtailmentWindows": [
         {
@@ -244,17 +244,17 @@
     "years": 6,
     "balancedTop5Recall": {
       "min": 0.4,
-      "mean": 0.7,
+      "mean": 0.73,
       "max": 1
     },
     "top5DayRecall": {
       "min": 0.8,
-      "mean": 0.93,
+      "mean": 0.97,
       "max": 1
     },
     "pooled": {
-      "dayRecall": 0.93,
-      "balancedRecall": 0.7,
+      "dayRecall": 0.97,
+      "balancedRecall": 0.73,
       "cpHourFilterSurvival": 1,
       "top5Days": 30,
       "actualTop5Hours": 30
