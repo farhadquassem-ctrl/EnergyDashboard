@@ -6,6 +6,7 @@ import assert from 'node:assert/strict'
 import {
   leadRecall, leadDiagnostics, leadHeadlineRecall, recallColorClass,
   computeHitRate, computeCalibration, computeTrendOverTime,
+  filterTrailingWindow, computeTrailingSummary,
   RECALL_GOOD, RECALL_OK,
 } from './calculations.js'
 
@@ -122,4 +123,77 @@ test('computeTrendOverTime: monthly Brier + MAE, sorted', () => {
 test('computeTrendOverTime skips unresolved and bad timestamps', () => {
   const trend = computeTrendOverTime([mk({ resolved: false }), mk({ predictedAt: 'not-a-date', resolved: true })])
   assert.equal(trend.length, 0)
+})
+
+// --- trailing-window summary ------------------------------------------------
+
+const NOW = new Date('2026-07-18T12:00:00Z')
+
+test('filterTrailingWindow keeps rows by targetDate, inclusive boundary + modelName', () => {
+  const preds = [
+    mk({ targetDate: '2026-07-10' }), // inside
+    mk({ targetDate: '2026-01-18' }), // exactly the 6-month start boundary -> inside
+    mk({ targetDate: '2026-01-17' }), // one day before start -> excluded
+    mk({ targetDate: '2026-07-19' }), // after now -> excluded
+    mk({ modelName: 'other', targetDate: '2026-07-10' }), // wrong model -> excluded
+  ]
+  const rows = filterTrailingWindow(preds, { modelName: 'ga-5cp-peak', months: 6, now: NOW })
+  assert.deepEqual(rows.map((p) => p.targetDate).sort(), ['2026-01-18', '2026-07-10'])
+})
+
+test('filterTrailingWindow on empty input returns empty', () => {
+  assert.deepEqual(filterTrailingWindow([], { now: NOW }), [])
+  assert.deepEqual(filterTrailingWindow(undefined, { now: NOW }), [])
+})
+
+test('computeTrailingSummary: MAE/MAPE/signed bias on hand-checked resolved rows', () => {
+  const preds = [
+    mk({ targetDate: '2026-07-08', predictedValue: 20000, actualValue: 22000, leadTimeDays: 4 }), // err 2000, ape 2000/22000
+    mk({ targetDate: '2026-07-10', predictedValue: 21000, actualValue: 24000, leadTimeDays: 2 }), // err 3000, ape 3000/24000
+  ]
+  const s = computeTrailingSummary(preds, { modelName: 'ga-5cp-peak', months: 6, now: NOW })
+  assert.equal(s.n, 2)
+  assert.equal(s.resolvedN, 2)
+  assert.equal(s.mae, 2500) // (2000+3000)/2
+  assert.equal(s.bias, -2500) // both under-predict -> negative
+  const expectMape = ((2000 / 22000) + (3000 / 24000)) / 2
+  assert.ok(Math.abs(s.mape - expectMape) < 1e-9)
+  assert.equal(s.windowStart, '2026-01-18')
+  assert.equal(s.windowEnd, '2026-07-18')
+})
+
+test('computeTrailingSummary: unresolved rows count in n, not resolvedN; metrics null when nothing resolved', () => {
+  const preds = [
+    mk({ targetDate: '2026-07-10', predictedValue: 21000, actualValue: null, resolved: false }),
+    mk({ targetDate: '2026-07-12', predictedValue: 20000, actualValue: null, resolved: false }),
+  ]
+  const s = computeTrailingSummary(preds, { modelName: 'ga-5cp-peak', now: NOW })
+  assert.equal(s.n, 2)
+  assert.equal(s.resolvedN, 0)
+  assert.equal(s.mae, null)
+  assert.equal(s.mape, null)
+  assert.equal(s.bias, null)
+})
+
+test('computeTrailingSummary: lead bucketing (2/5/10d) with a stable empty bucket', () => {
+  const preds = [
+    mk({ targetDate: '2026-07-08', predictedValue: 20000, actualValue: 22000, leadTimeDays: 2 }), // 1-3d
+    mk({ targetDate: '2026-07-10', predictedValue: 21000, actualValue: 24000, leadTimeDays: 10 }), // 8-14d
+  ]
+  const s = computeTrailingSummary(preds, { modelName: 'ga-5cp-peak', now: NOW })
+  assert.deepEqual(s.byLead.map((b) => b.bucket), ['1-3d', '4-7d', '8-14d'])
+  assert.equal(s.byLead[0].n, 1)
+  assert.equal(s.byLead[1].n, 0) // empty bucket present + stable
+  assert.equal(s.byLead[1].mae, null)
+  assert.equal(s.byLead[2].n, 1)
+})
+
+test('computeTrailingSummary: actualHit null keeps hit.resolved 0 and counts hitPendingN', () => {
+  const preds = [
+    mk({ targetDate: '2026-07-08', predictedValue: 20000, actualValue: 22000, actualHit: null, resolved: true }),
+    mk({ targetDate: '2026-07-10', predictedValue: 21000, actualValue: 24000, actualHit: null, resolved: true }),
+  ]
+  const s = computeTrailingSummary(preds, { modelName: 'ga-5cp-peak', now: NOW })
+  assert.equal(s.hit.resolved, 0)
+  assert.equal(s.hitPendingN, 2)
 })

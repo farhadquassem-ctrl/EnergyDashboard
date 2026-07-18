@@ -183,6 +183,108 @@ export function computeTrendOverTime(predictions, { modelName, bucket = 'month' 
 
 const clamp01 = (p) => Math.min(1, Math.max(0, p))
 
+// --- trailing-window summary (the live prediction-log accuracy panel) -------
+// Unlike computeTrendOverTime (buckets by predictedAt), the trailing panel
+// filters by TARGET date (D5): "how accurate were our predictions ABOUT the
+// last N months", which is the window a reader actually means. Point-error
+// (MAE/MAPE/bias) is computable now — actualValue resolves the day after each
+// target day — while the top-5 hit label stays pending until a base period
+// closes (Apr 30), so this returns both and lets the UI show the honest split.
+
+const LEAD_BUCKETS = [
+  { bucket: '1-3d', min: 1, max: 3 },
+  { bucket: '4-7d', min: 4, max: 7 },
+  { bucket: '8-14d', min: 8, max: 14 },
+]
+
+// YYYY-MM-DD (UTC) for a Date — matches the repo's string-compare date convention.
+const pad2 = (n) => String(n).padStart(2, '0')
+function isoDateUTC(d) {
+  return `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-${pad2(d.getUTCDate())}`
+}
+// [start, end] YYYY-MM-DD for the trailing `months` calendar months ending at `now`.
+function trailingBounds(now, months) {
+  const end = isoDateUTC(now)
+  const start = isoDateUTC(new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - months, now.getUTCDate())))
+  return { windowStart: start, windowEnd: end }
+}
+
+/**
+ * Rows of a model whose TARGET date (D5 — the day being predicted, not the day
+ * the prediction was made) falls in the trailing `months` calendar months
+ * ending at `now`, inclusive. YYYY-MM-DD string compare (repo convention).
+ *
+ * @param {ModelPrediction[]} predictions
+ * @param {{ modelName?: string, months?: number, now?: Date }} [opts]
+ */
+export function filterTrailingWindow(predictions, { modelName, months = 6, now = new Date() } = {}) {
+  const { windowStart, windowEnd } = trailingBounds(now, months)
+  return forModel(predictions, modelName).filter(
+    (p) => p.targetDate >= windowStart && p.targetDate <= windowEnd,
+  )
+}
+
+/**
+ * Live trailing-accuracy summary from a model's prospective prediction log.
+ * MW-error metrics (mae/mape/signed bias) over resolved rows in the window;
+ * a by-lead breakdown; and the detection hit-rate (which stays at
+ * resolved:0 until a base period closes and actualHit populates).
+ *
+ * `bias` is signed mean(predicted − actual): negative ⇒ the model runs low
+ * (under-predicts), which the committed log currently shows.
+ *
+ * @param {ModelPrediction[]} predictions
+ * @param {{ modelName?: string, months?: number, now?: Date, threshold?: number }} [opts]
+ * @returns {{ months:number, windowStart:string, windowEnd:string, n:number,
+ *   resolvedN:number, mae:number|null, mape:number|null, bias:number|null,
+ *   byLead:{bucket:string,n:number,mae:number|null,mape:number|null}[],
+ *   hit:ReturnType<typeof computeHitRate>, hitPendingN:number }}
+ */
+export function computeTrailingSummary(predictions, { modelName, months = 6, now = new Date(), threshold = 0.5 } = {}) {
+  const { windowStart, windowEnd } = trailingBounds(now, months)
+  const windowRows = filterTrailingWindow(predictions, { modelName, months, now })
+  const resolved = windowRows.filter((p) => p.actualValue != null && p.predictedValue != null)
+
+  const mae = resolved.length
+    ? resolved.reduce((s, p) => s + Math.abs(p.predictedValue - p.actualValue), 0) / resolved.length
+    : null
+  const bias = resolved.length
+    ? resolved.reduce((s, p) => s + (p.predictedValue - p.actualValue), 0) / resolved.length
+    : null
+  const mapeRows = resolved.filter((p) => p.actualValue > 0)
+  const mape = mapeRows.length
+    ? mapeRows.reduce((s, p) => s + Math.abs(p.predictedValue - p.actualValue) / p.actualValue, 0) / mapeRows.length
+    : null
+
+  const byLead = LEAD_BUCKETS.map(({ bucket, min, max }) => {
+    const rows = resolved.filter((p) => p.leadTimeDays >= min && p.leadTimeDays <= max)
+    const mrows = rows.filter((p) => p.actualValue > 0)
+    return {
+      bucket,
+      n: rows.length,
+      mae: rows.length ? rows.reduce((s, p) => s + Math.abs(p.predictedValue - p.actualValue), 0) / rows.length : null,
+      mape: mrows.length ? mrows.reduce((s, p) => s + Math.abs(p.predictedValue - p.actualValue) / p.actualValue, 0) / mrows.length : null,
+    }
+  })
+
+  const hit = computeHitRate(windowRows, { modelName, threshold })
+  const hitPendingN = windowRows.filter((p) => p.resolved && p.actualHit == null).length
+
+  return {
+    months,
+    windowStart,
+    windowEnd,
+    n: windowRows.length,
+    resolvedN: resolved.length,
+    mae,
+    mape,
+    bias,
+    byLead,
+    hit,
+    hitPendingN,
+  }
+}
+
 // YYYY-MM (month) or YYYY-Www (ISO week) key from an ISO timestamp.
 function bucketKey(iso, bucket) {
   if (!iso) return null
