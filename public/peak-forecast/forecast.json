@@ -1,11 +1,11 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-17T11:03:03.483-04:00",
-  "datasetThrough": "2026-07-17",
+  "generatedAt": "2026-07-18T10:34:25.935-04:00",
+  "datasetThrough": "2026-07-18",
   "staleNote": null,
   "model": {
     "r2": 0.54,
-    "trainRows": 15815
+    "trainRows": 15817
   },
   "basePeriod": {
     "start": "2026-05-01",
@@ -58,72 +58,14 @@
   ],
   "predictedPeaks": [
     {
-      "date": "2026-07-24",
-      "daysOut": 7,
-      "weatherSource": "climatology+persistence",
-      "isForecastWeather": false,
-      "peakRiskDay": true,
-      "predictedPeakHourStart": 16,
-      "predictedPeakHourEnding": 17,
-      "predictedMw": 18866,
-      "tempC": 27.2,
-      "leadBucket": 7,
-      "projectedRank": 6,
-      "wouldRankTop5": false,
-      "probability": 0.01,
-      "peakPercentile": 0.94,
-      "confidence": "high",
-      "curtailmentWindows": [
-        {
-          "profile": "Conservative",
-          "windowHours": 3,
-          "hourStart": 15,
-          "label": "HE16–HE18"
-        },
-        {
-          "profile": "Balanced",
-          "windowHours": 4,
-          "hourStart": 15,
-          "label": "HE16–HE19"
-        },
-        {
-          "profile": "Aggressive",
-          "windowHours": 5,
-          "hourStart": 14,
-          "label": "HE15–HE19"
-        }
-      ],
-      "expectedAccuracy": {
-        "basis": "walk-forward backtest, surrogate (climatology+persistence) weather",
-        "years": 6,
-        "balancedTop5Recall": {
-          "min": 0,
-          "mean": 0.07,
-          "max": 0.2
-        },
-        "top5DayRecall": {
-          "min": 0,
-          "mean": 0.07,
-          "max": 0.2
-        },
-        "pooled": {
-          "dayRecall": 0.07,
-          "balancedRecall": 0.07,
-          "cpHourFilterSurvival": 0.57,
-          "top5Days": 30,
-          "actualTop5Hours": 30
-        }
-      }
-    },
-    {
       "date": "2026-07-20",
-      "daysOut": 3,
+      "daysOut": 2,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 16,
       "predictedPeakHourEnding": 17,
-      "predictedMw": 18715,
+      "predictedMw": 18717,
       "tempC": 27,
       "leadBucket": 3,
       "projectedRank": 6,
@@ -168,6 +110,64 @@
           "dayRecall": 0.17,
           "balancedRecall": 0.13,
           "cpHourFilterSurvival": 0.67,
+          "top5Days": 30,
+          "actualTop5Hours": 30
+        }
+      }
+    },
+    {
+      "date": "2026-07-27",
+      "daysOut": 9,
+      "weatherSource": "climatology+persistence",
+      "isForecastWeather": false,
+      "peakRiskDay": true,
+      "predictedPeakHourStart": 16,
+      "predictedPeakHourEnding": 17,
+      "predictedMw": 18339,
+      "tempC": 26.6,
+      "leadBucket": 14,
+      "projectedRank": 6,
+      "wouldRankTop5": false,
+      "probability": 0.02,
+      "peakPercentile": 0.84,
+      "confidence": "high",
+      "curtailmentWindows": [
+        {
+          "profile": "Conservative",
+          "windowHours": 3,
+          "hourStart": 15,
+          "label": "HE16–HE18"
+        },
+        {
+          "profile": "Balanced",
+          "windowHours": 4,
+          "hourStart": 15,
+          "label": "HE16–HE19"
+        },
+        {
+          "profile": "Aggressive",
+          "windowHours": 5,
+          "hourStart": 14,
+          "label": "HE15–HE19"
+        }
+      ],
+      "expectedAccuracy": {
+        "basis": "walk-forward backtest, surrogate (climatology+persistence) weather",
+        "years": 6,
+        "balancedTop5Recall": {
+          "min": 0,
+          "mean": 0.07,
+          "max": 0.4
+        },
+        "top5DayRecall": {
+          "min": 0,
+          "mean": 0.07,
+          "max": 0.4
+        },
+        "pooled": {
+          "dayRecall": 0.07,
+          "balancedRecall": 0.07,
+          "cpHourFilterSurvival": 0.7,
           "top5Days": 30,
           "actualTop5Hours": 30
         }
@@ -222,17 +222,17 @@
       "years": 6,
       "balancedTop5Recall": {
         "min": 0,
-        "mean": 0.1,
-        "max": 0.6
+        "mean": 0.07,
+        "max": 0.4
       },
       "top5DayRecall": {
         "min": 0,
-        "mean": 0.1,
-        "max": 0.6
+        "mean": 0.07,
+        "max": 0.4
       },
       "pooled": {
-        "dayRecall": 0.1,
-        "balancedRecall": 0.1,
+        "dayRecall": 0.07,
+        "balancedRecall": 0.07,
         "cpHourFilterSurvival": 0.7,
         "top5Days": 30,
         "actualTop5Hours": 30
