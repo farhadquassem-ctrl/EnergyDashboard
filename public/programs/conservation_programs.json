@@ -1,6 +1,6 @@
 {
   "source": "Curated by the EnergyDashboard team from IESO Save on Energy, OEB, and Enbridge Gas program pages. Organized by use case — NOT a verbatim mirror. These are 2026 reference points; every 'keyDetail' is marked verify:true until the weekly refresh job reconciles it against source (scripts/programs/). Not affiliated with the IESO, OEB, or any utility.",
-  "asOf": "2026-07-13",
+  "asOf": "2026-07-20",
   "refreshCadence": "weekly",
   "programs": [
     {
@@ -213,7 +213,7 @@
     }
   ],
   "watch": {
-    "lastRun": "2026-07-13",
+    "lastRun": "2026-07-20",
     "changedPages": [],
     "changedPrograms": []
   }
