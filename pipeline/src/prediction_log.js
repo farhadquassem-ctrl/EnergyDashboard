@@ -57,6 +57,12 @@ export function predictionsFromForecast(forecast) {
     actualHit: null,
     resolved: false,
     leadTimeDays: p.daysOut,
+    // Optional provenance (additive): which weather drove this prediction and
+    // the peak-hour temp, so accuracy can later be sliced real-forecast vs
+    // surrogate. Present on forecast.json's predictedPeaks; null on older runs.
+    // resolvePredictions spreads `...p`, so these survive resolution untouched.
+    weatherSource: p.weatherSource ?? null,
+    tempC: p.tempC ?? null,
   }))
 }
 

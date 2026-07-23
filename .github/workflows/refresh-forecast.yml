@@ -25,8 +25,9 @@ on:
         type: boolean
         default: false
 
-# Only push forecast.json; nothing else. This token's push to main is what
-# triggers the Vercel deploy (Vercel's webhook fires regardless of author; the
+# Pushes the refreshed forecast.json, prediction_log.json, and the append-only
+# weather_archive.json; nothing else. This token's push to main is what triggers
+# the Vercel deploy (Vercel's webhook fires regardless of author; the
 # GITHUB_TOKEN push does NOT recursively re-trigger this workflow).
 permissions:
   contents: write
@@ -114,6 +115,16 @@ jobs:
         working-directory: pipeline
         run: npm run fetch:forecast
 
+      # Snapshot the forecast we just downloaded into the committed append-only
+      # archive (public/peak-forecast/weather_archive.json). ECCC keeps no
+      # archive of past forecasts and each fetch:forecast overwrites the
+      # intermediate, so this is the only place the historical-forecast dataset
+      # accrues. Idempotent per ECCC issuance (keep-first by siteId|issuedAt).
+      - name: Archive ECCC citypage forecast
+        if: ${{ inputs.diagnose_only != true }}
+        working-directory: pipeline
+        run: npm run archive:forecast
+
       - name: Export forecast.json for the dashboard
         if: ${{ inputs.diagnose_only != true }}
         working-directory: pipeline
@@ -126,17 +137,17 @@ jobs:
         working-directory: pipeline
         run: npm run log:predictions
 
-      - name: Commit forecast + prediction log if changed
+      - name: Commit forecast + prediction log + weather archive if changed
         if: ${{ inputs.diagnose_only != true }}
         run: |
           set -euo pipefail
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- public/peak-forecast/forecast.json public/peak-forecast/prediction_log.json; then
-            echo "forecast.json + prediction_log.json unchanged — nothing to commit."
+          if git diff --quiet -- public/peak-forecast/forecast.json public/peak-forecast/prediction_log.json public/peak-forecast/weather_archive.json; then
+            echo "forecast.json + prediction_log.json + weather_archive.json unchanged — nothing to commit."
             exit 0
           fi
-          git add public/peak-forecast/forecast.json public/peak-forecast/prediction_log.json
+          git add public/peak-forecast/forecast.json public/peak-forecast/prediction_log.json public/peak-forecast/weather_archive.json
           git commit -m "chore(forecast): refresh peak forecast data [skip ci]"
           # Rebase on any concurrent main updates, then push. Retry a couple of
           # times in case main moved between fetch and push.
