@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-07-25T14:48:40.397Z",
+  "updatedAt": "2026-07-26T14:51:15.997Z",
   "models": [
     "ga-5cp-peak"
   ],
@@ -374,7 +374,7 @@
       "predictedAt": "2026-07-21T11:58:52.242-04:00",
       "predictedValue": 19775,
       "predictedProbability": 0.01,
-      "actualValue": 15140,
+      "actualValue": 19892,
       "actualHit": null,
       "resolved": true,
       "leadTimeDays": 4
@@ -385,9 +385,9 @@
       "predictedAt": "2026-07-21T11:58:52.242-04:00",
       "predictedValue": 20809,
       "predictedProbability": 0.01,
-      "actualValue": null,
+      "actualValue": 15446,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 5
     },
     {
@@ -396,9 +396,9 @@
       "predictedAt": "2026-07-22T11:55:14.413-04:00",
       "predictedValue": 19782,
       "predictedProbability": 0.01,
-      "actualValue": null,
+      "actualValue": 15446,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 4
     },
     {
@@ -407,9 +407,9 @@
       "predictedAt": "2026-07-25T10:48:40.029-04:00",
       "predictedValue": 18757,
       "predictedProbability": 0.03,
-      "actualValue": null,
+      "actualValue": 15446,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 1
     },
     {
@@ -477,6 +477,28 @@
       "actualHit": null,
       "resolved": false,
       "leadTimeDays": 6
+    },
+    {
+      "modelName": "ga-5cp-peak",
+      "targetDate": "2026-07-30",
+      "predictedAt": "2026-07-26T10:51:15.542-04:00",
+      "predictedValue": 19758,
+      "predictedProbability": 0.01,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 4
+    },
+    {
+      "modelName": "ga-5cp-peak",
+      "targetDate": "2026-07-31",
+      "predictedAt": "2026-07-26T10:51:15.542-04:00",
+      "predictedValue": 20782,
+      "predictedProbability": 0.01,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 5
     },
     {
       "modelName": "ga-5cp-peak",
