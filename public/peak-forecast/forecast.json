@@ -1,11 +1,11 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-27T13:14:14.046-04:00",
-  "datasetThrough": "2026-07-27",
+  "generatedAt": "2026-07-28T12:24:34.489-04:00",
+  "datasetThrough": "2026-07-28",
   "staleNote": null,
   "model": {
     "r2": 0.54,
-    "trainRows": 15840
+    "trainRows": 15846
   },
   "basePeriod": {
     "start": "2026-05-01",
@@ -59,19 +59,19 @@
   "predictedPeaks": [
     {
       "date": "2026-07-31",
-      "daysOut": 4,
+      "daysOut": 3,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 16,
       "predictedPeakHourEnding": 17,
-      "predictedMw": 20784,
+      "predictedMw": 20788,
       "tempC": 29,
-      "leadBucket": 7,
+      "leadBucket": 3,
       "projectedRank": 6,
       "wouldRankTop5": false,
-      "probability": 0.01,
-      "peakPercentile": 1,
+      "probability": 0.04,
+      "peakPercentile": 0.99,
       "confidence": "high",
       "curtailmentWindows": [
         {
@@ -98,18 +98,18 @@
         "years": 6,
         "balancedTop5Recall": {
           "min": 0,
-          "mean": 0.07,
-          "max": 0.2
+          "mean": 0.1,
+          "max": 0.4
         },
         "top5DayRecall": {
           "min": 0,
-          "mean": 0.07,
-          "max": 0.2
+          "mean": 0.13,
+          "max": 0.4
         },
         "pooled": {
-          "dayRecall": 0.07,
-          "balancedRecall": 0.07,
-          "cpHourFilterSurvival": 0.6,
+          "dayRecall": 0.13,
+          "balancedRecall": 0.1,
+          "cpHourFilterSurvival": 0.7,
           "top5Days": 30,
           "actualTop5Hours": 30
         }
@@ -117,19 +117,19 @@
     },
     {
       "date": "2026-07-30",
-      "daysOut": 3,
+      "daysOut": 2,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 16,
       "predictedPeakHourEnding": 17,
-      "predictedMw": 19760,
-      "tempC": 28,
+      "predictedMw": 18737,
+      "tempC": 27,
       "leadBucket": 3,
       "projectedRank": 6,
       "wouldRankTop5": false,
-      "probability": 0.04,
-      "peakPercentile": 0.97,
+      "probability": 0.03,
+      "peakPercentile": 0.88,
       "confidence": "high",
       "curtailmentWindows": [
         {
