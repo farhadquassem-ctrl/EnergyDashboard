@@ -1,11 +1,11 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-28T12:24:34.489-04:00",
-  "datasetThrough": "2026-07-28",
+  "generatedAt": "2026-07-29T12:01:13.245-04:00",
+  "datasetThrough": "2026-07-29",
   "staleNote": null,
   "model": {
     "r2": 0.54,
-    "trainRows": 15846
+    "trainRows": 15851
   },
   "basePeriod": {
     "start": "2026-05-01",
@@ -58,20 +58,20 @@
   ],
   "predictedPeaks": [
     {
-      "date": "2026-07-31",
-      "daysOut": 3,
-      "weatherSource": "eccc-citypage",
+      "date": "2026-08-04",
+      "daysOut": 6,
+      "weatherSource": "eccc-citypage (low filled from climo span)",
       "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 16,
       "predictedPeakHourEnding": 17,
-      "predictedMw": 20788,
+      "predictedMw": 20772,
       "tempC": 29,
-      "leadBucket": 3,
+      "leadBucket": 7,
       "projectedRank": 6,
       "wouldRankTop5": false,
-      "probability": 0.04,
-      "peakPercentile": 0.99,
+      "probability": 0.01,
+      "peakPercentile": 1,
       "confidence": "high",
       "curtailmentWindows": [
         {
@@ -98,18 +98,18 @@
         "years": 6,
         "balancedTop5Recall": {
           "min": 0,
-          "mean": 0.1,
-          "max": 0.4
+          "mean": 0.03,
+          "max": 0.2
         },
         "top5DayRecall": {
           "min": 0,
-          "mean": 0.13,
-          "max": 0.4
+          "mean": 0.03,
+          "max": 0.2
         },
         "pooled": {
-          "dayRecall": 0.13,
-          "balancedRecall": 0.1,
-          "cpHourFilterSurvival": 0.7,
+          "dayRecall": 0.03,
+          "balancedRecall": 0.03,
+          "cpHourFilterSurvival": 0.6,
           "top5Days": 30,
           "actualTop5Hours": 30
         }
@@ -117,13 +117,13 @@
     },
     {
       "date": "2026-07-30",
-      "daysOut": 2,
+      "daysOut": 1,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 16,
       "predictedPeakHourEnding": 17,
-      "predictedMw": 18737,
+      "predictedMw": 18738,
       "tempC": 27,
       "leadBucket": 3,
       "projectedRank": 6,
@@ -201,17 +201,17 @@
       "years": 6,
       "balancedTop5Recall": {
         "min": 0,
-        "mean": 0.07,
+        "mean": 0.03,
         "max": 0.2
       },
       "top5DayRecall": {
         "min": 0,
-        "mean": 0.07,
+        "mean": 0.03,
         "max": 0.2
       },
       "pooled": {
-        "dayRecall": 0.07,
-        "balancedRecall": 0.07,
+        "dayRecall": 0.03,
+        "balancedRecall": 0.03,
         "cpHourFilterSurvival": 0.6,
         "top5Days": 30,
         "actualTop5Hours": 30
