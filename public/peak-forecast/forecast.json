@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-30T12:08:16.030-04:00",
+  "generatedAt": "2026-07-31T08:04:03.585-04:00",
   "datasetThrough": "2026-07-30",
   "staleNote": null,
   "model": {
@@ -58,19 +58,19 @@
   ],
   "predictedPeaks": [
     {
-      "date": "2026-07-31",
-      "daysOut": 1,
+      "date": "2026-08-05",
+      "daysOut": 5,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 16,
       "predictedPeakHourEnding": 17,
-      "predictedMw": 21813,
-      "tempC": 30,
-      "leadBucket": 3,
+      "predictedMw": 20766,
+      "tempC": 29,
+      "leadBucket": 7,
       "projectedRank": 6,
       "wouldRankTop5": false,
-      "probability": 0.04,
+      "probability": 0.01,
       "peakPercentile": 1,
       "confidence": "high",
       "curtailmentWindows": [
@@ -98,38 +98,38 @@
         "years": 6,
         "balancedTop5Recall": {
           "min": 0,
-          "mean": 0.1,
-          "max": 0.4
+          "mean": 0.03,
+          "max": 0.2
         },
         "top5DayRecall": {
           "min": 0,
-          "mean": 0.13,
-          "max": 0.4
+          "mean": 0.03,
+          "max": 0.2
         },
         "pooled": {
-          "dayRecall": 0.13,
-          "balancedRecall": 0.1,
-          "cpHourFilterSurvival": 0.7,
+          "dayRecall": 0.03,
+          "balancedRecall": 0.03,
+          "cpHourFilterSurvival": 0.6,
           "top5Days": 30,
           "actualTop5Hours": 30
         }
       }
     },
     {
-      "date": "2026-08-05",
+      "date": "2026-08-06",
       "daysOut": 6,
       "weatherSource": "eccc-citypage (low filled from climo span)",
       "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 16,
       "predictedPeakHourEnding": 17,
-      "predictedMw": 20766,
-      "tempC": 29,
+      "predictedMw": 19749,
+      "tempC": 28,
       "leadBucket": 7,
       "projectedRank": 6,
       "wouldRankTop5": false,
       "probability": 0.01,
-      "peakPercentile": 1,
+      "peakPercentile": 0.99,
       "confidence": "high",
       "curtailmentWindows": [
         {
