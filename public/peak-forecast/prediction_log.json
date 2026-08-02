@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-08-01T11:19:56.072Z",
+  "updatedAt": "2026-08-02T11:19:39.899Z",
   "models": [
     "ga-5cp-peak"
   ],
@@ -528,7 +528,7 @@
       "predictedAt": "2026-07-26T10:51:15.542-04:00",
       "predictedValue": 20782,
       "predictedProbability": 0.01,
-      "actualValue": 16127,
+      "actualValue": 23381,
       "actualHit": null,
       "resolved": true,
       "leadTimeDays": 5
@@ -539,7 +539,7 @@
       "predictedAt": "2026-07-27T13:14:14.046-04:00",
       "predictedValue": 20784,
       "predictedProbability": 0.01,
-      "actualValue": 16127,
+      "actualValue": 23381,
       "actualHit": null,
       "resolved": true,
       "leadTimeDays": 4
@@ -550,7 +550,7 @@
       "predictedAt": "2026-07-28T12:24:34.489-04:00",
       "predictedValue": 20788,
       "predictedProbability": 0.04,
-      "actualValue": 16127,
+      "actualValue": 23381,
       "actualHit": null,
       "resolved": true,
       "leadTimeDays": 3
@@ -561,7 +561,7 @@
       "predictedAt": "2026-07-30T12:08:16.030-04:00",
       "predictedValue": 21813,
       "predictedProbability": 0.04,
-      "actualValue": 16127,
+      "actualValue": 23381,
       "actualHit": null,
       "resolved": true,
       "leadTimeDays": 1
@@ -637,6 +637,28 @@
       "targetDate": "2026-08-07",
       "predictedAt": "2026-08-01T07:19:55.627-04:00",
       "predictedValue": 19757,
+      "predictedProbability": 0.01,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 6
+    },
+    {
+      "modelName": "ga-5cp-peak",
+      "targetDate": "2026-08-07",
+      "predictedAt": "2026-08-02T07:19:39.444-04:00",
+      "predictedValue": 19762,
+      "predictedProbability": 0.01,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 5
+    },
+    {
+      "modelName": "ga-5cp-peak",
+      "targetDate": "2026-08-08",
+      "predictedAt": "2026-08-02T07:19:39.444-04:00",
+      "predictedValue": 19807,
       "predictedProbability": 0.01,
       "actualValue": null,
       "actualHit": null,
