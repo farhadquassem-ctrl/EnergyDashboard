@@ -1,6 +1,6 @@
 {
   "source": "Curated by the EnergyDashboard team from IESO Save on Energy, OEB, and Enbridge Gas program pages. Organized by use case — NOT a verbatim mirror. These are 2026 reference points; every 'keyDetail' is marked verify:true until the weekly refresh job reconciles it against source (scripts/programs/). Not affiliated with the IESO, OEB, or any utility.",
-  "asOf": "2026-07-27",
+  "asOf": "2026-08-03",
   "refreshCadence": "weekly",
   "programs": [
     {
@@ -158,7 +158,8 @@
         "label": "Open program page",
         "target": "https://www.saveonenergy.ca/en/For-Business-and-Industry/Programs-and-incentives/Retrofit-Program"
       },
-      "verify": true
+      "verify": true,
+      "sourceChangedAt": "2026-08-03"
     },
     {
       "id": "ga-tracking",
@@ -209,12 +210,19 @@
         "label": "Open program page",
         "target": "https://www.saveonenergy.ca/en/For-Business-and-Industry/Programs-and-incentives"
       },
-      "verify": true
+      "verify": true,
+      "sourceChangedAt": "2026-08-03"
     }
   ],
   "watch": {
-    "lastRun": "2026-07-27",
-    "changedPages": [],
-    "changedPrograms": []
+    "lastRun": "2026-08-03",
+    "changedPages": [
+      "https://www.saveonenergy.ca/en/For-Business-and-Industry/Programs-and-incentives/Retrofit-Program",
+      "https://www.saveonenergy.ca/en/For-Business-and-Industry/Programs-and-incentives"
+    ],
+    "changedPrograms": [
+      "retrofit-program",
+      "small-business-peak-perks"
+    ]
   }
 }
