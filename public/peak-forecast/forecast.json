@@ -1,11 +1,11 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-08T06:37:48.490-04:00",
-  "datasetThrough": "2026-08-07",
+  "generatedAt": "2026-08-09T06:38:59.430-04:00",
+  "datasetThrough": "2026-08-08",
   "staleNote": null,
   "model": {
-    "r2": 0.54,
-    "trainRows": 15922
+    "r2": 0.53,
+    "trainRows": 15926
   },
   "basePeriod": {
     "start": "2026-05-01",
@@ -58,20 +58,20 @@
   ],
   "predictedPeaks": [
     {
-      "date": "2026-08-10",
+      "date": "2026-08-11",
       "daysOut": 2,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 16,
       "predictedPeakHourEnding": 17,
-      "predictedMw": 20822,
-      "tempC": 29,
+      "predictedMw": 19801,
+      "tempC": 28,
       "leadBucket": 3,
       "projectedRank": 6,
       "wouldRankTop5": false,
       "probability": 0.04,
-      "peakPercentile": 0.99,
+      "peakPercentile": 0.97,
       "confidence": "high",
       "curtailmentWindows": [
         {
@@ -116,15 +116,15 @@
       }
     },
     {
-      "date": "2026-08-09",
+      "date": "2026-08-10",
       "daysOut": 1,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 16,
       "predictedPeakHourEnding": 17,
-      "predictedMw": 18805,
-      "tempC": 28,
+      "predictedMw": 18767,
+      "tempC": 27,
       "leadBucket": 3,
       "projectedRank": 6,
       "wouldRankTop5": false,
