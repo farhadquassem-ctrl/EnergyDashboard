@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-08-12T11:03:19.146Z",
+  "updatedAt": "2026-08-13T11:03:30.813Z",
   "models": [
     "ga-5cp-peak"
   ],
@@ -814,7 +814,7 @@
       "predictedAt": "2026-08-09T06:38:59.430-04:00",
       "predictedValue": 19801,
       "predictedProbability": 0.04,
-      "actualValue": 17148,
+      "actualValue": 22799,
       "actualHit": null,
       "resolved": true,
       "leadTimeDays": 2
@@ -825,7 +825,7 @@
       "predictedAt": "2026-08-10T07:12:26.876-04:00",
       "predictedValue": 18772,
       "predictedProbability": 0.03,
-      "actualValue": 17148,
+      "actualValue": 22799,
       "actualHit": null,
       "resolved": true,
       "leadTimeDays": 1
@@ -836,9 +836,9 @@
       "predictedAt": "2026-08-10T07:12:26.876-04:00",
       "predictedValue": 18707,
       "predictedProbability": 0.03,
-      "actualValue": null,
+      "actualValue": 16548,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 2
     },
     {
@@ -847,9 +847,9 @@
       "predictedAt": "2026-08-11T06:54:00.380-04:00",
       "predictedValue": 17131,
       "predictedProbability": 0.01,
-      "actualValue": null,
+      "actualValue": 16548,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 1
     },
     {
@@ -876,6 +876,17 @@
     },
     {
       "modelName": "ga-5cp-peak",
+      "targetDate": "2026-08-14",
+      "predictedAt": "2026-08-13T07:03:30.375-04:00",
+      "predictedValue": 17689,
+      "predictedProbability": 0.02,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 1
+    },
+    {
+      "modelName": "ga-5cp-peak",
       "targetDate": "2026-08-18",
       "predictedAt": "2026-08-12T07:03:18.691-04:00",
       "predictedValue": 17685,
@@ -884,6 +895,17 @@
       "actualHit": null,
       "resolved": false,
       "leadTimeDays": 6
+    },
+    {
+      "modelName": "ga-5cp-peak",
+      "targetDate": "2026-08-18",
+      "predictedAt": "2026-08-13T07:03:30.375-04:00",
+      "predictedValue": 17690,
+      "predictedProbability": 0.01,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 5
     }
   ]
 }
