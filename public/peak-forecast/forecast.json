@@ -1,11 +1,11 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-17T06:35:48.230-04:00",
-  "datasetThrough": "2026-08-16",
+  "generatedAt": "2026-08-18T06:32:28.320-04:00",
+  "datasetThrough": "2026-08-17",
   "staleNote": null,
   "model": {
     "r2": 0.53,
-    "trainRows": 15985
+    "trainRows": 15987
   },
   "basePeriod": {
     "start": "2026-05-01",
@@ -58,20 +58,20 @@
   ],
   "predictedPeaks": [
     {
-      "date": "2026-08-18",
-      "daysOut": 1,
+      "date": "2026-08-21",
+      "daysOut": 3,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 15,
       "predictedPeakHourEnding": 16,
-      "predictedMw": 18729,
-      "tempC": 27,
+      "predictedMw": 19768,
+      "tempC": 28,
       "leadBucket": 3,
       "projectedRank": 6,
       "wouldRankTop5": false,
-      "probability": 0.03,
-      "peakPercentile": 0.88,
+      "probability": 0.04,
+      "peakPercentile": 0.97,
       "confidence": "high",
       "curtailmentWindows": [
         {
@@ -116,39 +116,39 @@
       }
     },
     {
-      "date": "2026-08-21",
+      "date": "2026-08-22",
       "daysOut": 4,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
       "peakRiskDay": true,
-      "predictedPeakHourStart": 21,
-      "predictedPeakHourEnding": 22,
-      "predictedMw": 17151,
-      "tempC": 21.2,
+      "predictedPeakHourStart": 15,
+      "predictedPeakHourEnding": 16,
+      "predictedMw": 17749,
+      "tempC": 27,
       "leadBucket": 7,
       "projectedRank": 6,
       "wouldRankTop5": false,
-      "probability": 0.02,
-      "peakPercentile": 0.4,
-      "confidence": "moderate",
+      "probability": 0.01,
+      "peakPercentile": 0.63,
+      "confidence": "high",
       "curtailmentWindows": [
         {
           "profile": "Conservative",
           "windowHours": 3,
-          "hourStart": 20,
-          "label": "HE21–HE23"
+          "hourStart": 14,
+          "label": "HE15–HE17"
         },
         {
           "profile": "Balanced",
           "windowHours": 4,
-          "hourStart": 20,
-          "label": "HE21–HE24"
+          "hourStart": 14,
+          "label": "HE15–HE18"
         },
         {
           "profile": "Aggressive",
           "windowHours": 5,
-          "hourStart": 19,
-          "label": "HE20–HE24"
+          "hourStart": 13,
+          "label": "HE14–HE18"
         }
       ],
       "expectedAccuracy": {
