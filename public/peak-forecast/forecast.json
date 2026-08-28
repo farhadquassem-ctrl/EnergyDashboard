@@ -1,11 +1,11 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-27T16:13:24.490-04:00",
-  "datasetThrough": "2026-08-27",
+  "generatedAt": "2026-08-28T17:09:46.645-04:00",
+  "datasetThrough": "2026-08-28",
   "staleNote": null,
   "model": {
     "r2": 0.53,
-    "trainRows": 16004
+    "trainRows": 16009
   },
   "basePeriod": {
     "start": "2026-05-01",
@@ -59,13 +59,13 @@
   "predictedPeaks": [
     {
       "date": "2026-09-01",
-      "daysOut": 5,
+      "daysOut": 4,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 16,
       "predictedPeakHourEnding": 17,
-      "predictedMw": 19797,
+      "predictedMw": 19798,
       "tempC": 28,
       "leadBucket": 7,
       "projectedRank": 6,
@@ -116,20 +116,20 @@
       }
     },
     {
-      "date": "2026-08-30",
-      "daysOut": 3,
+      "date": "2026-09-02",
+      "daysOut": 5,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 16,
       "predictedPeakHourEnding": 17,
-      "predictedMw": 18810,
-      "tempC": 28,
-      "leadBucket": 3,
+      "predictedMw": 18771,
+      "tempC": 27,
+      "leadBucket": 7,
       "projectedRank": 6,
       "wouldRankTop5": false,
-      "probability": 0.03,
-      "peakPercentile": 0.9,
+      "probability": 0.01,
+      "peakPercentile": 0.93,
       "confidence": "high",
       "curtailmentWindows": [
         {
@@ -156,18 +156,18 @@
         "years": 6,
         "balancedTop5Recall": {
           "min": 0,
-          "mean": 0.07,
+          "mean": 0.03,
           "max": 0.2
         },
         "top5DayRecall": {
           "min": 0,
-          "mean": 0.1,
+          "mean": 0.03,
           "max": 0.2
         },
         "pooled": {
-          "dayRecall": 0.1,
-          "balancedRecall": 0.07,
-          "cpHourFilterSurvival": 0.7,
+          "dayRecall": 0.03,
+          "balancedRecall": 0.03,
+          "cpHourFilterSurvival": 0.6,
           "top5Days": 30,
           "actualTop5Hours": 30
         }
