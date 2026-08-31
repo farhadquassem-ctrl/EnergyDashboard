@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-31T00:57:24.196-04:00",
+  "generatedAt": "2026-08-31T13:28:26.966-04:00",
   "datasetThrough": "2026-08-29",
-  "staleNote": "dataset ends 2026-08-29 (49h ago) — persistence term skipped; running board is as of the dataset end, not now",
+  "staleNote": "dataset ends 2026-08-29 (61h ago) — persistence term skipped; running board is as of the dataset end, not now",
   "model": {
     "r2": 0.53,
     "trainRows": 16009
@@ -58,14 +58,14 @@
   ],
   "predictedPeaks": [
     {
-      "date": "2026-09-01",
-      "daysOut": 1,
+      "date": "2026-09-02",
+      "daysOut": 2,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 16,
       "predictedPeakHourEnding": 17,
-      "predictedMw": 20826,
+      "predictedMw": 20827,
       "tempC": 29,
       "leadBucket": 3,
       "projectedRank": 6,
@@ -116,14 +116,14 @@
       }
     },
     {
-      "date": "2026-09-02",
-      "daysOut": 2,
+      "date": "2026-09-01",
+      "daysOut": 1,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 16,
       "predictedPeakHourEnding": 17,
-      "predictedMw": 19799,
+      "predictedMw": 19798,
       "tempC": 28,
       "leadBucket": 3,
       "projectedRank": 6,
