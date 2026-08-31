@@ -280,6 +280,24 @@ first live-data forecast run lands (see the one outstanding item at the end of
    the workflow's job). Scheduled runs require the workflow to sit on the
    **default** branch (`main`) — satisfied.
 
+   **⚠ Upstream blips abort the whole chain — retry budget hardened 2026-08.**
+   Run 33317650516 (2026-08-30) failed on `fetch:weather`: `api.weather.gc.ca`
+   was briefly unreachable, and `src/lib/http.js`'s retry (3 tries, 1s/2s/4s)
+   gave up after ~38s, so the daily refresh published nothing (1 failure in 62
+   runs; the next day's schedule self-heals). Every fetch step aborts the run by
+   design — that part is correct and stays. What was wrong was the policy, now:
+   5 tries with jittered 5/10/20/30s backoff (~2 min per URL), a 90s per-attempt
+   `AbortSignal.timeout` so a stalled socket can't hold the job open, **no
+   trailing sleep after the final attempt** (the old loop always waited out one
+   more backoff and logged a "retrying" line for a retry that never happened),
+   4xx no longer retried (expected 404s — the 2020/2021 peak files, missing
+   demand archives — now fail fast instead of burning ~7s each), `Retry-After`
+   honoured on 429/503, and undici `cause` chains unwrapped into the log (that
+   run's log said only "fetch failed"; it now names `ECONNRESET`/
+   `UND_ERR_CONNECT_TIMEOUT`/etc.). Covered by `src/lib/http.test.js`; job
+   `timeout-minutes` 20 → 30 for the wider budget. Deliberately not a bigger
+   budget: a genuinely down upstream should still fail promptly and loudly.
+
    **✅ accuracyByLead near-zero — root-caused 2026-07, reframed not tuned.**
    The first live `accuracyByLead` (mean ~3%, 14d = 0) triggered a diagnosis
    (`docs/prompts/investigate-low-accuracy-by-lead.md`). Verdict, from a

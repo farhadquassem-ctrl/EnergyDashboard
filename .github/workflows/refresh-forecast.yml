@@ -39,7 +39,12 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # Normal runs finish in ~2 min. The headroom is for the fetch steps' retry
+    # budget (pipeline/src/lib/http.js): each URL now rides out ~2 min of a
+    # flaky upstream, so a broadly-degraded IESO/ECCC can legitimately take a
+    # while to conclude it has failed. A run that fails is not fatal — the next
+    # day's schedule (or a manual dispatch) republishes.
+    timeout-minutes: 30
     # Multi-year window so the walk-forward backtest + probability calibration
     # have enough base periods to be meaningful (a trailing 12-month window
     # leaves ~1 evaluable year -> degenerate calibration). Uses the historical

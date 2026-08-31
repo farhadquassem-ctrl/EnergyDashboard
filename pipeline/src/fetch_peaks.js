@@ -155,7 +155,7 @@ export async function fetchPeaks() {
 if (isMain(import.meta.url)) {
   fetchPeaks().catch((e) => {
     console.error('fetch_peaks failed:', e.message)
-    console.error('NOTE: reports-public.ieso.ca is blocked from the Claude sandbox; run this locally.')
+    console.error('NOTE: needs reports-public.ieso.ca. On CI/your machine that host is reachable, so a failure here after retries is usually a transient upstream outage — re-run. It is blocked outright from the Claude sandbox.')
     process.exit(1)
   })
 }

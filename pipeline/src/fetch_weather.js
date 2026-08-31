@@ -152,7 +152,7 @@ if (isMain(import.meta.url)) {
       : fetchWeather
   run().catch((e) => {
     console.error('fetch_weather failed:', e.message)
-    console.error('NOTE: verify api.weather.gc.ca egress; blocked from the Claude sandbox.')
+    console.error('NOTE: needs api.weather.gc.ca. On CI/your machine that host is reachable, so a failure here after retries is usually a transient upstream outage — re-run. It is blocked outright from the Claude sandbox.')
     process.exit(1)
   })
 }
