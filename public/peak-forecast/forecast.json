@@ -1,11 +1,11 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-31T13:28:26.966-04:00",
-  "datasetThrough": "2026-08-29",
-  "staleNote": "dataset ends 2026-08-29 (61h ago) — persistence term skipped; running board is as of the dataset end, not now",
+  "generatedAt": "2026-09-01T10:38:18.060-04:00",
+  "datasetThrough": "2026-09-01",
+  "staleNote": null,
   "model": {
     "r2": 0.53,
-    "trainRows": 16009
+    "trainRows": 16014
   },
   "basePeriod": {
     "start": "2026-05-01",
@@ -59,19 +59,19 @@
   "predictedPeaks": [
     {
       "date": "2026-09-02",
-      "daysOut": 2,
+      "daysOut": 1,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 16,
       "predictedPeakHourEnding": 17,
-      "predictedMw": 20827,
-      "tempC": 29,
+      "predictedMw": 19802,
+      "tempC": 28,
       "leadBucket": 3,
       "projectedRank": 6,
       "wouldRankTop5": false,
       "probability": 0.04,
-      "peakPercentile": 0.99,
+      "peakPercentile": 0.97,
       "confidence": "high",
       "curtailmentWindows": [
         {
@@ -116,20 +116,20 @@
       }
     },
     {
-      "date": "2026-09-01",
-      "daysOut": 1,
+      "date": "2026-09-03",
+      "daysOut": 2,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 16,
       "predictedPeakHourEnding": 17,
-      "predictedMw": 19798,
-      "tempC": 28,
+      "predictedMw": 18785,
+      "tempC": 27,
       "leadBucket": 3,
       "projectedRank": 6,
       "wouldRankTop5": false,
-      "probability": 0.04,
-      "peakPercentile": 0.97,
+      "probability": 0.03,
+      "peakPercentile": 0.89,
       "confidence": "high",
       "curtailmentWindows": [
         {
