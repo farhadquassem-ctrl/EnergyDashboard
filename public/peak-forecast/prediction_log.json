@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-02T14:12:03.978Z",
+  "updatedAt": "2026-09-03T14:15:26.806Z",
   "models": [
     "ga-5cp-peak"
   ],
@@ -1210,7 +1210,7 @@
       "predictedAt": "2026-08-28T17:09:46.645-04:00",
       "predictedValue": 18771,
       "predictedProbability": 0.01,
-      "actualValue": 16956,
+      "actualValue": 21787,
       "actualHit": null,
       "resolved": true,
       "leadTimeDays": 5
@@ -1221,7 +1221,7 @@
       "predictedAt": "2026-08-29T10:58:50.999-04:00",
       "predictedValue": 19799,
       "predictedProbability": 0.01,
-      "actualValue": 16956,
+      "actualValue": 21787,
       "actualHit": null,
       "resolved": true,
       "leadTimeDays": 4
@@ -1232,7 +1232,7 @@
       "predictedAt": "2026-08-31T00:57:24.196-04:00",
       "predictedValue": 19799,
       "predictedProbability": 0.04,
-      "actualValue": 16956,
+      "actualValue": 21787,
       "actualHit": null,
       "resolved": true,
       "leadTimeDays": 2
@@ -1243,7 +1243,7 @@
       "predictedAt": "2026-08-31T13:28:26.966-04:00",
       "predictedValue": 20827,
       "predictedProbability": 0.04,
-      "actualValue": 16956,
+      "actualValue": 21787,
       "actualHit": null,
       "resolved": true,
       "leadTimeDays": 2
@@ -1254,7 +1254,7 @@
       "predictedAt": "2026-09-01T10:38:18.060-04:00",
       "predictedValue": 19802,
       "predictedProbability": 0.04,
-      "actualValue": 16956,
+      "actualValue": 21787,
       "actualHit": null,
       "resolved": true,
       "leadTimeDays": 1
@@ -1265,9 +1265,9 @@
       "predictedAt": "2026-08-20T06:34:27.510-04:00",
       "predictedValue": 17151,
       "predictedProbability": 0.02,
-      "actualValue": null,
+      "actualValue": 15938,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 14
     },
     {
@@ -1276,9 +1276,9 @@
       "predictedAt": "2026-08-21T06:34:34.659-04:00",
       "predictedValue": 17153,
       "predictedProbability": 0.02,
-      "actualValue": null,
+      "actualValue": 15938,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 13
     },
     {
@@ -1287,9 +1287,9 @@
       "predictedAt": "2026-08-22T06:27:29.755-04:00",
       "predictedValue": 17153,
       "predictedProbability": 0.02,
-      "actualValue": null,
+      "actualValue": 15938,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 12
     },
     {
@@ -1298,9 +1298,9 @@
       "predictedAt": "2026-08-23T06:28:12.150-04:00",
       "predictedValue": 17153,
       "predictedProbability": 0.02,
-      "actualValue": null,
+      "actualValue": 15938,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 11
     },
     {
@@ -1309,9 +1309,9 @@
       "predictedAt": "2026-08-24T06:40:46.022-04:00",
       "predictedValue": 17153,
       "predictedProbability": 0.02,
-      "actualValue": null,
+      "actualValue": 15938,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 10
     },
     {
@@ -1320,9 +1320,9 @@
       "predictedAt": "2026-09-01T10:38:18.060-04:00",
       "predictedValue": 18785,
       "predictedProbability": 0.03,
-      "actualValue": null,
+      "actualValue": 15938,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 2
     },
     {
@@ -1331,9 +1331,9 @@
       "predictedAt": "2026-09-02T10:12:03.535-04:00",
       "predictedValue": 18790,
       "predictedProbability": 0.03,
-      "actualValue": null,
+      "actualValue": 15938,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 1
     },
     {
@@ -1346,6 +1346,28 @@
       "actualHit": null,
       "resolved": false,
       "leadTimeDays": 2
+    },
+    {
+      "modelName": "ga-5cp-peak",
+      "targetDate": "2026-09-16",
+      "predictedAt": "2026-09-03T10:15:26.360-04:00",
+      "predictedValue": 17181,
+      "predictedProbability": 0.02,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 13
+    },
+    {
+      "modelName": "ga-5cp-peak",
+      "targetDate": "2026-09-17",
+      "predictedAt": "2026-09-03T10:15:26.360-04:00",
+      "predictedValue": 17182,
+      "predictedProbability": 0.02,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 14
     }
   ]
 }
