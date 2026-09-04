@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-04T10:05:59.445-04:00",
+  "generatedAt": "2026-09-04T14:27:46.958-04:00",
   "datasetThrough": "2026-09-04",
   "staleNote": null,
   "model": {
@@ -58,39 +58,39 @@
   ],
   "predictedPeaks": [
     {
-      "date": "2026-09-17",
-      "daysOut": 13,
-      "weatherSource": "climatology+persistence",
-      "isForecastWeather": false,
-      "peakRiskDay": false,
-      "predictedPeakHourStart": 21,
-      "predictedPeakHourEnding": 22,
-      "predictedMw": 17183,
-      "tempC": 18.3,
-      "leadBucket": 14,
+      "date": "2026-09-09",
+      "daysOut": 5,
+      "weatherSource": "eccc-citypage",
+      "isForecastWeather": true,
+      "peakRiskDay": true,
+      "predictedPeakHourStart": 16,
+      "predictedPeakHourEnding": 17,
+      "predictedMw": 17756,
+      "tempC": 26,
+      "leadBucket": 7,
       "projectedRank": 6,
       "wouldRankTop5": false,
-      "probability": 0.02,
-      "peakPercentile": 0.42,
-      "confidence": "moderate",
+      "probability": 0.01,
+      "peakPercentile": 0.63,
+      "confidence": "high",
       "curtailmentWindows": [
         {
           "profile": "Conservative",
           "windowHours": 3,
-          "hourStart": 20,
-          "label": "HE21–HE23"
+          "hourStart": 15,
+          "label": "HE16–HE18"
         },
         {
           "profile": "Balanced",
           "windowHours": 4,
-          "hourStart": 20,
-          "label": "HE21–HE24"
+          "hourStart": 15,
+          "label": "HE16–HE19"
         },
         {
           "profile": "Aggressive",
           "windowHours": 5,
-          "hourStart": 19,
-          "label": "HE20–HE24"
+          "hourStart": 14,
+          "label": "HE15–HE19"
         }
       ],
       "expectedAccuracy": {
@@ -109,21 +109,21 @@
         "pooled": {
           "dayRecall": 0.03,
           "balancedRecall": 0.03,
-          "cpHourFilterSurvival": 0.7,
+          "cpHourFilterSurvival": 0.6,
           "top5Days": 30,
           "actualTop5Hours": 30
         }
       }
     },
     {
-      "date": "2026-09-16",
-      "daysOut": 12,
+      "date": "2026-09-17",
+      "daysOut": 13,
       "weatherSource": "climatology+persistence",
       "isForecastWeather": false,
       "peakRiskDay": false,
       "predictedPeakHourStart": 21,
       "predictedPeakHourEnding": 22,
-      "predictedMw": 17182,
+      "predictedMw": 17183,
       "tempC": 18.3,
       "leadBucket": 14,
       "projectedRank": 6,
