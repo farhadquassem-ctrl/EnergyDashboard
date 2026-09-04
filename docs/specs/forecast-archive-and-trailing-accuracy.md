@@ -1,9 +1,9 @@
 # Spec: Forecast archive + trailing-accuracy display
 
-> Status: **approved, ready to build** (2026-07-18). Implement on a fresh
-> `claude/<topic>` branch off `main` per `docs/WORKFLOW.md`. Everything below
-> was validated against the code as of this commit; line references are
-> anchors, not gospel — re-check them before editing.
+> Status: **implemented** — shipped via PR #11
+> (`claude/forecast-archive-trailing-accuracy-uvm4qa`, merged to `main`
+> 2026-09). Kept as the design record; line references reflect the code as of
+> the spec date (2026-07-18), not necessarily the shipped result.
 
 ## Context
 
