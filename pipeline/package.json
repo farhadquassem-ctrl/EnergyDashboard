@@ -13,6 +13,7 @@
     "backtest:horizons": "node src/backtest_horizons.js",
     "calibrate": "node src/peak_probability.js",
     "fetch:forecast": "node src/fetch_forecast.js",
+    "archive:forecast": "node src/forecast_archive.js",
     "forecast": "node src/forecast.js",
     "export:dashboard": "node src/export_dashboard.js",
     "export:historical5cp": "node src/export_historical_5cp.js",

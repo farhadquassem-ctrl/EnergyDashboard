@@ -97,6 +97,10 @@ export const MARKETS = Object.freeze([
  *   in the base period's top-5), filled once that's finally knowable
  * @property {boolean} resolved actualValue is known (the target day has passed)
  * @property {number} leadTimeDays days between predictedAt and targetDate
+ * @property {string} [weatherSource] which weather drove the prediction
+ *   (e.g. 'eccc-citypage' vs 'climatology'); absent on older rows
+ * @property {number} [tempC] peak-hour temperature the prediction used; absent
+ *   on older rows
  */
 
 /**

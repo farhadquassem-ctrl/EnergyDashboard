@@ -37,6 +37,21 @@ test('predictionsFromForecast tolerates a missing probability', () => {
   assert.equal(preds[0].predictedProbability, null)
 })
 
+test('predictionsFromForecast carries weatherSource/tempC when present', () => {
+  const preds = predictionsFromForecast({
+    generatedAt: '2026-07-03T10:00:00-04:00',
+    predictedPeaks: [{ date: '2026-07-09', predictedMw: 22542, daysOut: 6, weatherSource: 'eccc-citypage', tempC: 31 }],
+  })
+  assert.equal(preds[0].weatherSource, 'eccc-citypage')
+  assert.equal(preds[0].tempC, 31)
+})
+
+test('predictionsFromForecast defaults weatherSource/tempC to null when absent', () => {
+  const preds = predictionsFromForecast(forecast)
+  assert.equal(preds[0].weatherSource, null)
+  assert.equal(preds[0].tempC, null)
+})
+
 test('mergePredictions is idempotent and additive by (model,target,predictedAt)', () => {
   const first = predictionsFromForecast(forecast)
   const same = mergePredictions(first, predictionsFromForecast(forecast))

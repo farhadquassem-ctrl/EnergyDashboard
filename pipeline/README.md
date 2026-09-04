@@ -129,6 +129,28 @@ against ECCC's published layout/schema and tested only on a synthetic fixture
 is the verification — sanity-check its printed table against weather.gc.ca,
 and ideally replace the synthetic fixture with a real capture.
 
+## Weather-forecast archive (`archive:forecast`)
+
+```bash
+npm run archive:forecast   # after fetch:forecast, append to weather_archive.json
+```
+
+`fetch:forecast` **overwrites** `data/forecast_citypage.json` each run, and ECCC
+keeps no archive of its past forecasts — so the real forecast issued on a given
+morning was previously lost the next day. `archive:forecast` snapshots each
+downloaded forecast (parsed per-day highs/lows only, not raw XML) into the
+committed, append-only **`public/peak-forecast/weather_archive.json`**, one entry
+per distinct ECCC issuance (keep-first by `siteId|issuedAt`, so re-running the
+same day adds nothing). Growth ≈ 0.6 KB/day. The refresh Action runs it right
+after `fetch:forecast` and commits it alongside `forecast.json`.
+
+**Payoff (v2, out of scope here):** once ≥1 summer has accrued, the backtest can
+swap its climatology surrogate for the real archived forecast at each lead —
+turning today's conservative lower-bound 3/7-day recalls into measured ones. The
+lookup contract (newest snapshot with `issuedAt <= target − leadDays`, then
+`days.find(d => d.date === target)`) is documented in `src/forecast_archive.js`.
+Backfilling is impossible — which is exactly why the archive starts now.
+
 ## Configuration (`src/config.js`)
 
 - **Date window:** trailing 12 months by default. `PIPELINE_END=2026-04-30`

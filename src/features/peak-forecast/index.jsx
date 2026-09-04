@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react'
 import TabShell, { TabEmpty, TabError, TabLoading } from '../../components/TabShell'
-import { usePeakForecast } from './hooks'
+import { usePeakForecast, usePredictionLog } from './hooks'
 import { HORIZON_OPTS, filterPeaksByHorizon, relTime } from './calculations'
 import PeriodExplainer from './components/PeriodExplainer'
 import RunningBoard from './components/RunningBoard'
 import PeakCard from './components/PeakCard'
 import PeakTable from './components/PeakTable'
 import AccuracyPanel from './components/AccuracyPanel'
+import TrailingAccuracyPanel from './components/TrailingAccuracyPanel'
 
 // Peak Forecast tab — the ICI-consumer 5CP view. Renders the pipeline's
 // forecast (public/peak-forecast/forecast.json): the current base period's
@@ -20,6 +21,12 @@ export default function PeakForecastTab() {
   // forecast.json (bypassing CDN/browser cache). It reloads deployed data — it
   // does not regenerate the forecast; that happens in the pipeline.
   const { data, error, loading, refreshing, refresh } = usePeakForecast()
+
+  // The prospective prediction log drives the live trailing-accuracy panel. It
+  // is deliberately NOT gated into the tab's loading/error path: a missing or
+  // young log is a normal "not accrued yet" state (fetchPredictionLog never
+  // rejects), so the panel simply renders once logData is present.
+  const { data: logData } = usePredictionLog()
 
   const visiblePeaks = useMemo(
     () => (data ? filterPeaksByHorizon(data.predictedPeaks, horizon) : []),
@@ -154,6 +161,10 @@ export default function PeakForecastTab() {
         accuracyBaseline={data.accuracyBaseline}
         horizons={data.horizons}
       />
+
+      {logData && (
+        <TrailingAccuracyPanel predictions={logData.predictions} updatedAt={logData.updatedAt} />
+      )}
 
       <p className="text-[11px] leading-relaxed text-zinc-500">
         Forecast from the peak-prediction pipeline (demand + weather OLS model), exported to
