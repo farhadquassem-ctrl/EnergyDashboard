@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-09T14:15:49.506Z",
+  "updatedAt": "2026-09-10T14:09:28.580Z",
   "models": [
     "ga-5cp-peak"
   ],
@@ -1353,7 +1353,7 @@
       "predictedAt": "2026-09-04T14:27:46.958-04:00",
       "predictedValue": 17756,
       "predictedProbability": 0.01,
-      "actualValue": 15476,
+      "actualValue": 20116,
       "actualHit": null,
       "resolved": true,
       "leadTimeDays": 5,
@@ -1366,7 +1366,7 @@
       "predictedAt": "2026-09-05T09:19:34.440-04:00",
       "predictedValue": 17761,
       "predictedProbability": 0.01,
-      "actualValue": 15476,
+      "actualValue": 20116,
       "actualHit": null,
       "resolved": true,
       "leadTimeDays": 4,
@@ -1379,7 +1379,7 @@
       "predictedAt": "2026-09-06T09:28:58.737-04:00",
       "predictedValue": 17745,
       "predictedProbability": 0.02,
-      "actualValue": 15476,
+      "actualValue": 20116,
       "actualHit": null,
       "resolved": true,
       "leadTimeDays": 3,
@@ -1392,12 +1392,25 @@
       "predictedAt": "2026-09-08T10:15:39.990-04:00",
       "predictedValue": 18814,
       "predictedProbability": 0.03,
-      "actualValue": 15476,
+      "actualValue": 20116,
       "actualHit": null,
       "resolved": true,
       "leadTimeDays": 1,
       "weatherSource": "eccc-citypage",
       "tempC": 27
+    },
+    {
+      "modelName": "ga-5cp-peak",
+      "targetDate": "2026-09-15",
+      "predictedAt": "2026-09-10T10:09:28.128-04:00",
+      "predictedValue": 17758,
+      "predictedProbability": 0.01,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 5,
+      "weatherSource": "eccc-citypage",
+      "tempC": 26
     },
     {
       "modelName": "ga-5cp-peak",
@@ -1546,6 +1559,19 @@
       "leadTimeDays": 8,
       "weatherSource": "climatology+persistence",
       "tempC": 18.4
+    },
+    {
+      "modelName": "ga-5cp-peak",
+      "targetDate": "2026-09-17",
+      "predictedAt": "2026-09-10T10:09:28.128-04:00",
+      "predictedValue": 17185,
+      "predictedProbability": 0.02,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 7,
+      "weatherSource": "climatology+persistence",
+      "tempC": 18.8
     }
   ]
 }
