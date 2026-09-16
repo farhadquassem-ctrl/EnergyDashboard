@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-09-15T14:42:39.486Z",
+  "updatedAt": "2026-09-16T14:43:42.566Z",
   "models": [
     "ga-5cp-peak"
   ],
@@ -1418,7 +1418,7 @@
       "predictedAt": "2026-09-10T10:09:28.128-04:00",
       "predictedValue": 17758,
       "predictedProbability": 0.01,
-      "actualValue": 13969,
+      "actualValue": 18335,
       "actualHit": null,
       "resolved": true,
       "leadTimeDays": 5,
@@ -1431,7 +1431,7 @@
       "predictedAt": "2026-09-11T10:08:54.998-04:00",
       "predictedValue": 17750,
       "predictedProbability": 0.01,
-      "actualValue": 13969,
+      "actualValue": 18335,
       "actualHit": null,
       "resolved": true,
       "leadTimeDays": 4,
@@ -1444,9 +1444,9 @@
       "predictedAt": "2026-09-03T10:15:26.360-04:00",
       "predictedValue": 17181,
       "predictedProbability": 0.02,
-      "actualValue": null,
+      "actualValue": 14748,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 13
     },
     {
@@ -1455,9 +1455,9 @@
       "predictedAt": "2026-09-04T10:05:59.445-04:00",
       "predictedValue": 17182,
       "predictedProbability": 0.02,
-      "actualValue": null,
+      "actualValue": 14748,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 12
     },
     {
@@ -1466,9 +1466,9 @@
       "predictedAt": "2026-09-07T11:37:28.363-04:00",
       "predictedValue": 17184,
       "predictedProbability": 0.02,
-      "actualValue": null,
+      "actualValue": 14748,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 9,
       "weatherSource": "climatology+persistence",
       "tempC": 17.9
@@ -1479,9 +1479,9 @@
       "predictedAt": "2026-09-08T10:15:39.990-04:00",
       "predictedValue": 17185,
       "predictedProbability": 0.02,
-      "actualValue": null,
+      "actualValue": 14748,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 8,
       "weatherSource": "climatology+persistence",
       "tempC": 18.1
@@ -1492,9 +1492,9 @@
       "predictedAt": "2026-09-09T10:15:49.057-04:00",
       "predictedValue": 17185,
       "predictedProbability": 0.02,
-      "actualValue": null,
+      "actualValue": 14748,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 7,
       "weatherSource": "climatology+persistence",
       "tempC": 18.4
@@ -1505,9 +1505,9 @@
       "predictedAt": "2026-09-14T12:15:05.775-04:00",
       "predictedValue": 17732,
       "predictedProbability": 0.02,
-      "actualValue": null,
+      "actualValue": 14748,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 2,
       "weatherSource": "eccc-citypage",
       "tempC": 26
@@ -1518,9 +1518,9 @@
       "predictedAt": "2026-09-15T10:42:39.220-04:00",
       "predictedValue": 17733,
       "predictedProbability": 0.02,
-      "actualValue": null,
+      "actualValue": 14748,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 1,
       "weatherSource": "eccc-citypage",
       "tempC": 26
@@ -1702,6 +1702,32 @@
       "leadTimeDays": 5,
       "weatherSource": "eccc-citypage",
       "tempC": 15
+    },
+    {
+      "modelName": "ga-5cp-peak",
+      "targetDate": "2026-09-28",
+      "predictedAt": "2026-09-16T10:43:42.109-04:00",
+      "predictedValue": 17194,
+      "predictedProbability": 0.02,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 12,
+      "weatherSource": "climatology+persistence",
+      "tempC": 16.9
+    },
+    {
+      "modelName": "ga-5cp-peak",
+      "targetDate": "2026-09-29",
+      "predictedAt": "2026-09-16T10:43:42.109-04:00",
+      "predictedValue": 17194,
+      "predictedProbability": 0.02,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 13,
+      "weatherSource": "climatology+persistence",
+      "tempC": 16.7
     }
   ]
 }
