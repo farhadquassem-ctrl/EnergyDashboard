@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-16T10:43:42.109-04:00",
-  "datasetThrough": "2026-09-16",
+  "generatedAt": "2026-09-17T10:46:56.206-04:00",
+  "datasetThrough": "2026-09-17",
   "staleNote": null,
   "model": {
     "r2": 0.53,
@@ -59,14 +59,14 @@
   "predictedPeaks": [
     {
       "date": "2026-09-28",
-      "daysOut": 12,
+      "daysOut": 11,
       "weatherSource": "climatology+persistence",
       "isForecastWeather": false,
       "peakRiskDay": false,
       "predictedPeakHourStart": 21,
       "predictedPeakHourEnding": 22,
       "predictedMw": 17194,
-      "tempC": 16.9,
+      "tempC": 17.2,
       "leadBucket": 14,
       "projectedRank": 6,
       "wouldRankTop5": false,
@@ -117,14 +117,14 @@
     },
     {
       "date": "2026-09-29",
-      "daysOut": 13,
+      "daysOut": 12,
       "weatherSource": "climatology+persistence",
       "isForecastWeather": false,
       "peakRiskDay": false,
       "predictedPeakHourStart": 21,
       "predictedPeakHourEnding": 22,
       "predictedMw": 17194,
-      "tempC": 16.7,
+      "tempC": 17,
       "leadBucket": 14,
       "projectedRank": 6,
       "wouldRankTop5": false,
