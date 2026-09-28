@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-27T11:02:49.623-04:00",
-  "datasetThrough": "2026-09-27",
+  "generatedAt": "2026-09-28T14:01:34.697-04:00",
+  "datasetThrough": "2026-09-28",
   "staleNote": null,
   "model": {
     "r2": 0.53,
@@ -58,7 +58,7 @@
   ],
   "predictedPeaks": [
     {
-      "date": "2026-09-28",
+      "date": "2026-09-29",
       "daysOut": 1,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
@@ -66,7 +66,7 @@
       "predictedPeakHourStart": 21,
       "predictedPeakHourEnding": 22,
       "predictedMw": 17192,
-      "tempC": 15.1,
+      "tempC": 18.1,
       "leadBucket": 3,
       "projectedRank": 6,
       "wouldRankTop5": false,
@@ -116,15 +116,15 @@
       }
     },
     {
-      "date": "2026-09-29",
+      "date": "2026-09-30",
       "daysOut": 2,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
       "peakRiskDay": false,
       "predictedPeakHourStart": 21,
       "predictedPeakHourEnding": 22,
-      "predictedMw": 17192,
-      "tempC": 17.1,
+      "predictedMw": 17188,
+      "tempC": 18.5,
       "leadBucket": 3,
       "projectedRank": 6,
       "wouldRankTop5": false,
