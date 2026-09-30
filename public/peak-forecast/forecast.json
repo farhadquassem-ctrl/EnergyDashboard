@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-29T12:24:28.728-04:00",
-  "datasetThrough": "2026-09-29",
+  "generatedAt": "2026-09-30T12:20:02.563-04:00",
+  "datasetThrough": "2026-09-30",
   "staleNote": null,
   "model": {
     "r2": 0.53,
@@ -58,20 +58,20 @@
   ],
   "predictedPeaks": [
     {
-      "date": "2026-09-30",
-      "daysOut": 1,
+      "date": "2026-10-05",
+      "daysOut": 5,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
-      "peakRiskDay": false,
+      "peakRiskDay": true,
       "predictedPeakHourStart": 21,
       "predictedPeakHourEnding": 22,
-      "predictedMw": 17189,
-      "tempC": 19,
-      "leadBucket": 3,
+      "predictedMw": 17399,
+      "tempC": 8.4,
+      "leadBucket": 7,
       "projectedRank": 6,
       "wouldRankTop5": false,
-      "probability": 0.01,
-      "peakPercentile": 0.39,
+      "probability": 0.02,
+      "peakPercentile": 0.49,
       "confidence": "moderate",
       "curtailmentWindows": [
         {
@@ -98,25 +98,25 @@
         "years": 6,
         "balancedTop5Recall": {
           "min": 0,
-          "mean": 0.07,
+          "mean": 0.03,
           "max": 0.2
         },
         "top5DayRecall": {
           "min": 0,
-          "mean": 0.1,
+          "mean": 0.03,
           "max": 0.2
         },
         "pooled": {
-          "dayRecall": 0.1,
-          "balancedRecall": 0.07,
-          "cpHourFilterSurvival": 0.7,
+          "dayRecall": 0.03,
+          "balancedRecall": 0.03,
+          "cpHourFilterSurvival": 0.6,
           "top5Days": 30,
           "actualTop5Hours": 30
         }
       }
     },
     {
-      "date": "2026-10-05",
+      "date": "2026-10-06",
       "daysOut": 6,
       "weatherSource": "eccc-citypage (low filled from climo span)",
       "isForecastWeather": true,
