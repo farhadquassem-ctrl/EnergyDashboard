@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-06T12:34:44.732-04:00",
+  "generatedAt": "2026-10-07T13:21:34.330-04:00",
   "datasetThrough": "2026-10-05",
-  "staleNote": null,
+  "staleNote": "dataset ends 2026-10-05 (61h ago) — persistence term skipped; running board is as of the dataset end, not now",
   "model": {
     "r2": 0.53,
     "trainRows": 16039
@@ -58,20 +58,20 @@
   ],
   "predictedPeaks": [
     {
-      "date": "2026-10-09",
-      "daysOut": 3,
+      "date": "2026-10-08",
+      "daysOut": 1,
       "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
-      "peakRiskDay": true,
+      "peakRiskDay": false,
       "predictedPeakHourStart": 21,
       "predictedPeakHourEnding": 22,
-      "predictedMw": 17240,
-      "tempC": 9.4,
+      "predictedMw": 17166,
+      "tempC": 11.6,
       "leadBucket": 3,
       "projectedRank": 6,
       "wouldRankTop5": false,
       "probability": 0.01,
-      "peakPercentile": 0.41,
+      "peakPercentile": 0.38,
       "confidence": "moderate",
       "curtailmentWindows": [
         {
@@ -116,20 +116,20 @@
       }
     },
     {
-      "date": "2026-10-07",
-      "daysOut": 1,
-      "weatherSource": "eccc-citypage",
-      "isForecastWeather": true,
+      "date": "2026-10-16",
+      "daysOut": 9,
+      "weatherSource": "climatology",
+      "isForecastWeather": false,
       "peakRiskDay": false,
       "predictedPeakHourStart": 21,
       "predictedPeakHourEnding": 22,
-      "predictedMw": 17176,
-      "tempC": 14.5,
-      "leadBucket": 3,
+      "predictedMw": 17164,
+      "tempC": 11.5,
+      "leadBucket": 14,
       "projectedRank": 6,
       "wouldRankTop5": false,
-      "probability": 0.01,
-      "peakPercentile": 0.38,
+      "probability": 0.02,
+      "peakPercentile": 0.41,
       "confidence": "moderate",
       "curtailmentWindows": [
         {
@@ -156,17 +156,17 @@
         "years": 6,
         "balancedTop5Recall": {
           "min": 0,
-          "mean": 0.07,
+          "mean": 0.03,
           "max": 0.2
         },
         "top5DayRecall": {
           "min": 0,
-          "mean": 0.1,
+          "mean": 0.03,
           "max": 0.2
         },
         "pooled": {
-          "dayRecall": 0.1,
-          "balancedRecall": 0.07,
+          "dayRecall": 0.03,
+          "balancedRecall": 0.03,
           "cpHourFilterSurvival": 0.7,
           "top5Days": 30,
           "actualTop5Hours": 30
