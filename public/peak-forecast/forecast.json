@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-09T12:53:28.659-04:00",
-  "datasetThrough": "2026-10-09",
+  "generatedAt": "2026-10-10T11:48:10.182-04:00",
+  "datasetThrough": "2026-10-10",
   "staleNote": null,
   "model": {
     "r2": 0.53,
@@ -58,20 +58,20 @@
   ],
   "predictedPeaks": [
     {
-      "date": "2026-10-14",
-      "daysOut": 5,
-      "weatherSource": "eccc-citypage",
+      "date": "2026-10-16",
+      "daysOut": 6,
+      "weatherSource": "eccc-citypage (low filled from climo span)",
       "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 21,
       "predictedPeakHourEnding": 22,
-      "predictedMw": 17330,
-      "tempC": 8.7,
+      "predictedMw": 17217,
+      "tempC": 9.6,
       "leadBucket": 7,
       "projectedRank": 6,
       "wouldRankTop5": false,
       "probability": 0.02,
-      "peakPercentile": 0.47,
+      "peakPercentile": 0.43,
       "confidence": "moderate",
       "curtailmentWindows": [
         {
@@ -117,13 +117,13 @@
     },
     {
       "date": "2026-10-23",
-      "daysOut": 14,
+      "daysOut": 13,
       "weatherSource": "climatology+persistence",
       "isForecastWeather": false,
       "peakRiskDay": true,
       "predictedPeakHourStart": 21,
       "predictedPeakHourEnding": 22,
-      "predictedMw": 17187,
+      "predictedMw": 17190,
       "tempC": 9.8,
       "leadBucket": 14,
       "projectedRank": 6,
