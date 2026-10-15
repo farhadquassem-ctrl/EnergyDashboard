@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-14T14:57:33.667Z",
+  "updatedAt": "2026-10-15T14:45:32.539Z",
   "models": [
     "ga-5cp-peak"
   ],
@@ -2281,7 +2281,7 @@
       "predictedAt": "2026-10-09T12:53:28.659-04:00",
       "predictedValue": 17330,
       "predictedProbability": 0.02,
-      "actualValue": 14530,
+      "actualValue": 17415,
       "actualHit": null,
       "resolved": true,
       "leadTimeDays": 5,
@@ -2365,6 +2365,19 @@
       "leadTimeDays": 2,
       "weatherSource": "eccc-citypage",
       "tempC": 6.8
+    },
+    {
+      "modelName": "ga-5cp-peak",
+      "targetDate": "2026-10-16",
+      "predictedAt": "2026-10-15T10:45:32.190-04:00",
+      "predictedValue": 17290,
+      "predictedProbability": 0.01,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 1,
+      "weatherSource": "eccc-citypage",
+      "tempC": 9
     },
     {
       "modelName": "ga-5cp-peak",
@@ -2456,6 +2469,19 @@
       "leadTimeDays": 14,
       "weatherSource": "climatology+persistence",
       "tempC": 9.5
+    },
+    {
+      "modelName": "ga-5cp-peak",
+      "targetDate": "2026-10-29",
+      "predictedAt": "2026-10-15T10:45:32.190-04:00",
+      "predictedValue": 17279,
+      "predictedProbability": 0.02,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 14,
+      "weatherSource": "climatology+persistence",
+      "tempC": 9
     }
   ]
 }
