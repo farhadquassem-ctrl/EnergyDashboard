@@ -1,11 +1,11 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-15T10:45:32.190-04:00",
-  "datasetThrough": "2026-10-15",
+  "generatedAt": "2026-10-16T10:39:48.908-04:00",
+  "datasetThrough": "2026-10-16",
   "staleNote": null,
   "model": {
     "r2": 0.53,
-    "trainRows": 16049
+    "trainRows": 16052
   },
   "basePeriod": {
     "start": "2026-05-01",
@@ -58,20 +58,20 @@
   ],
   "predictedPeaks": [
     {
-      "date": "2026-10-16",
-      "daysOut": 1,
-      "weatherSource": "eccc-citypage",
-      "isForecastWeather": true,
+      "date": "2026-10-29",
+      "daysOut": 13,
+      "weatherSource": "climatology+persistence",
+      "isForecastWeather": false,
       "peakRiskDay": true,
       "predictedPeakHourStart": 21,
       "predictedPeakHourEnding": 22,
-      "predictedMw": 17290,
-      "tempC": 9,
-      "leadBucket": 3,
+      "predictedMw": 17312,
+      "tempC": 8.8,
+      "leadBucket": 14,
       "projectedRank": 6,
       "wouldRankTop5": false,
-      "probability": 0.01,
-      "peakPercentile": 0.42,
+      "probability": 0.02,
+      "peakPercentile": 0.46,
       "confidence": "moderate",
       "curtailmentWindows": [
         {
@@ -98,17 +98,17 @@
         "years": 6,
         "balancedTop5Recall": {
           "min": 0,
-          "mean": 0.07,
+          "mean": 0.03,
           "max": 0.2
         },
         "top5DayRecall": {
           "min": 0,
-          "mean": 0.1,
+          "mean": 0.03,
           "max": 0.2
         },
         "pooled": {
-          "dayRecall": 0.1,
-          "balancedRecall": 0.07,
+          "dayRecall": 0.03,
+          "balancedRecall": 0.03,
           "cpHourFilterSurvival": 0.7,
           "top5Days": 30,
           "actualTop5Hours": 30
@@ -116,15 +116,15 @@
       }
     },
     {
-      "date": "2026-10-29",
-      "daysOut": 14,
+      "date": "2026-10-28",
+      "daysOut": 12,
       "weatherSource": "climatology+persistence",
       "isForecastWeather": false,
       "peakRiskDay": true,
       "predictedPeakHourStart": 21,
       "predictedPeakHourEnding": 22,
-      "predictedMw": 17279,
-      "tempC": 9,
+      "predictedMw": 17308,
+      "tempC": 8.8,
       "leadBucket": 14,
       "projectedRank": 6,
       "wouldRankTop5": false,
