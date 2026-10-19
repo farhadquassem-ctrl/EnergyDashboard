@@ -1,6 +1,6 @@
 {
   "source": "Curated by the EnergyDashboard team from IESO Save on Energy, OEB, and Enbridge Gas program pages. Organized by use case — NOT a verbatim mirror. These are 2026 reference points; every 'keyDetail' is marked verify:true until the weekly refresh job reconciles it against source (scripts/programs/). Not affiliated with the IESO, OEB, or any utility.",
-  "asOf": "2026-10-12",
+  "asOf": "2026-10-19",
   "refreshCadence": "weekly",
   "programs": [
     {
@@ -106,7 +106,7 @@
         "target": "https://www.saveonenergy.ca/en/For-Your-Home/Peak-Perks"
       },
       "verify": true,
-      "sourceChangedAt": "2026-09-07"
+      "sourceChangedAt": "2026-10-19"
     },
     {
       "id": "energy-affordability",
@@ -216,10 +216,12 @@
     }
   ],
   "watch": {
-    "lastRun": "2026-10-12",
+    "lastRun": "2026-10-19",
     "changedPages": [
-      "https://www.saveonenergy.ca/News-and-Updates"
+      "https://www.saveonenergy.ca/en/For-Your-Home/Peak-Perks"
     ],
-    "changedPrograms": []
+    "changedPrograms": [
+      "peak-perks"
+    ]
   }
 }
