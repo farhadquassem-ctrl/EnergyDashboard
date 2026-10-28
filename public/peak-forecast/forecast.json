@@ -1,11 +1,11 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-27T11:48:06.007-04:00",
-  "datasetThrough": "2026-10-27",
+  "generatedAt": "2026-10-28T12:30:05.514-04:00",
+  "datasetThrough": "2026-10-28",
   "staleNote": null,
   "model": {
     "r2": 0.53,
-    "trainRows": 16073
+    "trainRows": 16083
   },
   "basePeriod": {
     "start": "2026-05-01",
@@ -58,20 +58,20 @@
   ],
   "predictedPeaks": [
     {
-      "date": "2026-11-10",
-      "daysOut": 14,
-      "weatherSource": "climatology+persistence",
-      "isForecastWeather": false,
+      "date": "2026-11-03",
+      "daysOut": 6,
+      "weatherSource": "eccc-citypage (low filled from climo span)",
+      "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 21,
       "predictedPeakHourEnding": 22,
-      "predictedMw": 17555,
-      "tempC": 6.9,
-      "leadBucket": 14,
+      "predictedMw": 17722,
+      "tempC": 5.8,
+      "leadBucket": 7,
       "projectedRank": 6,
       "wouldRankTop5": false,
-      "probability": 0.02,
-      "peakPercentile": 0.55,
+      "probability": 0.01,
+      "peakPercentile": 0.62,
       "confidence": "high",
       "curtailmentWindows": [
         {
@@ -109,27 +109,27 @@
         "pooled": {
           "dayRecall": 0.03,
           "balancedRecall": 0.03,
-          "cpHourFilterSurvival": 0.7,
+          "cpHourFilterSurvival": 0.6,
           "top5Days": 30,
           "actualTop5Hours": 30
         }
       }
     },
     {
-      "date": "2026-11-09",
-      "daysOut": 13,
+      "date": "2026-11-11",
+      "daysOut": 14,
       "weatherSource": "climatology+persistence",
       "isForecastWeather": false,
       "peakRiskDay": true,
       "predictedPeakHourStart": 21,
       "predictedPeakHourEnding": 22,
-      "predictedMw": 17547,
-      "tempC": 7,
+      "predictedMw": 17629,
+      "tempC": 6.3,
       "leadBucket": 14,
       "projectedRank": 6,
       "wouldRankTop5": false,
       "probability": 0.02,
-      "peakPercentile": 0.55,
+      "peakPercentile": 0.57,
       "confidence": "high",
       "curtailmentWindows": [
         {
