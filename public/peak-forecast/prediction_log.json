@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-28T16:30:05.820Z",
+  "updatedAt": "2026-10-29T16:44:54.999Z",
   "models": [
     "ga-5cp-peak"
   ],
@@ -2593,7 +2593,7 @@
       "predictedAt": "2026-10-14T10:57:33.218-04:00",
       "predictedValue": 17214,
       "predictedProbability": 0.02,
-      "actualValue": 14515,
+      "actualValue": 17064,
       "actualHit": null,
       "resolved": true,
       "leadTimeDays": 14,
@@ -2606,7 +2606,7 @@
       "predictedAt": "2026-10-16T10:39:48.908-04:00",
       "predictedValue": 17308,
       "predictedProbability": 0.02,
-      "actualValue": 14515,
+      "actualValue": 17064,
       "actualHit": null,
       "resolved": true,
       "leadTimeDays": 12,
@@ -2619,7 +2619,7 @@
       "predictedAt": "2026-10-17T09:31:54.735-04:00",
       "predictedValue": 17283,
       "predictedProbability": 0.02,
-      "actualValue": 14515,
+      "actualValue": 17064,
       "actualHit": null,
       "resolved": true,
       "leadTimeDays": 11,
@@ -2632,9 +2632,9 @@
       "predictedAt": "2026-10-15T10:45:32.190-04:00",
       "predictedValue": 17279,
       "predictedProbability": 0.02,
-      "actualValue": null,
+      "actualValue": 13978,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 14,
       "weatherSource": "climatology+persistence",
       "tempC": 9
@@ -2645,9 +2645,9 @@
       "predictedAt": "2026-10-16T10:39:48.908-04:00",
       "predictedValue": 17312,
       "predictedProbability": 0.02,
-      "actualValue": null,
+      "actualValue": 13978,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 13,
       "weatherSource": "climatology+persistence",
       "tempC": 8.8
@@ -2658,9 +2658,9 @@
       "predictedAt": "2026-10-17T09:31:54.735-04:00",
       "predictedValue": 17292,
       "predictedProbability": 0.02,
-      "actualValue": null,
+      "actualValue": 13978,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 12,
       "weatherSource": "climatology+persistence",
       "tempC": 8.9
@@ -2820,6 +2820,32 @@
       "leadTimeDays": 14,
       "weatherSource": "climatology+persistence",
       "tempC": 6.3
+    },
+    {
+      "modelName": "ga-5cp-peak",
+      "targetDate": "2026-11-11",
+      "predictedAt": "2026-10-29T12:44:54.490-04:00",
+      "predictedValue": 17590,
+      "predictedProbability": 0.02,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 13,
+      "weatherSource": "climatology+persistence",
+      "tempC": 6.6
+    },
+    {
+      "modelName": "ga-5cp-peak",
+      "targetDate": "2026-11-12",
+      "predictedAt": "2026-10-29T12:44:54.490-04:00",
+      "predictedValue": 17653,
+      "predictedProbability": 0.02,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 14,
+      "weatherSource": "climatology+persistence",
+      "tempC": 6.1
     }
   ]
 }
