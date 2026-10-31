@@ -1,11 +1,11 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-30T12:36:14.307-04:00",
-  "datasetThrough": "2026-10-30",
+  "generatedAt": "2026-10-31T11:39:21-04:00",
+  "datasetThrough": "2026-10-31",
   "staleNote": null,
   "model": {
     "r2": 0.53,
-    "trainRows": 16083
+    "trainRows": 16084
   },
   "basePeriod": {
     "start": "2026-05-01",
@@ -59,19 +59,19 @@
   "predictedPeaks": [
     {
       "date": "2026-11-13",
-      "daysOut": 14,
+      "daysOut": 13,
       "weatherSource": "climatology+persistence",
       "isForecastWeather": false,
       "peakRiskDay": true,
       "predictedPeakHourStart": 21,
       "predictedPeakHourEnding": 22,
-      "predictedMw": 17691,
-      "tempC": 5.9,
+      "predictedMw": 17712,
+      "tempC": 5.7,
       "leadBucket": 14,
       "projectedRank": 6,
       "wouldRankTop5": false,
       "probability": 0.02,
-      "peakPercentile": 0.6,
+      "peakPercentile": 0.61,
       "confidence": "high",
       "curtailmentWindows": [
         {
@@ -117,19 +117,19 @@
     },
     {
       "date": "2026-11-12",
-      "daysOut": 13,
+      "daysOut": 12,
       "weatherSource": "climatology+persistence",
       "isForecastWeather": false,
       "peakRiskDay": true,
       "predictedPeakHourStart": 21,
       "predictedPeakHourEnding": 22,
-      "predictedMw": 17621,
-      "tempC": 6.4,
+      "predictedMw": 17647,
+      "tempC": 6.2,
       "leadBucket": 14,
       "projectedRank": 6,
       "wouldRankTop5": false,
       "probability": 0.02,
-      "peakPercentile": 0.57,
+      "peakPercentile": 0.58,
       "confidence": "high",
       "curtailmentWindows": [
         {
