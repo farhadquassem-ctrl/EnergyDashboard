@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-02T20:03:52.511Z",
+  "updatedAt": "2026-11-03T17:38:54.990Z",
   "models": [
     "ga-5cp-peak"
   ],
@@ -2950,6 +2950,32 @@
       "leadTimeDays": 14,
       "weatherSource": "climatology+persistence",
       "tempC": 4.5
+    },
+    {
+      "modelName": "ga-5cp-peak",
+      "targetDate": "2026-11-16",
+      "predictedAt": "2026-11-03T12:38:54.529-05:00",
+      "predictedValue": 17876,
+      "predictedProbability": 0.02,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 13,
+      "weatherSource": "climatology",
+      "tempC": 4.4
+    },
+    {
+      "modelName": "ga-5cp-peak",
+      "targetDate": "2026-11-17",
+      "predictedAt": "2026-11-03T12:38:54.529-05:00",
+      "predictedValue": 17909,
+      "predictedProbability": 0.02,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 14,
+      "weatherSource": "climatology",
+      "tempC": 4.2
     }
   ]
 }
