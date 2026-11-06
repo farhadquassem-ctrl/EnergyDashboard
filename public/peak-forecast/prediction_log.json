@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-05T17:55:21.502Z",
+  "updatedAt": "2026-11-06T17:16:34.930Z",
   "models": [
     "ga-5cp-peak"
   ],
@@ -2723,9 +2723,9 @@
       "predictedAt": "2026-10-22T10:56:47.814-04:00",
       "predictedValue": 17438,
       "predictedProbability": 0.02,
-      "actualValue": null,
+      "actualValue": 17363,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 14,
       "weatherSource": "climatology+persistence",
       "tempC": 7.8
@@ -2736,9 +2736,9 @@
       "predictedAt": "2026-10-23T10:44:59.432-04:00",
       "predictedValue": 17416,
       "predictedProbability": 0.02,
-      "actualValue": null,
+      "actualValue": 17363,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 13,
       "weatherSource": "climatology+persistence",
       "tempC": 8
@@ -2849,6 +2849,19 @@
     },
     {
       "modelName": "ga-5cp-peak",
+      "targetDate": "2026-11-11",
+      "predictedAt": "2026-11-06T12:16:34.467-05:00",
+      "predictedValue": 18076,
+      "predictedProbability": 0.01,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 5,
+      "weatherSource": "eccc-citypage",
+      "tempC": 3.1
+    },
+    {
+      "modelName": "ga-5cp-peak",
       "targetDate": "2026-11-12",
       "predictedAt": "2026-10-29T12:44:54.490-04:00",
       "predictedValue": 17653,
@@ -2898,6 +2911,19 @@
       "leadTimeDays": 11,
       "weatherSource": "climatology+persistence",
       "tempC": 6.1
+    },
+    {
+      "modelName": "ga-5cp-peak",
+      "targetDate": "2026-11-12",
+      "predictedAt": "2026-11-06T12:16:34.467-05:00",
+      "predictedValue": 17973,
+      "predictedProbability": 0.01,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 6,
+      "weatherSource": "eccc-citypage (low filled from climo span)",
+      "tempC": 3.8
     },
     {
       "modelName": "ga-5cp-peak",

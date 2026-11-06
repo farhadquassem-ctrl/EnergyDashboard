@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-05T12:55:21.041-05:00",
-  "datasetThrough": "2026-11-04",
+  "generatedAt": "2026-11-06T12:16:34.467-05:00",
+  "datasetThrough": "2026-11-05",
   "staleNote": null,
   "model": {
     "r2": 0.53,
@@ -59,19 +59,19 @@
   "predictedPeaks": [
     {
       "date": "2026-11-11",
-      "daysOut": 6,
-      "weatherSource": "eccc-citypage (low filled from climo span)",
+      "daysOut": 5,
+      "weatherSource": "eccc-citypage",
       "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 21,
       "predictedPeakHourEnding": 22,
-      "predictedMw": 17972,
-      "tempC": 3.8,
+      "predictedMw": 18076,
+      "tempC": 3.1,
       "leadBucket": 7,
       "projectedRank": 6,
       "wouldRankTop5": false,
       "probability": 0.01,
-      "peakPercentile": 0.72,
+      "peakPercentile": 0.76,
       "confidence": "high",
       "curtailmentWindows": [
         {
@@ -116,20 +116,20 @@
       }
     },
     {
-      "date": "2026-11-19",
-      "daysOut": 14,
-      "weatherSource": "climatology+persistence",
-      "isForecastWeather": false,
+      "date": "2026-11-12",
+      "daysOut": 6,
+      "weatherSource": "eccc-citypage (low filled from climo span)",
+      "isForecastWeather": true,
       "peakRiskDay": true,
       "predictedPeakHourStart": 21,
       "predictedPeakHourEnding": 22,
-      "predictedMw": 17913,
-      "tempC": 4.1,
-      "leadBucket": 14,
+      "predictedMw": 17973,
+      "tempC": 3.8,
+      "leadBucket": 7,
       "projectedRank": 6,
       "wouldRankTop5": false,
-      "probability": 0.02,
-      "peakPercentile": 0.71,
+      "probability": 0.01,
+      "peakPercentile": 0.72,
       "confidence": "high",
       "curtailmentWindows": [
         {
@@ -167,7 +167,7 @@
         "pooled": {
           "dayRecall": 0.03,
           "balancedRecall": 0.03,
-          "cpHourFilterSurvival": 0.7,
+          "cpHourFilterSurvival": 0.6,
           "top5Days": 30,
           "actualTop5Hours": 30
         }
