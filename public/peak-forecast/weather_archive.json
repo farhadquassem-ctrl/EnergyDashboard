@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-07T16:11:07.837Z",
+  "updatedAt": "2026-11-08T16:33:37.985Z",
   "siteIds": [
     "s0000458"
   ],
@@ -2795,6 +2795,49 @@
         },
         {
           "date": "2026-11-13",
+          "highC": 6,
+          "lowC": null
+        }
+      ]
+    },
+    {
+      "issuedAt": "2026-11-08T16:00:00Z",
+      "fetchedAt": "2026-11-08T16:33:37.831Z",
+      "siteId": "s0000458",
+      "sourceUrl": "https://dd.weather.gc.ca/today/citypage_weather/ON/16/20261108T160100.174Z_MSC_CitypageWeather_s0000458_en.xml",
+      "days": [
+        {
+          "date": "2026-11-08",
+          "highC": 10,
+          "lowC": 5
+        },
+        {
+          "date": "2026-11-09",
+          "highC": 11,
+          "lowC": 5
+        },
+        {
+          "date": "2026-11-10",
+          "highC": 14,
+          "lowC": 3
+        },
+        {
+          "date": "2026-11-11",
+          "highC": 12,
+          "lowC": 1
+        },
+        {
+          "date": "2026-11-12",
+          "highC": 8,
+          "lowC": 0
+        },
+        {
+          "date": "2026-11-13",
+          "highC": 7,
+          "lowC": 0
+        },
+        {
+          "date": "2026-11-14",
           "highC": 6,
           "lowC": null
         }
