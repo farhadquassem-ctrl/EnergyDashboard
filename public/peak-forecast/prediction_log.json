@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-16T20:05:14.872Z",
+  "updatedAt": "2026-11-17T19:00:21.491Z",
   "models": [
     "ga-5cp-peak"
   ],
@@ -3113,9 +3113,9 @@
       "predictedAt": "2026-11-02T15:03:52.063-05:00",
       "predictedValue": 17872,
       "predictedProbability": 0.02,
-      "actualValue": null,
+      "actualValue": 18814,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 14,
       "weatherSource": "climatology+persistence",
       "tempC": 4.5
@@ -3126,9 +3126,9 @@
       "predictedAt": "2026-11-03T12:38:54.529-05:00",
       "predictedValue": 17876,
       "predictedProbability": 0.02,
-      "actualValue": null,
+      "actualValue": 18814,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 13,
       "weatherSource": "climatology",
       "tempC": 4.4
@@ -3139,9 +3139,9 @@
       "predictedAt": "2026-11-11T12:46:27.954-05:00",
       "predictedValue": 18298,
       "predictedProbability": 0.01,
-      "actualValue": null,
+      "actualValue": 18814,
       "actualHit": null,
-      "resolved": false,
+      "resolved": true,
       "leadTimeDays": 5,
       "weatherSource": "eccc-citypage",
       "tempC": 1.4
@@ -3314,6 +3314,32 @@
       "leadTimeDays": 14,
       "weatherSource": "climatology+persistence",
       "tempC": 1.1
+    },
+    {
+      "modelName": "ga-5cp-peak",
+      "targetDate": "2026-11-30",
+      "predictedAt": "2026-11-17T14:00:21.129-05:00",
+      "predictedValue": 18297,
+      "predictedProbability": 0.02,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 13,
+      "weatherSource": "climatology+persistence",
+      "tempC": 1.2
+    },
+    {
+      "modelName": "ga-5cp-peak",
+      "targetDate": "2026-12-01",
+      "predictedAt": "2026-11-17T14:00:21.129-05:00",
+      "predictedValue": 18330,
+      "predictedProbability": 0.02,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 14,
+      "weatherSource": "climatology+persistence",
+      "tempC": 1
     }
   ]
 }
