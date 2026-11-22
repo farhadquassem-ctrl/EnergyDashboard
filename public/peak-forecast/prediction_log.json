@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-11-21T17:12:15.025Z",
+  "updatedAt": "2026-11-22T17:41:20.427Z",
   "models": [
     "ga-5cp-peak"
   ],
@@ -3278,6 +3278,19 @@
     },
     {
       "modelName": "ga-5cp-peak",
+      "targetDate": "2026-11-24",
+      "predictedAt": "2026-11-22T12:41:20.050-05:00",
+      "predictedValue": 18626,
+      "predictedProbability": 0.03,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 2,
+      "weatherSource": "eccc-citypage",
+      "tempC": -1.1
+    },
+    {
+      "modelName": "ga-5cp-peak",
       "targetDate": "2026-11-26",
       "predictedAt": "2026-11-12T12:59:32.527-05:00",
       "predictedValue": 18170,
@@ -3444,6 +3457,19 @@
       "leadTimeDays": 14,
       "weatherSource": "climatology+persistence",
       "tempC": 0.7
+    },
+    {
+      "modelName": "ga-5cp-peak",
+      "targetDate": "2026-12-04",
+      "predictedAt": "2026-11-22T12:41:20.050-05:00",
+      "predictedValue": 18386,
+      "predictedProbability": 0.02,
+      "actualValue": null,
+      "actualHit": null,
+      "resolved": false,
+      "leadTimeDays": 12,
+      "weatherSource": "climatology+persistence",
+      "tempC": 0.6
     }
   ]
 }
