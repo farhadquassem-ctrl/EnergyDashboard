@@ -1,11 +1,11 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-26T14:28:29.799-05:00",
-  "datasetThrough": "2026-11-25",
+  "generatedAt": "2026-11-27T14:24:14.319-05:00",
+  "datasetThrough": "2026-11-26",
   "staleNote": null,
   "model": {
     "r2": 0.53,
-    "trainRows": 16252
+    "trainRows": 16264
   },
   "basePeriod": {
     "start": "2026-05-01",
@@ -59,19 +59,19 @@
   "predictedPeaks": [
     {
       "date": "2026-12-08",
-      "daysOut": 12,
+      "daysOut": 11,
       "weatherSource": "climatology+persistence",
       "isForecastWeather": false,
       "peakRiskDay": true,
       "predictedPeakHourStart": 21,
       "predictedPeakHourEnding": 22,
-      "predictedMw": 18530,
-      "tempC": -0.4,
+      "predictedMw": 18495,
+      "tempC": -0.2,
       "leadBucket": 14,
       "projectedRank": 6,
       "wouldRankTop5": false,
       "probability": 0.02,
-      "peakPercentile": 0.89,
+      "peakPercentile": 0.88,
       "confidence": "high",
       "curtailmentWindows": [
         {
@@ -98,17 +98,17 @@
         "years": 6,
         "balancedTop5Recall": {
           "min": 0,
-          "mean": 0.03,
-          "max": 0.2
+          "mean": 0,
+          "max": 0
         },
         "top5DayRecall": {
           "min": 0,
-          "mean": 0.03,
-          "max": 0.2
+          "mean": 0,
+          "max": 0
         },
         "pooled": {
-          "dayRecall": 0.03,
-          "balancedRecall": 0.03,
+          "dayRecall": 0,
+          "balancedRecall": 0,
           "cpHourFilterSurvival": 0.7,
           "top5Days": 30,
           "actualTop5Hours": 30
@@ -116,20 +116,20 @@
       }
     },
     {
-      "date": "2026-12-07",
-      "daysOut": 11,
+      "date": "2026-12-09",
+      "daysOut": 12,
       "weatherSource": "climatology+persistence",
       "isForecastWeather": false,
       "peakRiskDay": true,
       "predictedPeakHourStart": 21,
       "predictedPeakHourEnding": 22,
-      "predictedMw": 18512,
-      "tempC": -0.3,
+      "predictedMw": 18475,
+      "tempC": 0,
       "leadBucket": 14,
       "projectedRank": 6,
       "wouldRankTop5": false,
       "probability": 0.02,
-      "peakPercentile": 0.89,
+      "peakPercentile": 0.88,
       "confidence": "high",
       "curtailmentWindows": [
         {
@@ -156,17 +156,17 @@
         "years": 6,
         "balancedTop5Recall": {
           "min": 0,
-          "mean": 0.03,
-          "max": 0.2
+          "mean": 0,
+          "max": 0
         },
         "top5DayRecall": {
           "min": 0,
-          "mean": 0.03,
-          "max": 0.2
+          "mean": 0,
+          "max": 0
         },
         "pooled": {
-          "dayRecall": 0.03,
-          "balancedRecall": 0.03,
+          "dayRecall": 0,
+          "balancedRecall": 0,
           "cpHourFilterSurvival": 0.7,
           "top5Days": 30,
           "actualTop5Hours": 30
@@ -222,17 +222,17 @@
       "years": 6,
       "balancedTop5Recall": {
         "min": 0,
-        "mean": 0.03,
-        "max": 0.2
+        "mean": 0,
+        "max": 0
       },
       "top5DayRecall": {
         "min": 0,
-        "mean": 0.03,
-        "max": 0.2
+        "mean": 0,
+        "max": 0
       },
       "pooled": {
-        "dayRecall": 0.03,
-        "balancedRecall": 0.03,
+        "dayRecall": 0,
+        "balancedRecall": 0,
         "cpHourFilterSurvival": 0.7,
         "top5Days": 30,
         "actualTop5Hours": 30
